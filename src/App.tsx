@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
+import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
@@ -11,7 +12,7 @@ import './App.css';
 export const store = configureStore({
   reducer: {
     map: mapReducer,
-    //layerCache: layerCacheReducer,
+    cache: cacheReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
