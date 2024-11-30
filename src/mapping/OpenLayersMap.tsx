@@ -20,6 +20,7 @@ class OpenLayersMap {
           zoom: 5,
           projection: 'EPSG:3857',
         }),
+        controls: [],
       };
 
       OpenLayersMap.#map = new ol.Map(options);
