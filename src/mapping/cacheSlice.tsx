@@ -3,9 +3,16 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../App';
 
 interface InitialState {
-  [key: string]: {
-    [key: string]: string | number;
-  };
+  [key: string]: CacheEntry | CacheRequest;
+}
+
+interface CacheEntry extends GenericLayerMixIn {
+  source: string;
+  ol_uid: string;
+}
+
+interface CacheRequest {
+  source: string;
 }
 
 interface GenericLayerMixIn {
@@ -20,12 +27,12 @@ interface GetLayer {
 
 interface PostLayer extends GenericLayerMixIn {
   id: string;
+  source: string;
   ol_uid: string;
 }
 
 interface PutLayer extends GenericLayerMixIn {
   id: string;
-  ol_uid: string;
 }
 
 interface DeleteLayer {
@@ -45,9 +52,8 @@ export const cacheSlice = createSlice({
     },
     postLayer: (state, data: PayloadAction<PostLayer>) => {
       const id: string = data.payload.id;
-      const keys = Object.keys(data.payload).filter((key) => key !== 'id');
-      const entry: { [key: string]: string | number } = {};
-      keys.map((key) => (entry[key] = data.payload[key]));
+      const entry: PostLayer | CacheEntry = data.payload;
+      delete entry[id];
       state[id] = entry;
     },
     putLayer: (state, data: PayloadAction<PutLayer>) => {
@@ -68,6 +74,5 @@ export const cacheSlice = createSlice({
 
 export const { getLayer, postLayer, putLayer, deleteLayer } =
   cacheSlice.actions;
-
 export const selectCache = (state: RootState) => state.cache;
 export default cacheSlice.reducer;

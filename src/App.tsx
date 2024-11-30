@@ -22,6 +22,15 @@ export const store = configureStore({
     }),
 });
 
+interface SourceProps {
+  sourceIdentifier: string;
+  cache?: number;
+}
+
+const Dummy = ({ sourceIdentifier }: SourceProps) => {
+  return <div>{sourceIdentifier}</div>;
+};
+
 const App = () => {
   useEffect(() => {
     sessionStorage.clear();
@@ -30,7 +39,9 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles></Profiles>
-        <Sources></Sources>
+        <Sources>
+          <Dummy sourceIdentifier={'fasta'} />
+        </Sources>
         <TileLayer />
       </Map>
     </div>
