@@ -1,11 +1,9 @@
-// @ts-nocheck
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
 import { get } from 'ol/proj';
-import { useDispatch, useSelector } from 'react-redux';
-
+import { useAppDispatch as useDispatch, useAppSelector as useSelector } from '../../hooks';
 import {
   swapLayers,
   clearLayers,
@@ -33,11 +31,10 @@ const apiCall = async (url) => {
   return data;
 };
 
-const FastaSourceLayer = ({ id }) => {
+const FastaSourceLayer = ({ id: string }) => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectFastaBaseUrl);
   const layerCache = useSelector(selectLayerCache);
-  const [layerData, setLayerData] = useState();
 
   const urlParams = id.split('?');
   let forecastQs = '';

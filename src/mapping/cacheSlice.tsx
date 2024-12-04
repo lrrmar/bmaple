@@ -20,22 +20,22 @@ interface GenericLayerMixIn {
 }
 
 // RequestLayer?
-interface GetLayer {
+export interface Request {
   id: string;
   source: string; // Get config array from App?
 }
 
-interface PostLayer extends GenericLayerMixIn {
+export interface Ingest extends GenericLayerMixIn {
   id: string;
   source: string;
   ol_uid: string;
 }
 
-interface PutLayer extends GenericLayerMixIn {
+export interface Update extends GenericLayerMixIn {
   id: string;
 }
 
-interface DeleteLayer {
+export interface Remove {
   id: string;
 }
 
@@ -45,34 +45,65 @@ export const cacheSlice = createSlice({
   name: 'cache',
   initialState,
   reducers: {
-    getLayer: (state, data: PayloadAction<GetLayer>) => {
-      const id: string = data.payload.id;
-      const source: string = data.payload.source;
-      state[id] = { source: source };
+    request: (state, data: PayloadAction<Request | Request[]>) => {
+      const cache = state;
+      // Handle single or array of Request
+      const toRequest: Request[] = Array.isArray(data.payload)
+        ? data.payload
+        : [data.payload];
+      toRequest.forEach((request: Request) => {
+        const id: string = request.id;
+        const source: string = request.source;
+        cache[id] = { source: source };
+      });
+      state = cache;
     },
-    postLayer: (state, data: PayloadAction<PostLayer>) => {
-      const id: string = data.payload.id;
-      const entry: PostLayer | CacheEntry = data.payload;
-      delete entry[id];
-      state[id] = entry;
+    ingest: (state, data: PayloadAction<Ingest | Ingest[]>) => {
+      const cache = state;
+      // Handle single or array of Request
+      const toIngest: Ingest[] = Array.isArray(data.payload)
+        ? data.payload
+        : [data.payload];
+      toIngest.forEach((ingest: Ingest) => {
+        const id: string = ingest.id;
+        const entry: Ingest | CacheEntry = ingest;
+        delete entry[id];
+        cache[id] = entry;
+      });
+      state = cache;
     },
-    putLayer: (state, data: PayloadAction<PutLayer>) => {
-      const id: string = data.payload.id;
-      const keys: string[] = Object.keys(data.payload).filter(
-        (key) => key !== 'id',
-      );
-      const entry: { [key: string]: string | number } = {};
-      keys.map((key) => (entry[key] = data.payload[key]));
-      state[id] = { ...state[id], ...entry };
+    update: (state, data: PayloadAction<Update | Update[]>) => {
+      const cache = state;
+      // Handle single or array of Request
+      const toUpdate: Update[] = Array.isArray(data.payload)
+        ? data.payload
+        : [data.payload];
+      toUpdate.forEach((update: Update) => {
+        const id: string = update.id;
+        const keys: string[] = Object.keys(update).filter(
+          (key) => key !== 'id',
+        );
+        const entry: { [key: string]: string | number } = {};
+        keys.map((key) => (entry[key] = update[key]));
+        cache[id] = { ...cache[id], ...entry };
+      });
+      state = cache;
     },
-    deleteLayer: (state, data: PayloadAction<DeleteLayer>) => {
-      const id: string = data.payload.id;
-      delete state[id];
+    remove: (state, data: PayloadAction<Remove | Remove[]>) => {
+      const cache = state;
+      // Handle single or array of Request
+      const toRemove: Remove[] = Array.isArray(data.payload)
+        ? data.payload
+        : [data.payload];
+      toRemove.forEach((remove: Remove) => {
+        const id: string = remove.id;
+        delete cache[id];
+      });
+      state = cache;
     },
   },
 });
 
-export const { getLayer, postLayer, putLayer, deleteLayer } =
-  cacheSlice.actions;
+export const { request, ingest, update, remove } = cacheSlice.actions;
 export const selectCache = (state: RootState) => state.cache;
 export default cacheSlice.reducer;

@@ -173,12 +173,7 @@ const FastaHashTablesServer = () => {
     fetchFastaHashes();
   }, []);
 
-  return fastaHashes;
-};
-
-const useFastaHashTables = () => {
-  const fastaHashes = sessionStorage.getItem('fastaHashes');
-  return fastaHashes == null ? [] : JSON.parse(fastaHashes);
+  return <div ClassName='FastaHashTables'></div>;
 };
 
 export default FastaHashTablesServer;

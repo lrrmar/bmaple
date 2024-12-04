@@ -19,6 +19,7 @@ const initialState: InitialState = {
   selectedRdtId: null,
   profileCrrId: null,
   profileRdtId: null,
+  hashTables: {},
 };
 
 export const fastaSlice = createSlice({
@@ -47,8 +48,7 @@ export const {
   updateProfileRdtId,
 } = mapSlice.actions;
 
-export const selectBaseUrl = (state: RootState) =>
-  state.fasta.baseUrl;
+export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
 export const selectSelectedCrrId = (state: RootState) =>
   state.fasta.selectedCrrId;
 export const selectSelectedRdtId = (state: RootState) =>
@@ -57,4 +57,5 @@ export const selectProfileCrrId = (state: RootState) =>
   state.fasta.profileCrrId;
 export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
+export const selectHashTables = (state: RootState) => state.fasta.hashTables;
 export default fastaSlice.reducer;
