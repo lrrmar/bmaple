@@ -7,12 +7,14 @@ import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import TileLayer from './mapping/TileLayer';
+import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import './App.css';
 
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
+    geojsonField: geojsonFieldReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

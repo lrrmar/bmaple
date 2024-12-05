@@ -6,6 +6,10 @@ interface InitialState {
   [key: string]: CacheEntry | CacheRequest;
 }
 
+export interface Cache {
+  [key: string]: CacheEntry | CacheRequest;
+}
+
 interface CacheEntry extends GenericLayerMixIn {
   source: string;
   ol_uid: string;
