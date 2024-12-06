@@ -4,7 +4,7 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 
-import { updateProfileId, selectSelectedId } from './geojsonFieldSlice.js';
+import { updateProfileId, selectSelectedId } from './geojsonFieldSlice';
 
 import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
 
@@ -28,7 +28,7 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
   }, [requestId]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {
-    return <SourceLayer sourceIdentifier={sourceIdentifier} id={id} />;
+    return <SourceLayer sourceIdentifier={sourceIdentifier} id={id} key={id} />;
   });
 
   const HashTable = HashTablesServer();

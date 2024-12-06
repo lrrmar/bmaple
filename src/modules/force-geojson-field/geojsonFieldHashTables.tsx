@@ -14,7 +14,7 @@ const GeojsonFieldHashTablesServer = () => {
   const [initRender, setInitRender] = useState(true);
 
   const getHashTables = (): HashTable[] | null => {
-    var hashes = sessionStorage.getItem('geojsonFieldHashes');
+    let hashes = sessionStorage.getItem('geojsonFieldHashes');
     if (hashes === null) {
       sessionStorage.setItem('geojsonFieldHashes', JSON.stringify([]));
       hashes = sessionStorage.getItem('geojsonFieldHashes');
@@ -82,7 +82,7 @@ const GeojsonFieldHashTablesServer = () => {
   };
 
   useEffect(() => {
-    var newVariables = variables.filter(
+    const newVariables = variables.filter(
       (item) => !variablesRef.current.includes(item),
     );
     newVariables.map((variable) => fetchVariableHashes(variable));

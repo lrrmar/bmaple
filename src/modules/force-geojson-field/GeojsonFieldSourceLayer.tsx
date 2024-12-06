@@ -65,7 +65,9 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
         setLayerProperties(properties);
         setLayerData(data);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log('Error');
+    }
   };
 
   /* FETCHING LAYER DATA */

@@ -18,9 +18,9 @@ const Graphics = () => {
      * for new and old layers
      */
     const mapUtils: OpenLayersMap = new OpenLayersMap();
-    var cacheEntry: Entry | undefined = undefined;
-    var newLayer: VectorLayer<Feature> | undefined;
-    var currentLayer: VectorLayer<Feature> | undefined;
+    let cacheEntry: Entry | undefined = undefined;
+    let newLayer: VectorLayer<Feature> | undefined;
+    let currentLayer: VectorLayer<Feature> | undefined;
 
     // Get layer info from cache
     if (profileId) cacheEntry = cache[profileId];
@@ -36,7 +36,7 @@ const Graphics = () => {
     if (currentLayer) currentLayer.setVisible(false);
     if (!cacheEntry) return;
     if (!newLayer) return;
-    var hexPalette: { [key: string]: string } | null;
+    let hexPalette: { [key: string]: string } | null;
     /*if (cacheEntry.hasOwnProperty('hex_palette')) hexPalette: = cacheEntry.hex_pallette;
     if (cacheEntry.hasOwnProperty('levels')) {
       if (!hexPalette) return;
