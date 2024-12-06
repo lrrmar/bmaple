@@ -15,16 +15,19 @@ import {
 import { ingest, Ingest } from '../../mapping/cacheSlice';
 import { updateProfileId } from './geojsonFieldSlice';
 
-
 type Properties = {
   [key: string]: Properties | string[] | string | number[] | number;
-}
+};
 
 interface LayerProperties extends Properties {
   levels: { [key: string]: string[] | number[] };
 }
 interface FeatureProperties extends Properties {
   level: string | number;
+}
+
+interface Json {
+  [key: string]: string | number | string[] | number[] | Json;
 }
 
 //API to fetch from Server
@@ -46,8 +49,9 @@ interface Props {
 
 const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
-  const [layerData, setLayerData] = useState(null);
-  const [layerProperties, setLayerProperties] = useState<LayerProperties | null>(null);
+  const [layerData, setLayerData] = useState<Json | null>(null);
+  const [layerProperties, setLayerProperties] =
+    useState<LayerProperties | null>(null);
   const [map, setMap] = useState<MapType | null>(OpenLayersMap.map);
   const hasFetched = useRef(false);
 
@@ -64,9 +68,9 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     } catch (error) {}
   };
 
+  /* FETCHING LAYER DATA */
+
   useEffect(() => {
-    /* populate layerData, checking against data source and if has fetched.
-     */
     if (hasFetched.current) {
       return;
     }
@@ -74,10 +78,12 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     fetchLayerData(id);
   }, []);
 
+  /* - CREATE VECTOR LAYER
+   * - INGEST INTO CACHE
+   * - UPDATE PROFILEID
+   */
+
   useEffect(() => {
-    /* create OL vector layer and add to map, then cache the layer and update
-     * pointer to wrfGraphicProfile
-     */
     if (!layerData) {
       return;
     }
@@ -94,18 +100,21 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
       return;
     }
     vectorSource.getFeatures().map((feature) => {
-      const originalProps: FeatureProperties = {level: 0, ...feature.getProperties()};
-      const newProps: Properties =
-        {
-          ...originalProps,
-          source: sourceIdentifier,
-        };
+      const originalProps: FeatureProperties = {
+        level: 0,
+        ...feature.getProperties(),
+      };
+      const newProps: Properties = {
+        ...originalProps,
+        source: sourceIdentifier,
+      };
       if (layerProperties['levels']) {
         const levels = layerProperties['levels'];
-        const levelKey: string = typeof originalProps.level === "string" ?
-          originalProps.level : originalProps.level.toString(); 
-        newProps['contourRange'] =
-          levels[levelKey];
+        const levelKey: string =
+          typeof originalProps.level === 'string'
+            ? originalProps.level
+            : originalProps.level.toString();
+        newProps['contourRange'] = levels[levelKey];
       }
       if (layerProperties['varname']) {
         newProps['variable'] = layerProperties['varname'];
@@ -124,9 +133,13 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     map.once('postrender', (event) => {
       const properties = { ...layerData };
       delete properties.features;
+      const ol_uid: string | null = vectorLayer.getProperties().ol_uid;
+      // Big error... how can we handle?
+      if (!ol_uid) return;
       const toCache = {
         id: id,
-        ol_uid: vectorLayer.ol_uid,
+        ol_uid: ol_uid,
+        source: sourceIdentifier,
         ...properties,
       };
 
