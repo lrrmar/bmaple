@@ -5,6 +5,7 @@ import OLVectorLayer from 'ol/layer/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Vector as VectorSource } from 'ol/source';
 import { get } from 'ol/proj';
+import { getUid } from 'ol/util';
 import MapType from 'ol/Map';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import {
@@ -128,14 +129,20 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     });
     const vectorLayer = new OLVectorLayer({
       source: vectorSource,
+      zIndex: 20,
     });
     vectorLayer.setVisible(false);
     const add = map.addLayer(vectorLayer);
 
+    console.log('pre post render');
+
     map.once('postrender', (event) => {
+      console.log('post render');
       const properties = { ...layerData };
       delete properties.features;
-      const ol_uid: string | null = vectorLayer.getProperties().ol_uid;
+      const ol_uid: string | null = getUid(vectorLayer);
+      console.log(vectorLayer);
+      console.log(ol_uid);
       // Big error... how can we handle?
       if (!ol_uid) return;
       const toCache = {

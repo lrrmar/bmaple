@@ -10,6 +10,8 @@ import TileLayer from './mapping/TileLayer';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
+import TempMenu from './modules/force-geojson-field/TempMenu';
+import FloatingBox from './features/FloatingBox';
 import './App.css';
 
 export const store = configureStore({
@@ -33,13 +35,16 @@ const App = () => {
   return (
     <div className="App">
       <Map>
-          <Profiles>
-            <GeojsonFieldProfile sourceIdentifier={'geojsonField'} />
-          </Profiles>
+        <Profiles>
+          <GeojsonFieldProfile />
+        </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
         </Sources>
         <TileLayer />
+        <FloatingBox>
+          <TempMenu />
+        </FloatingBox>
       </Map>
     </div>
   );

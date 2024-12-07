@@ -41,12 +41,12 @@ export interface Remove {
   id: string;
 }
 
-const isPending = (element: CacheElement): element is Pending => {
+export const isPending = (element: CacheElement): element is Pending => {
   const keys: string[] = Object.keys(element);
   return keys.includes('source') && !keys.includes('ol_uid');
 };
 
-const isEntry = (element: CacheElement): element is Entry => {
+export const isEntry = (element: CacheElement): element is Entry => {
   const keys: string[] = Object.keys(element);
   return keys.includes('source') && keys.includes('ol_uid');
 };

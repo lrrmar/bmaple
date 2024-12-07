@@ -1,6 +1,7 @@
 import * as ol from 'ol';
 import BaseLayer from 'ol/layer/Base';
 import { fromLonLat } from 'ol/proj';
+import { getUid } from 'ol/util';
 
 class OpenLayersMap {
   static #instance: OpenLayersMap;
@@ -18,6 +19,7 @@ class OpenLayersMap {
           zoom: 5,
           projection: 'EPSG:3857',
         }),
+        zIndex: 0,
         controls: [],
       };
 
@@ -30,7 +32,7 @@ class OpenLayersMap {
   public getLayerByUid(ol_uid: string) {
     let layer: BaseLayer | undefined = undefined;
     OpenLayersMap.#map.getLayers().forEach((l: BaseLayer): void => {
-      if (l.getProperties()['ol_uid'] === ol_uid) {
+      if (getUid(l) === ol_uid) {
         layer = l;
       }
     });
