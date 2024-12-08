@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
 import type { RootState } from '../App';
 
 interface InitialState {
@@ -7,8 +6,8 @@ interface InitialState {
   zoom: number | null;
   units: string | null;
   positioning: {
-    time: string | null;
-    verticalLevel: string | null;
+    time: string;
+    verticalLevel: string;
   };
   clickEvent: { longitude: number; latitude: number } | null;
   featuresAtClick: ({ [key: string]: string } | undefined)[] | void[]; // Need to tackle the values / properties object from features to filter out undefined!
