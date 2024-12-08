@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
+import { useHashTables, HashTable } from './geojsonFieldHashTables';
 
 interface InitialState {
   selectedId: string | null;
@@ -32,6 +33,10 @@ export const geojsonFieldSlice = createSlice({
 export const { updateSelectedId, updateProfileId, updateHashesFlag } =
   geojsonFieldSlice.actions;
 
+export const selectHashTables = createSelector(
+  (state: RootState): RootState => state,
+  (): HashTable[] => useHashTables(),
+);
 export const selectSelectedId = (state: RootState) =>
   state.geojsonField.selectedId;
 export const selectProfileId = (state: RootState) =>

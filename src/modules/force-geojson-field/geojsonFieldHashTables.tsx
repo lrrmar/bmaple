@@ -2,8 +2,14 @@ import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { useAppDispatch as useDispatch } from '../../hooks';
 import { updateHashesFlag } from './geojsonFieldSlice';
 
-interface HashTable {
-  [key: string]: string | number | null;
+export interface HashTable {
+  [key: string]: string | number;
+  id: string;
+  varname: string;
+  level_type: string;
+  sim_start_time: string;
+  valid_time: string;
+  grid_id: number;
 }
 const GeojsonFieldHashTablesServer = () => {
   const dispatch = useDispatch();
@@ -91,7 +97,7 @@ const GeojsonFieldHashTablesServer = () => {
   return hashes;
 };
 
-const useHashTables = () => {
+export const useHashTables = () => {
   const hashes = sessionStorage.getItem('geojsonFieldHashes');
   return hashes == null ? [] : JSON.parse(hashes);
 };

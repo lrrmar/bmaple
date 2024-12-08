@@ -10,7 +10,7 @@ import TileLayer from './mapping/TileLayer';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
-import TempMenu from './modules/force-geojson-field/TempMenu';
+import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import FloatingBox from './features/FloatingBox';
 import './App.css';
 
@@ -43,7 +43,7 @@ const App = () => {
         </Sources>
         <TileLayer />
         <FloatingBox>
-          <TempMenu />
+          <LayerSelector />
         </FloatingBox>
       </Map>
     </div>
