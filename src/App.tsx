@@ -6,12 +6,16 @@ import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
-import TileLayer from './mapping/TileLayer';
+import BaseMaps from './mapping/BaseMaps';
+import DarkBaseMap from './mapping/DarkBaseMap';
+import LightBaseMap from './mapping/LightBaseMap';
+import OSMBaseMap from './mapping/OSMBaseMap';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import FloatingBox from './features/FloatingBox';
+import TempBaseMapMenu from './features/TempBaseMapMenu';
 import './App.css';
 
 export const store = configureStore({
@@ -41,9 +45,16 @@ const App = () => {
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
         </Sources>
-        <TileLayer />
+        <BaseMaps>
+          <DarkBaseMap id={'dark'} />
+          <LightBaseMap id={'light'} />
+          <OSMBaseMap id={'OSM'} />
+        </BaseMaps>
         <FloatingBox>
           <LayerSelector />
+        </FloatingBox>
+        <FloatingBox style={{ left: '10px' }}>
+          <TempBaseMapMenu />
         </FloatingBox>
       </Map>
     </div>

@@ -11,6 +11,8 @@ interface InitialState {
   };
   clickEvent: { longitude: number; latitude: number } | null;
   featuresAtClick: ({ [key: string]: string } | undefined)[] | void[]; // Need to tackle the values / properties object from features to filter out undefined!
+  baseMaps: string[];
+  baseMapId: string;
 }
 
 const initialState: InitialState = {
@@ -23,6 +25,8 @@ const initialState: InitialState = {
   },
   clickEvent: null,
   featuresAtClick: [],
+  baseMaps: [],
+  baseMapId: 'OSM',
 };
 
 export const mapSlice = createSlice({
@@ -59,6 +63,12 @@ export const mapSlice = createSlice({
     ) => {
       state.featuresAtClick = features.payload;
     },
+    updateBaseMaps: (state, baseMaps: PayloadAction<string[]>) => {
+      state.baseMaps = baseMaps.payload;
+    },
+    updateBaseMapId: (state, baseMapId: PayloadAction<string>) => {
+      state.baseMapId = baseMapId.payload;
+    },
   },
 });
 
@@ -69,6 +79,8 @@ export const {
   updatePositioning,
   updateClickEvent,
   updateFeaturesAtClick,
+  updateBaseMaps,
+  updateBaseMapId,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;
@@ -81,4 +93,6 @@ export const selectUnits = (state: RootState) => state.map.units;
 export const selectClickEvent = (state: RootState) => state.map.clickEvent;
 export const selectFeaturesAtClick = (state: RootState) =>
   state.map.featuresAtClick;
+export const selectBaseMaps = (state: RootState) => state.map.baseMaps;
+export const selectBaseMapId = (state: RootState) => state.map.baseMapId;
 export default mapSlice.reducer;

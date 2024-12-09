@@ -4,7 +4,7 @@ import * as olSource from 'ol/source';
 
 import openLayersMap from './OpenLayersMap';
 
-const TileLayer = () => {
+const DarkBaseMap = ({ id }: { id: string }) => {
   const map = openLayersMap.map;
 
   useEffect(() => {
@@ -21,4 +21,4 @@ const TileLayer = () => {
   return <div></div>;
 };
 
-export default TileLayer;
+export default DarkBaseMap;
