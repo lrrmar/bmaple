@@ -10,7 +10,8 @@ interface InitialState {
   selectedRdtId: string | null;
   profileCrrId: string | null;
   profileRdtId: string | null;
-  hashTables: { [key: string]: string | number };
+  hashTables: [ { [key: string]: string | number } ];
+  latestTimeslot: string | null;
 }
 
 const initialState: InitialState = {
@@ -19,7 +20,8 @@ const initialState: InitialState = {
   selectedRdtId: null,
   profileCrrId: null,
   profileRdtId: null,
-  hashTables: {},
+  hashTables: [],
+  latestTimeslot: null,
 };
 
 export const fastaSlice = createSlice({
@@ -27,16 +29,24 @@ export const fastaSlice = createSlice({
   initialState,
   reducers: {
     updateSelectedCrrId: (state, id: PayloadAction<string | null>) => {
+      console.log("updateSelectedCrrId:" + id.payload);
       state.selectedCrrId = id.payload;
     },
     updateSelectedRdtId: (state, id: PayloadAction<string | null>) => {
       state.selectedRdtId = id.payload;
     },
     updateProfileCrrId: (state, id: PayloadAction<string | null>) => {
+      console.log("updateProfileCrrId:" + id.payload);
       state.profileCrrId = id.payload;
     },
-    updateProfilRdtId: (state, id: PayloadAction<string | null>) => {
+    updateProfileRdtId: (state, id: PayloadAction<string | null>) => {
       state.profileRdtId = id.payload;
+    },
+    updateHashTables: (state, id: PayloadAction<{ [key: string]: string | number }>) => {
+      state.hashTables = id.payload;
+    },
+    updateLatestTimeslot: (state, timeslot: PayloadAction<string | null>) => {
+      state.latestTimeslot = timeslot.payload;
     },
   },
 });
@@ -46,7 +56,9 @@ export const {
   updateSelectedRdtId,
   updateProfileCrrId,
   updateProfileRdtId,
-} = mapSlice.actions;
+  updateHashTables,
+  updateLatestTimeslot,
+} = fastaSlice.actions;
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
 export const selectSelectedCrrId = (state: RootState) =>
@@ -58,4 +70,6 @@ export const selectProfileCrrId = (state: RootState) =>
 export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
+export const selectLatestTimeslot = (state: RootState) => state.fasta.latestTimeslot;
+
 export default fastaSlice.reducer;

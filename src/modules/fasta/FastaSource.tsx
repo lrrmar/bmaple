@@ -4,7 +4,7 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../hooks';
-import { request, Request, selectCache } from '../../mapping/cacheSlice';
+import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
 
 import {
   selectBaseUrl,
@@ -22,6 +22,8 @@ import {
  *  - hashtables type
  */
 
+import FastaHashTablesServer from './FastaHashTables';
+
 import hashTableToUrl from './fastaHashTableToUrl';
 import FastaSourceLayer from './FastaSourceLayer';
 
@@ -34,16 +36,27 @@ interface HashTable {
   forecast_timestamp: null
 }
 
-const FastaSource = () => {
+// TODO: add Cache to props after merge
+interface Props {
+  sourceIdentifier: string;
+  cache: Cache;
+}
+
+
+const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
   const base = useSelector(selectBaseUrl);
-  const cache = useSelector(selectCache);
+  const cacheX = useSelector(selectCache);
   const crrRequestId = useSelector(selectSelectedCrrId);
   const rdtRequestId = useSelector(selectSelectedRdtId);
 
   const hashTables = useSelector(selectHashTables);
 
+  console.log("FastaSource");
+
   useEffect(() => {
+    console.log("FastaSource");
+
     const allCacheRequests: Request[] = hashTables.map((hashTable: HashTable) => {
       console.log(hashTableToUrl(hashTable));
       const request = {
@@ -75,9 +88,10 @@ const FastaSource = () => {
   }, [rdtRequestId]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {
-    return <FastaSourceLayer key={id} id={id} />;
+    return <FastaSourceLayer sourceIdentifier={sourceIdentifier} key={id} id={id} />;
   });
 
+  const fastaHashTable = FastaHashTablesServer();
   return <div className="FastaSource">{sourcesToLoad}</div>;
 };
 

@@ -1,0 +1,77 @@
+:root {
+    --main-color: rgb(104, 117, 217);
+    --main-color-hover: rgb(104, 117, 217, 0.2);
+    --track-color: #ddd;
+    --text-color: black;
+    --mid-blue-color: #276AB3;
+  }
+  
+  .customSlider {
+    /* max width of your slider */
+    /* max-width: 600px; */
+    /* Optional: Only If you want to center your slider in the page */
+   /* margin: auto; */
+    /* position: absolute;  */
+     bottom: 10px;
+    /*right: 10px;*/
+    padding: 0px;
+    height: 10px;
+  }
+  
+  .customSlider-track {
+    top: 5px;
+    bottom: 5px;
+    height: 10px;
+    background: var(--track-color);
+  }
+  
+  /* color of the track before the thumb */
+  .customSlider-track.customSlider-track-0 {
+    background: var(--mid-blue-color);
+  }
+
+
+  .customSlider-mark {
+    width: 1px;
+    height: 20px;
+    background-color: rgb(0, 0, 0);
+    cursor: pointer;
+    /*border-radius: 50%;*/
+    vertical-align: middle;
+  }
+
+  /*
+  .customSlider.customSlider-mark {
+    margin: 0px calc(19px);
+    bottom: calc(50% - 6px);
+  }
+*/
+
+  .customSlider-thumb {
+    cursor: pointer;
+    /*color for the thumb */
+    background: var(--mid-blue-color);
+    /* shape of the thumb: circle */
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    /* remove default outline when selected */
+    outline: none;
+    text-align: center;
+
+  }
+  
+  .customSlider-thumb:hover {
+    box-shadow: 0 0 0 8px var(--main-color-hover);
+  }
+
+  .slider-time-label {
+    text-align: left;
+    vertical-align: top;
+    color: var(--text-color);
+    font-size: large;
+    margin-top: 0px;
+    margin-bottom: 10px;
+
+  }
+

@@ -9,17 +9,17 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  updateFastaHashesFlag,
-  selectFastaBaseUrl,
-  updateFastaHashTables,
-  updateFastaLatestTimeslot,
-} from '../mapSlice';
+  //updateFastaHashesFlag,
+  selectBaseUrl,
+  updateHashTables,
+  updateLatestTimeslot,
+} from './fastaSlice';
 
 const FastaHashTablesContext = createContext();
 
 const FastaHashTablesServer = () => {
   const dispatch = useDispatch();
-  const fastaBaseUrl = useSelector(selectFastaBaseUrl);
+  const fastaBaseUrl = useSelector(selectBaseUrl);
   const [variables, setVariables] = useState([]);
   const variablesRef = useRef([]);
   const [hashTables, setHashTables] = useState([]);
@@ -57,7 +57,7 @@ const FastaHashTablesServer = () => {
     sessionStorage.setItem('fastaHashes', JSON.stringify(concatFastaHashes));
     const updatedFastaHashes = sessionStorage.getItem('fastaHashes');
     setFastaHashes(updatedFastaHashes);
-    dispatch(updateFastaHashesFlag());
+    //dispatch(updateFastaHashesFlag());
   };
 
   const filterFastaHashes = (hashes, product) => {
@@ -96,13 +96,13 @@ const FastaHashTablesServer = () => {
   // Dispatch HashTablesToKeep to Redux state
   useEffect(() => {
     console.log(hashTablesToKeep);
-    dispatch(updateFastaHashTables(hashTablesToKeep));
+    dispatch(updateHashTables(hashTablesToKeep));
   }, [hashTablesToKeep]);
 
   // Dispatch latestTimeslot to Redux state
   useEffect(() => {
     console.log(latestTimeslot);
-    dispatch(updateFastaLatestTimeslot(latestTimeslot));
+    dispatch(updateLatestTimeslot(latestTimeslot));
   }, [latestTimeslot]);
 
   const [fastaHashes, setFastaHashes] = useState(getFastaHashTables);
@@ -177,4 +177,4 @@ const FastaHashTablesServer = () => {
 };
 
 export default FastaHashTablesServer;
-export { FastaHashTablesContext, useFastaHashTables };
+export { FastaHashTablesContext };

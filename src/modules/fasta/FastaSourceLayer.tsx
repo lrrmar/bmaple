@@ -3,7 +3,17 @@ import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
 import { get } from 'ol/proj';
+import {getUid} from 'ol/util';
 import { useAppDispatch as useDispatch, useAppSelector as useSelector } from '../../hooks';
+import {
+  selectCache,
+  ingest,
+  Ingest
+} from '../../mapping/cacheSlice';
+import {
+  selectBaseUrl,
+} from './fastaSlice';
+/*
 import {
   swapLayers,
   clearLayers,
@@ -12,29 +22,36 @@ import {
   selectBackendVariables,
   selectRequestStatus,
   selectPositioning,
-  selectFastaLayerId,
-  selectFastaSourceLoad,
-  selectFastaBaseUrl,
   selectLayerCache,
   cacheLayer,
   requestLayerToCache,
   updateFastaGraphicProfileId,
-} from '../mapSlice';
-import mapObject from '../OLMap.js';
+} from '../../mapping/mapSlice';
+*/
+
+//import mapObject from '../../mapping/Map';
+import openLayersMap from '../../mapping/OpenLayersMap';
+
 
 import FastaHashTablesServer from './FastaHashTables';
 
 // API to fetch from Server
-const apiCall = async (url) => {
+const apiCall = async (url: any) => {
   const response = await fetch(url);
   const data = await response.json();
   return data;
 };
 
-const FastaSourceLayer = ({ id: string }) => {
+interface Props {
+  id: string;
+  sourceIdentifier: string;
+}
+
+const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
+ 
   const dispatch = useDispatch();
-  const fastaBaseUrl = useSelector(selectFastaBaseUrl);
-  const layerCache = useSelector(selectLayerCache);
+  const fastaBaseUrl = useSelector(selectBaseUrl);
+  const layerCache = useSelector(selectCache);
 
   const urlParams = id.split('?');
   let forecastQs = '';
@@ -45,11 +62,12 @@ const FastaSourceLayer = ({ id: string }) => {
     `https://${fastaBaseUrl}/api/v1/vts/${id.split('?')[0]}/{z}/{x}/{y}.pbf?${forecastQs}token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0`,
   );
   //const [url, setUrl] = useState(`https://${fastaBaseUrl}/api/v1/vts/crr/now/{z}/{x}/{y}.pbf?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0`)
-  const map = mapObject.getInstance();
+  //const map = mapObject.getInstance();
   const hasFetched = useRef(false);
 
+  /* async function to wrap api call and add response to state (layerData) */
+  /*
   const fetchLayerData = async (id) => {
-    /* async function to wrap api call and add response to state (layerData) */
     try {
       const data = await apiCall(id);
       if (data) {
@@ -59,7 +77,8 @@ const FastaSourceLayer = ({ id: string }) => {
       }
     } catch (error) {}
   };
-
+  */
+ 
   //    useEffect(() => {
   /* populate layerData, checking against data source and if has fetched.
    */
@@ -109,17 +128,23 @@ const FastaSourceLayer = ({ id: string }) => {
 
     // NEED TO CATCH 404
 
-    const map = mapObject.getInstance();
+    //const map = mapObject.getInstance();
+    const map = openLayersMap.map;
     map.addLayer(vtLayer);
+
     map.once('postrender', (event) => {
-      const toCache = {
+
+      const toCache : Ingest = {
         id: id,
-        ol_uid: vtLayer.ol_uid,
+        source: "fasta",
+        ol_uid: getUid(vtLayer), //.ol_uid, // ol 9.1.0 --> 9.2.4
       };
 
-      dispatch(cacheLayer(toCache));
+      //dispatch(cacheLayer(toCache));
+      dispatch(ingest(toCache));
+
       setTimeout(() => {
-        vtLayer.setExtent(null); // Reset to allow loading dynamically later
+        vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
       }, 3000);
       //dispatch(updateFastaGraphicProfileId(id));
     });
