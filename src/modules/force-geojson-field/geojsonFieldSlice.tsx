@@ -6,12 +6,24 @@ interface InitialState {
   selectedId: string | null;
   profileId: string | null;
   hashesFlag: number;
+  contours: { [key: string]: string };
+  colourPaletteId: string;
+  colourPalettes: string[];
+  colourPalette: { [key: string]: string };
+  units: string;
+  opacity: number;
 }
 
 const initialState: InitialState = {
   selectedId: null,
   profileId: null,
   hashesFlag: 0,
+  contours: {},
+  colourPaletteId: 'viridis',
+  colourPalettes: [],
+  colourPalette: {},
+  units: '',
+  opacity: 0.8,
 };
 
 export const geojsonFieldSlice = createSlice({
@@ -27,11 +39,44 @@ export const geojsonFieldSlice = createSlice({
     updateHashesFlag: (state) => {
       state.hashesFlag = state.hashesFlag + 1;
     },
+    updateContours: (
+      state,
+      contours: PayloadAction<{ [key: string]: string }>,
+    ) => {
+      state.contours = contours.payload;
+    },
+    updateColourPaletteId: (state, id: PayloadAction<string>) => {
+      state.colourPaletteId = id.payload;
+    },
+    updateColourPalettes: (state, colourPalettes: PayloadAction<string[]>) => {
+      state.colourPalettes = colourPalettes.payload;
+    },
+    updateColourPalette: (
+      state,
+      colourPalette: PayloadAction<{ [key: string]: string }>,
+    ) => {
+      state.colourPalette = colourPalette.payload;
+    },
+    updateUnits: (state, units: PayloadAction<string>) => {
+      state.units = units.payload;
+    },
+    updateOpacity: (state, opacity: PayloadAction<number>) => {
+      state.opacity = opacity.payload;
+    },
   },
 });
 
-export const { updateSelectedId, updateProfileId, updateHashesFlag } =
-  geojsonFieldSlice.actions;
+export const {
+  updateSelectedId,
+  updateProfileId,
+  updateHashesFlag,
+  updateContours,
+  updateColourPaletteId,
+  updateColourPalettes,
+  updateColourPalette,
+  updateUnits,
+  updateOpacity,
+} = geojsonFieldSlice.actions;
 
 export const selectHashTables = createSelector(
   (state: RootState): RootState => state,
@@ -43,4 +88,13 @@ export const selectProfileId = (state: RootState) =>
   state.geojsonField.profileId;
 export const selectHashesFlag = (state: RootState) =>
   state.geojsonField.hashesFlag;
+export const selectContours = (state: RootState) => state.geojsonField.contours;
+export const selectColourPaletteId = (state: RootState) =>
+  state.geojsonField.colourPaletteId;
+export const selectColourPalettes = (state: RootState) =>
+  state.geojsonField.colourPalettes;
+export const selectColourPalette = (state: RootState) =>
+  state.geojsonField.colourPalette;
+export const selectUnits = (state: RootState) => state.geojsonField.units;
+export const selectOpacity = (state: RootState) => state.geojsonField.opacity;
 export default geojsonFieldSlice.reducer;

@@ -32,8 +32,6 @@ interface Props {
   numKeys: number;
 }
 const ColourPanel = ({ level, lowerHexCode, upperHexCode, numKeys }: Props) => {
-  console.log(level, lowerHexCode, upperHexCode);
-  console.log(numKeys);
   const style: React.CSSProperties = {
     width: '50px',
     height: new String(60 / numKeys) + 'vh',
@@ -69,7 +67,7 @@ const ContourColourBar = () => {
 
   useEffect(() => {
     const numContours: number = Object.keys(contours).length;
-    const numColours: number = Object.keys(contours).length;
+    const numColours: number = Object.keys(colourPalette).length;
     if (numContours === 0 || numColours === 0 || numColours !== numContours) {
       setComponents([]);
     } else {

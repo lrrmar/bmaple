@@ -35,7 +35,7 @@ const LayerSelector = () => {
   const variableHashes: HashTable[] = useSelector(selectHashTables);
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
-  const [pulseInterval, setPulseInterval] = useState(500);
+  const [pulseInterval, setPulseInterval] = useState(1000);
 
   useEffect(() => {
     /* Initial selection / positioning
@@ -131,7 +131,6 @@ const LayerSelector = () => {
 
   useEffect(() => {
     if (animate) {
-      console.log(pulse);
       const currentIndex = availableValidTimes.indexOf(validTime);
       if (currentIndex === availableValidTimes.length - 1) {
         return;

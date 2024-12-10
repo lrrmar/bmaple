@@ -16,6 +16,7 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import FloatingBox from './features/FloatingBox';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
+import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import './App.css';
 
 export const store = configureStore({
@@ -55,6 +56,9 @@ const App = () => {
         </FloatingBox>
         <FloatingBox style={{ left: '10px' }}>
           <TempBaseMapMenu />
+        </FloatingBox>
+        <FloatingBox style={{ left: '10px', top: '10px' }}>
+          <ContourColourBar />
         </FloatingBox>
       </Map>
     </div>
