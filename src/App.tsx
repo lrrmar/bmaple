@@ -15,6 +15,7 @@ import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import FloatingBox from './features/FloatingBox';
+import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import './App.css';
@@ -51,16 +52,16 @@ const App = () => {
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox>
-          <LayerSelector />
-        </FloatingBox>
-        <FloatingBox style={{ left: '10px' }}>
-          <TempBaseMapMenu />
-        </FloatingBox>
-        <FloatingBox style={{ left: '10px', top: '10px' }}>
-          <ContourColourBar />
-        </FloatingBox>
       </Map>
+      <FloatingBox>
+        <LayerSelector />
+      </FloatingBox>
+      <FloatingBox style={{ top: '10px' }}>
+        <ContourColourBar />
+      </FloatingBox>
+      <FoldOutMenu align={'left'}>
+        <TempBaseMapMenu id={'style'} />
+      </FoldOutMenu>
     </div>
   );
 };
