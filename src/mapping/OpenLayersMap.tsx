@@ -1,12 +1,11 @@
 import * as ol from 'ol';
-import VectorLayer from 'ol/layer/Vector';
-import { get, fromLonLat, ProjectionLike } from 'ol/proj';
+import BaseLayer from 'ol/layer/Base';
+import { fromLonLat } from 'ol/proj';
+import { getUid } from 'ol/util';
 
 class OpenLayersMap {
   static #instance: OpenLayersMap;
   static #map: ol.Map;
-
-  //private constructor() {}
 
   public static get instance(): OpenLayersMap {
     return OpenLayersMap.#instance;
@@ -20,6 +19,7 @@ class OpenLayersMap {
           zoom: 5,
           projection: 'EPSG:3857',
         }),
+        zIndex: 0,
         controls: [],
       };
 
@@ -30,17 +30,14 @@ class OpenLayersMap {
   }
 
   public getLayerByUid(ol_uid: string) {
-    let layer;
-    OpenLayersMap.#map.getLayers().forEach((l: any) => {
-      if (l.ol_uid === ol_uid) {
+    let layer: BaseLayer | undefined = undefined;
+    OpenLayersMap.#map.getLayers().forEach((l: BaseLayer): void => {
+      if (getUid(l) === ol_uid) {
         layer = l;
       }
     });
-    return layer;
+    return layer ? layer : undefined;
   }
 }
-
-//const openLayersMap = new OpenLayersMap();
-//Object.freeze(openLayersMap);
 
 export default OpenLayersMap;

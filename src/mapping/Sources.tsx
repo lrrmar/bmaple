@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { useAppSelector as useSelector } from '../hooks';
 
-import { selectCache } from './cacheSlice';
+import { selectCache, Cache } from './cacheSlice';
 
 type Props = {
   children?: React.ReactNode | React.ReactNode[];
@@ -31,23 +31,24 @@ const Sources = ({ children }: Props) => {
   useEffect(() => {
     // Provide each source with the cache, filtered by sourceIdentifier
     if (!cache) return;
-    const childrenWithCache = React.Children.map(children, (el) => {
-      if (React.isValidElement<ChildProps>(el)) {
-        const sourceIdentifier: string = el.props.sourceIdentifier;
-        const cacheForChild = cache;
-        Object.keys(cache).forEach((key) => {
-          if (cacheForChild[key].source !== sourceIdentifier) {
-            delete cacheForChild[key];
-          }
-        });
-        return React.cloneElement(el, {
-          sourceIdentifier: sourceIdentifier,
-          cache: cacheForChild,
-        });
-      }
-      console.log(childrenWithCache);
-    });
-  }, [cache]);
+    const childrenWithCacheToSet: React.ReactNode[] | null | undefined =
+      React.Children.map(children, (el) => {
+        if (React.isValidElement<ChildProps>(el)) {
+          const sourceIdentifier: string = el.props.sourceIdentifier;
+          const cacheForChild: Cache = cache;
+          Object.keys(cache).forEach((key) => {
+            if (cacheForChild[key].source !== sourceIdentifier) {
+              delete cacheForChild[key];
+            }
+          });
+          return React.cloneElement(el, {
+            sourceIdentifier: sourceIdentifier,
+            cache: cacheForChild,
+          });
+        }
+      });
+    if (childrenWithCacheToSet) setChildrenWithCache(childrenWithCacheToSet);
+  }, [cache, children]);
   return <div className="Sources">{childrenWithCache}</div>;
 };
 
