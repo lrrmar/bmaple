@@ -16,7 +16,7 @@ import {
   selectProfileCrrId,
   selectProfileRdtId
 } from './fastaSlice';
-import { CacheEntry, request, Request, selectCache } from '../../mapping/cacheSlice';
+import { Entry, request, Request, selectCache } from '../../mapping/cacheSlice';
 
 import openLayersMap from '../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
@@ -141,7 +141,7 @@ const Graphics = () => {
     const crrStyle = createCrrStyleFunction();
 
     var newOlUidCrr: string|null = null;
-    var layer = layerCache[crrLayerId] as CacheEntry;
+    var layer = layerCache[crrLayerId] as Entry;
     if (layer === undefined) {
     //  layer = { ol_uid: null };
     }
@@ -178,7 +178,7 @@ const Graphics = () => {
     */
 
     var newOlUidRdt: string|null = null;
-    var layer = layerCache[rdtLayerId] as CacheEntry;
+    var layer = layerCache[rdtLayerId] as Entry;
     if (layer === undefined) {
     //  layer = { ol_uid: null };
     }

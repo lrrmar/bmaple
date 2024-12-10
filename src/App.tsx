@@ -8,11 +8,20 @@ import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import TileLayer from './mapping/TileLayer';
 import './App.css';
+import fastaReducer from './modules/fasta/fastaSlice';
+import Slider from './modules/fasta/Slider';
+import FastaProfile from './modules/fasta/FastaGraphic';
+import FastaSource from './modules/fasta/FastaSource';
+import FastaMainMenu from './modules/fasta/FastaMainMenu';
+import FastaSourceLayer from './modules/fasta/FastaSourceLayer';
+
+
 
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
+    fasta: fastaReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -27,9 +36,6 @@ interface SourceProps {
   cache?: number;
 }
 
-const Dummy = ({ sourceIdentifier }: SourceProps) => {
-  return <div>{sourceIdentifier}</div>;
-};
 
 const App = () => {
   useEffect(() => {
@@ -38,12 +44,17 @@ const App = () => {
   return (
     <div className="App">
       <Map>
-        <Profiles></Profiles>
+        <Profiles>
+          <FastaProfile/>
+        </Profiles>
         <Sources>
-          <Dummy sourceIdentifier={'fasta'} />
+          <FastaSource cache={{}} sourceIdentifier={'fasta'} />
         </Sources>
         <TileLayer />
       </Map>
+      <FastaMainMenu>
+        <Slider />
+      </FastaMainMenu>
     </div>
   );
 };

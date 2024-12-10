@@ -9,12 +9,12 @@ import {
 } from 'react-redux';
 import ReactSlider from "react-slider";
 import './Slider.css';
-import { useFastaHashTables } from './fasta/FastaHashTables';
+import { useFastaHashTables } from './FastaHashTables';
 import {
     selectFastaHashesFlag,
     //updateSelectedFastaCrrLayer,
     //updateSelectedFastaRdtLayer,
-} from '../mapping/mapSlice';
+} from '../../mapping/mapSlice';
 import {
     selectBaseUrl,
     selectSelectedCrrId,
@@ -32,12 +32,12 @@ import {
     updateSelectedFastaCrrLayer,
     updateSelectedFastaRdtLayer,
     */
-} from './fasta/fastaSlice';
+} from './fastaSlice';
 import {
     dateAsUrlParamString,
     dateAsDisplayString,
-} from './fasta/dateFormatHelpers';
-import fastaHashTableToUrl from  './fasta/fastaHashTableToUrl';
+} from './dateFormatHelpers';
+import fastaHashTableToUrl from  './fastaHashTableToUrl';
 import { current } from '@reduxjs/toolkit';
 
 
