@@ -1,7 +1,6 @@
 import React, {
     useEffect,
     useState,
-    //useRef,
 } from 'react';
 import {
     useDispatch,
@@ -9,49 +8,25 @@ import {
 } from 'react-redux';
 import ReactSlider from "react-slider";
 import './Slider.css';
-import { useFastaHashTables } from './FastaHashTables';
 import {
-    selectFastaHashesFlag,
-    //updateSelectedFastaCrrLayer,
-    //updateSelectedFastaRdtLayer,
-} from '../../mapping/mapSlice';
-import {
-    selectBaseUrl,
-    selectSelectedCrrId,
-    selectSelectedRdtId,
     selectHashTables,
     selectLatestTimeslot,
-    updateProfileCrrId,
-    updateProfileRdtId,
     updateSelectedCrrId,
     updateSelectedRdtId,
-    /*
-    selectFastaHashesFlag,
-    selectFastaHashTables,
-    selectFastaLatestTimeslot,
-    updateSelectedFastaCrrLayer,
-    updateSelectedFastaRdtLayer,
-    */
 } from './fastaSlice';
+import type { HashTable } from './FastaHashTables';
 import {
-    dateAsUrlParamString,
     dateAsDisplayString,
 } from './dateFormatHelpers';
 import fastaHashTableToUrl from  './fastaHashTableToUrl';
-import { current } from '@reduxjs/toolkit';
-
 
 const Slider = () => {
 
     const dispatch = useDispatch();
     const fastaHashes = useSelector(selectHashTables);
     const fastaLatestTimeslot = useSelector(selectLatestTimeslot);
-
-    //const [availableProducts, setAvailableProducts] = useState([]);
-
-    const [sliderTimeslots, setSliderTimeslots] = useState([]);
-    const [selectedTimeslot, setSelectedTimeslot] = useState();
-    const [product , setProduct] = useState('');
+    const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
+    const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
     const [currentTimeString , setCurrentTimeString] = useState('');
 
     // We display a fixed number of slots
@@ -61,18 +36,11 @@ const Slider = () => {
     const defaultSliderValue = 8;
 
     useEffect(() => {
-        
         if (fastaHashes.length === 0) {
             return
         };
-
         console.log("fastaHashes:");
         console.log(fastaHashes);
-
-        //setProduct("crr");
-        
-        // If you uncomment the next line you will be able to see RDT polygons on the map with a black fill.
-        //setProduct("rdt");
 
         setSelectedTimeslot(sliderTimeslots[defaultSliderValue]);
     }, [fastaHashes]);
@@ -81,7 +49,6 @@ const Slider = () => {
     useEffect(() => {
         /* Initial selection / positioning
         */
-
         console.log("Slider::useEffect(), [fastaLatestTimeslot]");
 
         if (!fastaLatestTimeslot) {
@@ -111,7 +78,7 @@ const Slider = () => {
             console.log("selectedTs:" + strTs);
 
             // Find the CRR/RDT hash with matching effective_ts
-            const crrLayerHash = fastaHashes.find(hash => {
+            const crrLayerHash = fastaHashes.find( (hash : HashTable) => {
                 return hash.name === "crr"
                     && hash.effective_ts === selectedTimeslot;
             });
@@ -128,7 +95,7 @@ const Slider = () => {
             }
 
             // Find the CRR/RDT hash with matching effective_ts
-            const rdtLayerHash = fastaHashes.find(hash => {
+            const rdtLayerHash = fastaHashes.find( (hash : HashTable) => {
                 return hash.name === "rdt"
                         && hash.effective_ts === selectedTimeslot;
             });
@@ -138,9 +105,7 @@ const Slider = () => {
                 console.log(url);
                 const newRdtLayerHash = {apiRequest: url};
 
-                // RDT support: do this update for both CRR and RDT
-                dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
-                
+                dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));                
                 setCurrentTimeString(dateAsDisplayString(new Date(rdtLayerHash.effective_ts)));
             } else {
                 dispatch(updateSelectedRdtId(null));
@@ -152,7 +117,6 @@ const Slider = () => {
 
     //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
     //const Thumb = (props, state) => <div {...props} key={state.key}></div>;;
-
     //renderTrack={Track}
     //renderThumb={Thumb}
 

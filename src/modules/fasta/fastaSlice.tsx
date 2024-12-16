@@ -2,6 +2,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../App';
+import type { HashTable } from './FastaHashTables';
 
 interface InitialState {
   baseUrl: string;
@@ -10,7 +11,7 @@ interface InitialState {
   selectedRdtId: string | null;
   profileCrrId: string | null;
   profileRdtId: string | null;
-  hashTables: [ { [key: string]: string | number } ];
+  hashTables: HashTable[];
   latestTimeslot: string | null;
 }
 
@@ -42,7 +43,7 @@ export const fastaSlice = createSlice({
     updateProfileRdtId: (state, id: PayloadAction<string | null>) => {
       state.profileRdtId = id.payload;
     },
-    updateHashTables: (state, id: PayloadAction<{ [key: string]: string | number }>) => {
+    updateHashTables: (state, id: PayloadAction<HashTable[]>) => {
       state.hashTables = id.payload;
     },
     updateLatestTimeslot: (state, timeslot: PayloadAction<string | null>) => {

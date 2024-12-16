@@ -1,4 +1,4 @@
-function dateAsUrlParamString(date) {
+function dateAsUrlParamString(date : Date) {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
   const day = String(date.getUTCDate()).padStart(2, '0');
@@ -31,7 +31,7 @@ const months = [
   'December',
 ];
 
-function dateAsDisplayString(date) {
+function dateAsDisplayString(date : Date) {
   const dayOfWeek = days[date.getUTCDay()];
   const day = String(date.getUTCDate()).padStart(2, '0');
   const month = months[date.getUTCMonth()];

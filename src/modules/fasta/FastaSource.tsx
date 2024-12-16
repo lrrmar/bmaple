@@ -1,62 +1,33 @@
 import React, { useEffect } from 'react';
-
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../hooks';
 import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
-
 import {
-  selectBaseUrl,
   selectSelectedCrrId,
   selectSelectedRdtId,
   selectHashTables,
   updateProfileCrrId,
   updateProfileRdtId,
 } from './fastaSlice';
-
-/*
- *  todo...
- *
- *  - create cache types in cache slice and import
- *  - hashtables type
- */
-
 import FastaHashTablesServer from './FastaHashTables';
-
 import hashTableToUrl from './fastaHashTableToUrl';
 import FastaSourceLayer from './FastaSourceLayer';
+import type { HashTable } from './FastaHashTables';
 
-
-interface HashTable {
-  name: string
-  timeslot: string
-  is_latest: boolean
-  forecast_slot: string
-  forecast_timestamp: null
-}
-
-// TODO: add Cache to props after merge
 interface Props {
   sourceIdentifier: string;
   cache: Cache;
 }
 
-
 const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
-  const base = useSelector(selectBaseUrl);
-  const cacheX = useSelector(selectCache);
-  const crrRequestId = useSelector(selectSelectedCrrId);
-  const rdtRequestId = useSelector(selectSelectedRdtId);
-
-  const hashTables = useSelector(selectHashTables);
-
-  console.log("FastaSource");
+  const crrRequestId : string = useSelector(selectSelectedCrrId);
+  const rdtRequestId : string = useSelector(selectSelectedRdtId);
+  const hashTables : HashTable[] = useSelector(selectHashTables);
 
   useEffect(() => {
-    console.log("FastaSource");
-
     const allCacheRequests: Request[] = hashTables.map((hashTable: HashTable) => {
       console.log(hashTableToUrl(hashTable));
       const request = {
