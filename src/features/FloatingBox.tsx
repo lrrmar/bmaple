@@ -28,6 +28,7 @@ const FloatingBox = (props: Props) => {
     flexDirection: 'row-reverse',
     backgroundColor: 'rgba(100, 100, 150, 0.5)',
     borderRadius: '5px',
+    zIndex: 10,
     ...props.style,
   };
 
