@@ -6,12 +6,11 @@ interface GenericLayerMixIn {
   [key: string]: GenericLayerMixIn | string[] | string | number[] | number;
 }
 
-export interface Pending {
+export interface Pending extends GenericLayerMixIn {
   source: string;
 }
 
-export interface Entry extends Pending, GenericLayerMixIn {
-  source: string;
+export interface Entry extends Pending {
   ol_uid: string;
 }
 

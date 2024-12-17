@@ -40,8 +40,11 @@ const Graphics = () => {
   const colourPaletteId = useSelector(selectColourPaletteId);
   const opacity = useSelector(selectOpacity);
   const cache = useSelector(selectCacheEntries);
-  const [currentOlUid, setCurrentOlUid] = useState<string | null>(null);
-  const [layer, setLayer] = useState<VectorLayer<Feature> | null>(null);
+  const [currentLayer, setCurrentLayer] = useState<VectorLayer<Feature> | null>(
+    null,
+  );
+  const [oldLayer, setOldLayer] = useState<VectorLayer<Feature> | null>(null);
+  const [isStyling, setIsStyling] = useState<boolean>(false);
   const [defaultColourPalette, setDefaultColourPalette] = useState<{
     [key: string]: string;
   }>({});
@@ -54,7 +57,6 @@ const Graphics = () => {
     let cacheEntry: Entry | undefined = undefined;
     let geojsonFieldCacheEntry: GeojsonFieldEntry | undefined = undefined;
     let newLayer: VectorLayer<Feature> | undefined;
-    let currentLayer: VectorLayer<Feature> | undefined;
 
     // Get layer info from cache
     if (profileId) cacheEntry = cache[profileId];
@@ -68,26 +70,34 @@ const Graphics = () => {
     // Get new layer from open layers
     if (geojsonFieldCacheEntry)
       newLayer = mapUtils.getLayerByUid(geojsonFieldCacheEntry.ol_uid);
-    if (geojsonFieldCacheEntry)
-      if (geojsonFieldCacheEntry && currentOlUid)
-        // Get new layer from open layers
-        currentLayer = mapUtils.getLayerByUid(currentOlUid);
 
-    // Format current and new layers
-    if (currentLayer) currentLayer.setVisible(false);
+    // current layer ---> old layer
+    // new layer ---> current layer
+    // extract formatting data from new layer
+    if (currentLayer) setOldLayer(currentLayer);
     if (!geojsonFieldCacheEntry) return;
     if (!newLayer) return;
-    setLayer(newLayer);
-    setCurrentOlUid(geojsonFieldCacheEntry.ol_uid);
+    setCurrentLayer(newLayer);
     dispatch(updateContours(geojsonFieldCacheEntry.levels));
     setDefaultColourPalette(geojsonFieldCacheEntry.hex_palette);
     dispatch(updateUnits(geojsonFieldCacheEntry.units));
   }, [profileId]);
 
-  // Handle colouring
+  // Exchange layer visibility ASAP, dependant on styling bool
   useEffect(() => {
-    if (!layer) return;
-    const source: VectorSource<Feature> | null = layer.getSource();
+    if (isStyling) return;
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      setOldLayer(null);
+    }
+    if (currentLayer) currentLayer.setVisible(true);
+  }, [currentLayer]);
+
+  // Handle layer colouring change
+  useEffect(() => {
+    if (!currentLayer) return;
+    setIsStyling(true);
+    const source: VectorSource<Feature> | null = currentLayer.getSource();
     if (!source) return;
     let hexPalette: { [key: string]: string } = {};
     if (colourPaletteId !== 'default') {
@@ -104,15 +114,17 @@ const Graphics = () => {
         getVectorStyle(feature.getProperties().level, hexPalette),
       );
     });
-    layer.setVisible(true);
+    setIsStyling(false);
     dispatch(updateColourPalette(hexPalette));
-  }, [layer, colourPaletteId]);
+  }, [currentLayer, colourPaletteId]);
 
   // Handle opacity
   useEffect(() => {
-    if (!layer) return;
-    layer.setOpacity(opacity);
-  }, [layer, opacity]);
+    if (!currentLayer) return;
+    setIsStyling(true);
+    currentLayer.setOpacity(opacity);
+    setIsStyling(false);
+  }, [currentLayer, opacity]);
 
   // Dispatch list of colour palettes
   useEffect(() => {

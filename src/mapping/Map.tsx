@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, MutableRefObject } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import './Map.css';
 import MapType from 'ol/Map';
+import Feature, { FeatureLike } from 'ol/Feature';
+import Geometry from 'ol/geom/Geometry';
 import { toLonLat, fromLonLat } from 'ol/proj';
 
 import {
@@ -9,6 +11,8 @@ import {
   selectZoom,
   updateClickEvent,
   updateFeaturesAtClick,
+  FeatureAtClick,
+  isFeatureAtClick,
 } from './mapSlice';
 import OpenLayersMap from './OpenLayersMap';
 
@@ -97,12 +101,14 @@ const Map = ({ children }: Props) => {
       longitude: lonLat[0],
       latitude: lonLat[1],
     };
-    const featuresAtClick = map
-      .getFeaturesAtPixel([e.clientX, e.clientY])
-      .map((feature) => {
+    const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
+      map.getFeaturesAtPixel([e.clientX, e.clientY]);
+    if (!featuresAtPixel) return;
+    const featuresAtClick: (FeatureAtClick | undefined)[] = featuresAtPixel.map(
+      (feature: Feature<Geometry> | FeatureLike) => {
+        if (!feature) return;
         const geometry = feature.getGeometry();
         if (!geometry) return;
-
         const geometryType: string = geometry.getType();
         const ol_uid: string = feature.getProperties()['ol_uid'];
         if (!ol_uid) return;
@@ -111,15 +117,18 @@ const Map = ({ children }: Props) => {
           ...feature.getProperties(),
         }; // get type
         delete values.geometry;
-        const info = {
-          ol_uid: feature.getProperties()['ol_uid'],
+        const info: FeatureAtClick = {
+          ol_uid: ol_uid,
           geometry: geometryType,
           ...values,
         };
         return info;
-      });
+      },
+    );
+    const filteredFeaturesAtClick: FeatureAtClick[] =
+      featuresAtClick.filter(isFeatureAtClick);
     dispatch(updateClickEvent(mapCoordinate));
-    dispatch(updateFeaturesAtClick(featuresAtClick));
+    dispatch(updateFeaturesAtClick(filteredFeaturesAtClick));
   }
 
   return (

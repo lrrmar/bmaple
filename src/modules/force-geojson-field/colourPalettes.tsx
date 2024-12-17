@@ -12,6 +12,9 @@ const IBM = (n: number): string[] =>
     .mode('lab')
     .colors(n);
 
+const redBlue = (n: number): string[] =>
+  chroma.scale(['blue', 'red']).mode('lab').colors(n);
+
 const tol = (n: number): string[] =>
   chroma
     .scale([
@@ -33,6 +36,7 @@ interface ColourPalettes {
 const colourPalettes: ColourPalettes = {
   viridis: viridis,
   'white-blue': whiteBlue,
+  'red-blue': redBlue,
   IBM: IBM,
   tol: tol,
 };

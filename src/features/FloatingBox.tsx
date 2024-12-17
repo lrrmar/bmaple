@@ -34,17 +34,15 @@ const FloatingBox = (props: Props) => {
 
   console.log(style);
   return (
-    <div style={style}>
-      {!!minimise && (
-        <button
-          onClick={(e) => {
-            setIsMinimised(!isMinimised);
-          }}
-        >
-          {minimise}
-        </button>
-      )}
-      {!isMinimised && props.children}
+    <div>
+      <button
+        onClick={(e) => {
+          setIsMinimised(!isMinimised);
+        }}
+      >
+        {minimise}
+      </button>
+      <div style={style}>{!isMinimised && props.children}</div>
     </div>
   );
 };

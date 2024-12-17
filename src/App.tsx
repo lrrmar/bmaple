@@ -53,10 +53,16 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
       </Map>
-      <FloatingBox>
+      <FloatingBox
+        style={{
+          backgroundImage:
+            'linear-gradient(to top, rgb(0, 0, 0), rgb(28, 28, 28)',
+          color: 'rgb(250, 250, 250)',
+        }}
+      >
         <LayerSelector />
       </FloatingBox>
-      <FloatingBox style={{ top: '10px' }}>
+      <FloatingBox minimise={'?'} style={{ top: '10px' }}>
         <ContourColourBar />
       </FloatingBox>
       <FoldOutMenu align={'left'}>

@@ -120,7 +120,7 @@ const LayerSelector = () => {
 
   const style: React.CSSProperties = {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
   };
 
   useEffect(() => {
@@ -158,173 +158,187 @@ const LayerSelector = () => {
     <div style={style}>
       {/*isLoading && <LoadingSpinner />*/}
       <label htmlFor="varname">Variable:</label>
-      <select
-        id="varname"
-        value={varname}
-        onChange={(e) => {
-          setVarname(e.target.value);
-        }}
-      >
-        {[...availableVarnames].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
+      <div>
+        <select
+          id="varname"
+          value={varname}
+          onChange={(e) => {
+            setVarname(e.target.value);
+          }}
+        >
+          {[...availableVarnames].map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </select>
+      </div>
       <label htmlFor="Domain">Domain:</label>
-      <select
-        id="domain"
-        value={domain}
-        onChange={(e) => {
-          setDomain(parseInt(e.target.value));
-        }}
-      >
-        {[...availableDomains].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={() => {
-          const currentIndex = availableDomains.indexOf(domain);
-          if (currentIndex === 0) {
-            return;
-          }
-          setDomain(availableDomains[currentIndex - 1]);
-        }}
-      >
-        -
-      </button>
-      <button
-        onClick={() => {
-          const currentIndex = availableDomains.indexOf(domain);
-          if (currentIndex === availableDomains.length - 1) {
-            return;
-          }
-          setDomain(availableDomains[currentIndex + 1]);
-        }}
-      >
-        +
-      </button>
+      <div>
+        <select
+          id="domain"
+          value={domain}
+          onChange={(e) => {
+            setDomain(parseInt(e.target.value));
+          }}
+        >
+          {[...availableDomains].map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={() => {
+            const currentIndex = availableDomains.indexOf(domain);
+            if (currentIndex === 0) {
+              return;
+            }
+            setDomain(availableDomains[currentIndex - 1]);
+          }}
+        >
+          -
+        </button>
+        <button
+          onClick={() => {
+            const currentIndex = availableDomains.indexOf(domain);
+            if (currentIndex === availableDomains.length - 1) {
+              return;
+            }
+            setDomain(availableDomains[currentIndex + 1]);
+          }}
+        >
+          +
+        </button>
+      </div>
       <label htmlFor="startTime">Start time:</label>
-      <select
-        id="startTime"
-        value={startTime}
-        onChange={(e) => {
-          setStartTime(e.target.value);
-        }}
-      >
-        {[...availableStartTimes].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
+      <div>
+        <select
+          id="startTime"
+          value={startTime}
+          onChange={(e) => {
+            setStartTime(e.target.value);
+          }}
+        >
+          {[...availableStartTimes].map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </select>
+      </div>
       <label htmlFor="validTime">Valid time:</label>
-      <select
-        id="validTime"
-        value={validTime}
-        onChange={(e) => {
-          dispatch(updatePositioning({ ...positioning, time: e.target.value }));
-        }}
-      >
-        {[...availableValidTimes].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={() => {
-          const currentIndex = availableValidTimes.indexOf(validTime);
-          if (currentIndex === 0) {
-            return;
-          }
-          dispatch(
-            updatePositioning({
-              ...positioning,
-              time: availableValidTimes[currentIndex - 1],
-            }),
-          );
-        }}
-      >
-        -
-      </button>
-      <button
-        onClick={() => {
-          const currentIndex = availableValidTimes.indexOf(validTime);
-          if (currentIndex === availableValidTimes.length - 1) {
-            return;
-          }
-          dispatch(
-            updatePositioning({
-              ...positioning,
-              time: availableValidTimes[currentIndex + 1],
-            }),
-          );
-        }}
-      >
-        +
-      </button>
-      <button
-        onClick={() => {
-          setAnimate(!animate);
-        }}
-      >
-        {animate ? '\u25A0' : '\u25B6'}
-      </button>
-      <label htmlFor="Vertical Level">Level:</label>
-      <select
-        id="verticalLevel"
-        value={verticalLevel}
-        onChange={(e) => {
-          dispatch(
-            updatePositioning({
-              ...positioning,
-              verticalLevel: e.target.value,
-            }),
-          );
-        }}
-      >
-        {[...availableLevels].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={() => {
-          const currentIndex = availableLevels.indexOf(verticalLevel);
-          if (currentIndex === 0) {
-            return;
-          }
-          dispatch(
-            updatePositioning({
-              ...positioning,
-              verticalLevel: availableLevels[currentIndex - 1],
-            }),
-          );
-        }}
-      >
-        -
-      </button>
-      <button
-        onClick={() => {
-          const currentIndex = availableLevels.indexOf(verticalLevel);
-          if (currentIndex === availableLevels.length - 1) {
-            return;
-          }
-          dispatch(
-            updatePositioning({
-              ...positioning,
-              verticalLevel: availableLevels[currentIndex + 1],
-            }),
-          );
-        }}
-      >
-        +
-      </button>
+      <div>
+        <select
+          id="validTime"
+          value={validTime}
+          onChange={(e) => {
+            dispatch(
+              updatePositioning({ ...positioning, time: e.target.value }),
+            );
+          }}
+        >
+          {[...availableValidTimes].map((val) => (
+            <option key={val} value={val}>
+              {val}
+            </option>
+          ))}
+        </select>
+        <div>
+          <button
+            onClick={() => {
+              const currentIndex = availableValidTimes.indexOf(validTime);
+              if (currentIndex === 0) {
+                return;
+              }
+              dispatch(
+                updatePositioning({
+                  ...positioning,
+                  time: availableValidTimes[currentIndex - 1],
+                }),
+              );
+            }}
+          >
+            -
+          </button>
+          <button
+            onClick={() => {
+              const currentIndex = availableValidTimes.indexOf(validTime);
+              if (currentIndex === availableValidTimes.length - 1) {
+                return;
+              }
+              dispatch(
+                updatePositioning({
+                  ...positioning,
+                  time: availableValidTimes[currentIndex + 1],
+                }),
+              );
+            }}
+          >
+            +
+          </button>
+          <button
+            onClick={() => {
+              setAnimate(!animate);
+            }}
+          >
+            {animate ? '\u25A0' : '\u25B6'}
+          </button>
+        </div>
+        <label htmlFor="Vertical Level">Level:</label>
+        <div>
+          <select
+            id="verticalLevel"
+            value={verticalLevel}
+            onChange={(e) => {
+              dispatch(
+                updatePositioning({
+                  ...positioning,
+                  verticalLevel: e.target.value,
+                }),
+              );
+            }}
+          >
+            {[...availableLevels].map((val) => (
+              <option key={val} value={val}>
+                {val}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => {
+              const currentIndex = availableLevels.indexOf(verticalLevel);
+              if (currentIndex === 0) {
+                return;
+              }
+              dispatch(
+                updatePositioning({
+                  ...positioning,
+                  verticalLevel: availableLevels[currentIndex - 1],
+                }),
+              );
+            }}
+          >
+            -
+          </button>
+          <button
+            onClick={() => {
+              const currentIndex = availableLevels.indexOf(verticalLevel);
+              if (currentIndex === availableLevels.length - 1) {
+                return;
+              }
+              dispatch(
+                updatePositioning({
+                  ...positioning,
+                  verticalLevel: availableLevels[currentIndex + 1],
+                }),
+              );
+            }}
+          >
+            +
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

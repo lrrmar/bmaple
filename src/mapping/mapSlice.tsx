@@ -1,6 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../App';
 
+export interface FeatureAtClick {
+  ol_uid: string;
+  geometry: string;
+  [key: string]: string | number;
+}
+
+export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
+  return !!x && typeof x.ol_uid === 'string' && x.geometry === 'string';
+};
+
 interface InitialState {
   center: number[] | null;
   zoom: number | null;
@@ -10,7 +20,7 @@ interface InitialState {
     verticalLevel: string;
   };
   clickEvent: { longitude: number; latitude: number } | null;
-  featuresAtClick: ({ [key: string]: string } | undefined)[] | void[]; // Need to tackle the values / properties object from features to filter out undefined!
+  featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
   baseMapId: string;
 }
@@ -57,9 +67,7 @@ export const mapSlice = createSlice({
     },
     updateFeaturesAtClick: (
       state,
-      features: PayloadAction<
-        ({ [key: string]: string } | undefined)[] | void[]
-      >,
+      features: PayloadAction<FeatureAtClick[]>,
     ) => {
       state.featuresAtClick = features.payload;
     },
