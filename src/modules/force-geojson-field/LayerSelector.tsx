@@ -1,10 +1,17 @@
+import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import React, { useEffect, useState, useRef } from 'react';
+import { Button, Dropdown } from 'semantic-ui-react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../hooks';
 import LoadingSpinner from '../../features/LoadingSpinner';
-import { updatePositioning, selectPositioning } from '../../mapping/mapSlice';
+import {
+  updateDisplayTime,
+  selectDisplayTime,
+  updateVerticalLevel,
+  selectVerticalLevel,
+} from '../../mapping/mapSlice';
 import { HashTable } from './geojsonFieldHashTables';
 
 import {
@@ -15,23 +22,55 @@ import {
   selectHashesFlag,
 } from './geojsonFieldSlice';
 
+type DropDownListProps = {
+  value: string;
+  setValue:
+    | React.Dispatch<React.SetStateAction<string>>
+    | ((arg: string) => void);
+  //    | ActionCreatorWithPayload<string>;
+  values: string[];
+};
+
+const isString = (x: any) => !!x && typeof x === 'string';
+
+const DropDownList = ({
+  value,
+  setValue,
+  values,
+}: DropDownListProps): React.ReactElement => (
+  <Dropdown
+    id={value.toString()}
+    placeholder={value.toString()}
+    search
+    onChange={(e, d) => {
+      if (typeof d.value === 'string') {
+        setValue(d.value);
+      }
+    }}
+    options={[...values].map((val) => ({
+      key: val,
+      text: val,
+      value: val,
+    }))}
+  />
+);
+
 const LayerSelector = () => {
   const dispatch = useDispatch();
-  const positioning = useSelector(selectPositioning);
+  const validTime = useSelector(selectDisplayTime);
+  const verticalLevel = useSelector(selectVerticalLevel);
   const geojsonFieldHashesFlag = useSelector(selectHashesFlag);
   const profileId = useSelector(selectProfileId);
   const selectedId = useSelector(selectSelectedId);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableVarnames, setAvailableVarnames] = useState<string[]>([]);
-  const [availableDomains, setAvailableDomains] = useState<number[]>([]);
+  const [availableDomains, setAvailableDomains] = useState<string[]>([]);
   const [availableStartTimes, setAvailableStartTimes] = useState<string[]>([]);
   const [availableValidTimes, setAvailableValidTimes] = useState<string[]>([]);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
   const [varname, setVarname] = useState<string>('');
-  const [domain, setDomain] = useState<number>(-1);
+  const [domain, setDomain] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
-  const validTime = positioning.time;
-  const verticalLevel = positioning.verticalLevel;
   const variableHashes: HashTable[] = useSelector(selectHashTables);
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
@@ -44,14 +83,10 @@ const LayerSelector = () => {
       return;
     }
     setVarname(variableHashes[0].varname);
-    setDomain(variableHashes[0].grid_id);
+    setDomain(variableHashes[0].grid_id.toString());
     setStartTime(variableHashes[0].sim_start_time);
-    dispatch(
-      updatePositioning({
-        time: variableHashes[0].valid_time,
-        verticalLevel: variableHashes[0].level_type,
-      }),
-    );
+    dispatch(updateDisplayTime(variableHashes[0].valid_time));
+    dispatch(updateVerticalLevel(variableHashes[0].level_type));
     setAvailableVarnames([
       ...new Set(
         variableHashes.map((hash) => {
@@ -63,7 +98,7 @@ const LayerSelector = () => {
       [
         ...new Set(
           variableHashes.map((hash) => {
-            return hash['grid_id'];
+            return hash['grid_id'].toString();
           }),
         ),
       ].sort(),
@@ -103,7 +138,7 @@ const LayerSelector = () => {
       sim_start_time: startTime,
       valid_time: validTime,
       level_type: verticalLevel,
-      grid_id: domain,
+      grid_id: parseInt(domain),
     };
     const layerHash = variableHashes.find((dict) =>
       Object.entries(layerMetaData).every(
@@ -135,12 +170,7 @@ const LayerSelector = () => {
       if (currentIndex === availableValidTimes.length - 1) {
         return;
       }
-      dispatch(
-        updatePositioning({
-          ...positioning,
-          time: availableValidTimes[currentIndex + 1],
-        }),
-      );
+      dispatch(updateDisplayTime(availableValidTimes[currentIndex + 1]));
     }
   }, [pulse]);
 
@@ -158,37 +188,19 @@ const LayerSelector = () => {
     <div style={style}>
       {/*isLoading && <LoadingSpinner />*/}
       <label htmlFor="varname">Variable:</label>
-      <div>
-        <select
-          id="varname"
-          value={varname}
-          onChange={(e) => {
-            setVarname(e.target.value);
-          }}
-        >
-          {[...availableVarnames].map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </select>
-      </div>
+      <DropDownList
+        values={availableVarnames}
+        value={varname}
+        setValue={setVarname}
+      />
       <label htmlFor="Domain">Domain:</label>
+      <DropDownList
+        values={availableDomains}
+        value={domain}
+        setValue={setDomain}
+      />
       <div>
-        <select
-          id="domain"
-          value={domain}
-          onChange={(e) => {
-            setDomain(parseInt(e.target.value));
-          }}
-        >
-          {[...availableDomains].map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </select>
-        <button
+        <Button
           onClick={() => {
             const currentIndex = availableDomains.indexOf(domain);
             if (currentIndex === 0) {
@@ -198,8 +210,8 @@ const LayerSelector = () => {
           }}
         >
           -
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => {
             const currentIndex = availableDomains.indexOf(domain);
             if (currentIndex === availableDomains.length - 1) {
@@ -209,134 +221,87 @@ const LayerSelector = () => {
           }}
         >
           +
-        </button>
+        </Button>
       </div>
       <label htmlFor="startTime">Start time:</label>
       <div>
-        <select
-          id="startTime"
+        <DropDownList
+          values={availableStartTimes}
           value={startTime}
-          onChange={(e) => {
-            setStartTime(e.target.value);
-          }}
-        >
-          {[...availableStartTimes].map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </select>
+          setValue={setStartTime}
+        />
       </div>
       <label htmlFor="validTime">Valid time:</label>
       <div>
-        <select
-          id="validTime"
+        <DropDownList
+          values={availableValidTimes}
           value={validTime}
-          onChange={(e) => {
-            dispatch(
-              updatePositioning({ ...positioning, time: e.target.value }),
-            );
-          }}
-        >
-          {[...availableValidTimes].map((val) => (
-            <option key={val} value={val}>
-              {val}
-            </option>
-          ))}
-        </select>
+          setValue={(time: string) => dispatch(updateDisplayTime(time))}
+        />
         <div>
-          <button
+          <Button
             onClick={() => {
               const currentIndex = availableValidTimes.indexOf(validTime);
               if (currentIndex === 0) {
                 return;
               }
               dispatch(
-                updatePositioning({
-                  ...positioning,
-                  time: availableValidTimes[currentIndex - 1],
-                }),
+                updateDisplayTime(availableValidTimes[currentIndex - 1]),
               );
             }}
           >
             -
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               const currentIndex = availableValidTimes.indexOf(validTime);
               if (currentIndex === availableValidTimes.length - 1) {
                 return;
               }
               dispatch(
-                updatePositioning({
-                  ...positioning,
-                  time: availableValidTimes[currentIndex + 1],
-                }),
+                updateDisplayTime(availableValidTimes[currentIndex + 1]),
               );
             }}
           >
             +
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               setAnimate(!animate);
             }}
           >
             {animate ? '\u25A0' : '\u25B6'}
-          </button>
+          </Button>
         </div>
         <label htmlFor="Vertical Level">Level:</label>
         <div>
-          <select
-            id="verticalLevel"
+          <DropDownList
+            values={availableLevels}
             value={verticalLevel}
-            onChange={(e) => {
-              dispatch(
-                updatePositioning({
-                  ...positioning,
-                  verticalLevel: e.target.value,
-                }),
-              );
-            }}
-          >
-            {[...availableLevels].map((val) => (
-              <option key={val} value={val}>
-                {val}
-              </option>
-            ))}
-          </select>
-          <button
+            setValue={(level: string) => dispatch(updateVerticalLevel(level))}
+          />
+          <Button
             onClick={() => {
               const currentIndex = availableLevels.indexOf(verticalLevel);
               if (currentIndex === 0) {
                 return;
               }
-              dispatch(
-                updatePositioning({
-                  ...positioning,
-                  verticalLevel: availableLevels[currentIndex - 1],
-                }),
-              );
+              dispatch(updateVerticalLevel(availableLevels[currentIndex - 1]));
             }}
           >
             -
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => {
               const currentIndex = availableLevels.indexOf(verticalLevel);
               if (currentIndex === availableLevels.length - 1) {
                 return;
               }
-              dispatch(
-                updatePositioning({
-                  ...positioning,
-                  verticalLevel: availableLevels[currentIndex + 1],
-                }),
-              );
+              dispatch(updateVerticalLevel(availableLevels[currentIndex + 1]));
             }}
           >
             +
-          </button>
+          </Button>
         </div>
       </div>
     </div>

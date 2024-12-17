@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
+import 'semantic-ui-css/semantic.min.css';
 
 import './index.css';
 import App, { store } from './App';
