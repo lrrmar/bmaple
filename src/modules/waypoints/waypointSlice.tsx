@@ -8,10 +8,12 @@ import {
 
 interface InitialState {
   profileIds: string[];
+  mode: string | undefined;
 }
 
 const initialState: InitialState = {
   profileIds: [],
+  mode: 'default',
 };
 
 export interface GenericLayerMixIn {
@@ -48,6 +50,7 @@ export const waypointSlice = createSlice({
 
 export const { appendProfileIds } = waypointSlice.actions;
 export const selectProfileIds = (state: RootState) => state.waypoint.profileIds;
+export const selectMode = (state: RootState) => state.waypoint.mode;
 export const selectWaypoints = (state: RootState) =>
   state.waypoint.profileIds.map((id) => state.cache[id]);
 export default waypointSlice.reducer;

@@ -19,6 +19,8 @@ import Geometry from 'ol/geom/Geometry';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import WaypointSourceLayer from './WaypointSourceLayer';
 
+import { selectMode } from './waypointSlice';
+
 interface Props {
   sourceIdentifier: string;
   cache: Cache;
@@ -30,6 +32,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
   const featuresAtClick = useSelector(selectFeaturesAtClick);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const mode = useSelector(selectMode);
   const [clickEvents, setClickEvents] = useState([]);
 
   useEffect(() => {
@@ -73,6 +76,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
     dispatch(
       request({
         source: sourceIdentifier,
+        mode: mode,
         id: uid,
         ...clickEvent,
         time: displayTime,
@@ -91,9 +95,6 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
       />
     );
   });
-
-  console.log(cache);
-  console.log(sourcesToLoad);
 
   return <div className="WaypointSource">{sourcesToLoad}</div>;
 };
