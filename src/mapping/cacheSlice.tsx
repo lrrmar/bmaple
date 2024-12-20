@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../App';
 
-interface GenericLayerMixIn {
-  [key: string]: GenericLayerMixIn | string[] | string | number[] | number;
+export interface Generic {
+  [key: string]: Generic | string[] | string | number[] | number | undefined;
 }
 
-export interface Pending extends GenericLayerMixIn {
+export interface Pending {
   source: string;
 }
 
@@ -14,7 +14,9 @@ export interface Entry extends Pending {
   ol_uid: string;
 }
 
-export type CacheElement = Pending | Entry;
+export type CacheElement =
+  | (Pending & Partial<Generic>)
+  | (Entry & Partial<Generic>);
 
 export interface Cache {
   [key: string]: CacheElement;
@@ -24,28 +26,21 @@ interface InitialState {
   [key: string]: CacheElement;
 }
 
-export interface Request extends Pending {
+interface Action {
   id: string;
 }
 
-export interface Ingest extends Entry {
-  id: string;
-}
+export type Request = Pending & Action & Partial<Generic>;
+export type Ingest = Entry & Action & Partial<Generic>;
+export type Update = Action & Partial<Generic>;
+export type Remove = Action;
 
-export interface Update extends GenericLayerMixIn {
-  id: string;
-}
-
-export interface Remove {
-  id: string;
-}
-
-export const isPending = (element: CacheElement): element is Pending => {
+export const isPending = (element: any): element is Pending => {
   const keys: string[] = Object.keys(element);
   return keys.includes('source') && !keys.includes('ol_uid');
 };
 
-export const isEntry = (element: CacheElement): element is Entry => {
+export const isEntry = (element: any): element is Entry => {
   const keys: string[] = Object.keys(element);
   return keys.includes('source') && keys.includes('ol_uid');
 };
@@ -64,8 +59,8 @@ export const cacheSlice = createSlice({
         : [data.payload];
       toRequest.forEach((request: Request) => {
         const id: string = request.id;
-        const source: string = request.source;
-        cache[id] = { source: source };
+        delete request[id];
+        cache[id] = request;
       });
       state = cache;
     },
@@ -92,7 +87,7 @@ export const cacheSlice = createSlice({
       toUpdate.forEach((update: Update) => {
         const id: string = update.id;
         if (!isEntry(cache[id])) return;
-        const updates: GenericLayerMixIn = update;
+        const updates: Generic = update;
         delete updates.id;
         cache[id] = { ...cache[id], ...updates };
       });

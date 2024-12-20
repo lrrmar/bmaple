@@ -6,7 +6,7 @@ import {
 
 import { updateProfileId, selectSelectedId } from './geojsonFieldSlice';
 
-import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
+import { request, Request, Cache } from '../../mapping/cacheSlice';
 
 import HashTablesServer from './geojsonFieldHashTables';
 import SourceLayer from './GeojsonFieldSourceLayer';
@@ -21,7 +21,7 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
 
   useEffect(() => {
     if (requestId && !cache[requestId]) {
-      dispatch(request({ id: requestId, source: 'geojsonField' }));
+      dispatch(request({ id: requestId, source: sourceIdentifier }));
     } else {
       dispatch(updateProfileId(requestId));
     }

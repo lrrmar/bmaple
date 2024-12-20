@@ -14,6 +14,9 @@ import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice
 import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
+import waypointReducer from './modules/waypoints/waypointSlice';
+import WaypointSource from './modules/waypoints/WaypointSource';
+import WaypointProfile from './modules/waypoints/WaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
@@ -25,6 +28,7 @@ export const store = configureStore({
     map: mapReducer,
     cache: cacheReducer,
     geojsonField: geojsonFieldReducer,
+    waypoint: waypointReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -43,9 +47,11 @@ const App = () => {
       <Map>
         <Profiles>
           <GeojsonFieldProfile />
+          <WaypointProfile />
         </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
+          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
