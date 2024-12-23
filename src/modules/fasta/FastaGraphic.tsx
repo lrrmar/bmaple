@@ -9,12 +9,11 @@ import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import { getUid } from 'ol/util';
 import { get } from 'ol/proj';
-
-//import mapObject from '../OLMap.js';
-//import getVectorStyle from '../Styles.js';
 import {
   selectProfileCrrId,
-  selectProfileRdtId
+  selectProfileRdtId,
+  selectFastaProducts,
+  FastaProduct,
 } from './fastaSlice';
 import { Entry, request, Request, selectCache } from '../../mapping/cacheSlice';
 
@@ -23,6 +22,8 @@ import BaseLayer from 'ol/layer/Base.js';
 import Style, { StyleLike } from 'ol/style/Style.js';
 import Fill from 'ol/style/Fill';
 import { FeatureLike } from 'ol/Feature';
+import { FlatStyleLike } from 'ol/style/flat';
+import Stroke from 'ol/style/Stroke';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -37,13 +38,44 @@ const Graphics = () => {
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string|null>(null);
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string|null>(null);
+  const products : FastaProduct[] = useSelector(selectFastaProducts);
+  const invisibleStyle = (feature: any, resolution: any) => [];
 
-  const showHideLayers = (newOlUid: string|null, currentOlUid: string|null, layerStyle: StyleLike) => {
+
+  const getLayer = (
+    uid: string|null) : VectorTileLayer<Feature<Geometry>>|null => {
+    
+    var baseLayer: BaseLayer|undefined = undefined;
+    var vectorTileLayer : VectorTileLayer<Feature<Geometry>>|null = null;
+
+    map
+      .getLayers()
+      .getArray()
+      .forEach((l) => {
+        if (getUid(l) === uid) {
+          baseLayer = l;
+        }
+      });
+    
+    if (baseLayer) {
+      vectorTileLayer = baseLayer as VectorTileLayer<Feature<Geometry>>;
+    }
+    return vectorTileLayer;
+  }
+
+  const showHideLayers = (
+    newOlUid: string|null,
+    currentOlUid: string|null,
+    isProductVisible: boolean,
+    layerStyle: StyleLike | FlatStyleLike | null | undefined,
+    layerOpacity: number|null) : VectorTileLayer<Feature<Geometry>>|null => {
     
     const invisibleStyle = (feature: any, resolution: any) => [];
 
     var newBaseLayer: BaseLayer|undefined = undefined;
     var oldBaseLayer: BaseLayer|undefined = undefined;
+
+    var newLayer : VectorTileLayer<Feature<Geometry>>|null = null;
 
     map
       .getLayers()
@@ -65,27 +97,28 @@ const Graphics = () => {
     }
   
     if (newBaseLayer) {
-      var newLayer = newBaseLayer as VectorTileLayer<Feature<Geometry>>;
-      if (!newLayer) {
-        return;
-      }
-        /*
-        Needed??
-        if (newLayer.hasOwnProperty('levels')) {
+      
+      newLayer = newBaseLayer as VectorTileLayer<Feature<Geometry>>;
 
-          newLayer
-          .getSource()
-          .getFeatures()
-          .map((feature) => {
-            feature.setStyle(
-              getVectorStyle(feature.getProperties().level, newLayer.hex_palette),
-            );
-          });
-        */
+      if (!newLayer) {
+        return null;
+      }
+
+      if (!isProductVisible) {
+        newLayer.setVisible(false);
+        newLayer.setStyle(invisibleStyle);
+        return null;
+      }
+
       newLayer.setVisible(true);
       newLayer.setStyle(layerStyle);
-      newLayer.setOpacity(0.8);
+
+      if (layerOpacity) {
+        newLayer.setOpacity(layerOpacity);
+      }
     }
+
+    return newLayer;
   };
 
   function createCrrStyleFunction() {
@@ -122,16 +155,45 @@ const Graphics = () => {
 
   function createRdtStyleFunction() {
     
-    const style_cell000 = new Style({fill: new Fill({color:'#fe293b'})});
-    const fallback = new Style({fill: new Fill({color:'#ccc'})});
+    const fillStyleCell000 = new Style({fill: new Fill({color:'rgb(254, 41, 59, 0.4)'})}); // red, semi-transparent
+    const fillFallback = new Style({fill: new Fill({color:'#ccc'})});
 
-    return (feature: FeatureLike) => {
-      const rainRate = feature.get('object_type');
-      if (rainRate === 'cell-000') { return style_cell000; }
-      else { return fallback; }
-    }
+    const lineStyleCell000 = new Style({stroke: new Stroke({color:'rgb(254, 41, 59, 0.9)', width: 1})}); // red
+    const lineStyleForecast = new Style({stroke: new Stroke({color:'#000000', width: 2})});
+    const lineStylePast = new Style({stroke: new Stroke({color:'#666666', width: 2})});
+    const lineFallback = new Style({stroke: new Stroke({color:'#ccc', width: 0})});
+
+    const styleFunction = (feature: FeatureLike) => {
+
+      var fillStyle = null;
+      var lineStyle = null;
+
+      const objectType = feature.get('object_type');
+
+      if (objectType === 'cell-000') { fillStyle = fillStyleCell000; }
+      else { fillStyle = fillFallback; }
+
+      if (objectType === 'cell-000') { lineStyle = lineStyleCell000; }
+      else if (objectType === 'FcstCGTraj') { lineStyle = lineStyleForecast; }
+      else if (objectType === 'PastCGTraj') { lineStyle = lineStylePast; }
+      else { lineStyle = lineFallback; }
+
+      return [fillStyle, lineStyle];
+    };
+
+    return styleFunction;
   }
 
+
+  const isProductVisible = (productName : string) => {        
+    const idxProduct = products.findIndex((pr) => pr.name === productName);
+    if (idxProduct !== -1) {
+        return products[idxProduct].visible;
+    }
+    else {
+        return false;
+    }
+}
 
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
@@ -148,34 +210,39 @@ const Graphics = () => {
     else {
       newOlUidCrr = layer.ol_uid;
     }
-    showHideLayers(newOlUidCrr, currentOlUidCrr, crrStyle);
+    
+    const crrIsVisible = isProductVisible("CRR");
+    
+    const oldLayer = getLayer(currentOlUidCrr);
+    const newLayer = getLayer(newOlUidCrr);
+
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      oldLayer.setStyle(invisibleStyle);
+    }
+
+    //showHideLayers(newOlUidCrr, currentOlUidCrr, crrIsVisible, crrStyle, 0.7);
+    if (newLayer) {
+
+      if (crrIsVisible) {
+        newLayer.setVisible(true);
+        newLayer.setStyle(crrStyle);
+      }
+      else {
+        newLayer.setVisible(false);
+        newLayer.setStyle(invisibleStyle);
+      }
+    }
+
     setCurrentOlUidCrr(newOlUidCrr);
-  }, [crrLayerId]);
+  }, [crrLayerId, products]);
 
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
      */
 
-    const rdtFillStyle = createRdtStyleFunction();
-
-    /*
-    const rdtLineStyle = {
-      'line-color': [
-        'match',
-        ['get', 'object_type'],
-        'cell-000',
-        '#fe293b', // red
-        'FcstCGTraj',
-        '#000000',
-        'PastCGTraj',
-        '#666666',
-        '#ccc',
-      ],
-      //'line-opacity': hiddenOpacity,
-      //'line-width': 2
-    };
-    */
+    const rdtStyles = createRdtStyleFunction();
 
     var newOlUidRdt: string|null = null;
     var layer = layerCache[rdtLayerId] as Entry;
@@ -185,10 +252,34 @@ const Graphics = () => {
     else {
       newOlUidRdt = layer.ol_uid;
     }
-    showHideLayers(newOlUidRdt, currentOlUidRdt, rdtFillStyle);
+
+    const rdtIsVisible = isProductVisible("RDT");
+    
+    const oldLayer = getLayer(currentOlUidRdt);
+    const newLayer = getLayer(newOlUidRdt);
+
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      oldLayer.setStyle(invisibleStyle);
+    }
+
+    //showHideLayers(newOlUidCrr, currentOlUidCrr, crrIsVisible, crrStyle, 0.7);
+    if (newLayer) {
+
+      if (rdtIsVisible) {
+        newLayer.setVisible(true);
+        newLayer.setStyle(rdtStyles);
+      }
+      else {
+        newLayer.setVisible(false);
+        newLayer.setStyle(invisibleStyle);
+      }
+    }
 
     setCurrentOlUidRdt(newOlUidRdt);
-  }, [rdtLayerId]);
+
+
+  }, [rdtLayerId, products]);
 
   return <div className="FastaGraphics"></div>;
 };

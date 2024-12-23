@@ -1,0 +1,25 @@
+:root {
+    --text-color: black;
+    --mid-blue-color: #276AB3;
+}
+
+.product-selector {
+    text-align: left;
+    color: var(--text-color);
+    font-size: large;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    margin-left: 0px;
+}
+
+.product-selector ul {
+    list-style-type: none;
+    font-size: large;
+    margin-left: 0px;
+    padding-left: 10px;
+    padding-right: 15px;
+}
+
+.product-selector li {
+    margin-top: 5px;
+  }

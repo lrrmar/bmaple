@@ -14,8 +14,12 @@ import FastaProfile from './modules/fasta/FastaGraphic';
 import FastaSource from './modules/fasta/FastaSource';
 import FastaMainMenu from './modules/fasta/FastaMainMenu';
 import FastaSourceLayer from './modules/fasta/FastaSourceLayer';
-
-
+import BaseMaps from './mapping/BaseMaps';
+import LightBaseMap from './mapping/LightBaseMap';
+import DarkBaseMap from './mapping/DarkBaseMap';
+import OSMBaseMap from './mapping/OSMBaseMap';
+import FloatingBox from './features/FloatingBox';
+import ProductSelector from './modules/fasta/ProductSelector';
 
 export const store = configureStore({
   reducer: {
@@ -36,6 +40,9 @@ interface SourceProps {
   cache?: number;
 }
 
+const floatingBoxStyle = { top: '20px', right: '20px',
+  borderColor: 'black', borderWidth: '2px',
+  borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
 
 const App = () => {
   useEffect(() => {
@@ -50,6 +57,14 @@ const App = () => {
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
         </Sources>
+        <BaseMaps>
+          <DarkBaseMap id={'dark'} />
+          <LightBaseMap id={'light'} />
+          <OSMBaseMap id={'OSM'} />
+        </BaseMaps>
+        <FloatingBox style={floatingBoxStyle}>
+          <ProductSelector></ProductSelector>
+        </FloatingBox>
         <TileLayer />
       </Map>
       <FastaMainMenu>

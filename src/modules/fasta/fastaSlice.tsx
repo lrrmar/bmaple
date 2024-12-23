@@ -13,6 +13,13 @@ interface InitialState {
   profileRdtId: string | null;
   hashTables: HashTable[];
   latestTimeslot: string | null;
+  fastaProducts: FastaProduct[];
+}
+
+export interface FastaProduct {
+  order: number;
+  name: string;
+  visible: boolean; // whether or not this product is currently visible on the map
 }
 
 const initialState: InitialState = {
@@ -23,6 +30,15 @@ const initialState: InitialState = {
   profileRdtId: null,
   hashTables: [],
   latestTimeslot: null,
+  fastaProducts: [ {
+    order: 0,
+    name: 'CRR',
+    visible: true,
+  }, {
+    order: 1,
+    name: 'RDT',
+    visible: false
+  }],
 };
 
 export const fastaSlice = createSlice({
@@ -49,6 +65,9 @@ export const fastaSlice = createSlice({
     updateLatestTimeslot: (state, timeslot: PayloadAction<string | null>) => {
       state.latestTimeslot = timeslot.payload;
     },
+    updateFastaProducts: (state, products : FastaProduct[]) => {
+      state.fastaProducts = products.payload;
+    },
   },
 });
 
@@ -59,6 +78,7 @@ export const {
   updateProfileRdtId,
   updateHashTables,
   updateLatestTimeslot,
+  updateFastaProducts,
 } = fastaSlice.actions;
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
@@ -72,5 +92,6 @@ export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
 export const selectLatestTimeslot = (state: RootState) => state.fasta.latestTimeslot;
+export const selectFastaProducts = (state: RootState) => state.fasta.fastaProducts;
 
 export default fastaSlice.reducer;

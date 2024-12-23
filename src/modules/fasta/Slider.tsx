@@ -23,8 +23,8 @@ import fastaHashTableToUrl from  './fastaHashTableToUrl';
 const Slider = () => {
 
     const dispatch = useDispatch();
-    const fastaHashes = useSelector(selectHashTables);
-    const fastaLatestTimeslot = useSelector(selectLatestTimeslot);
+    const fastaHashes : HashTable[] = useSelector(selectHashTables);
+    const fastaLatestTimeslot : number = useSelector(selectLatestTimeslot);
     const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
     const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
     const [currentTimeString , setCurrentTimeString] = useState('');
