@@ -37,8 +37,24 @@ function dateAsDisplayString(date : Date) {
   const month = months[date.getUTCMonth()];
   const hours = String(date.getUTCHours()).padStart(2, '0');
   const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  const tz = '+' + String(date.getTimezoneOffset()).padStart(2, '0') + ':00';
-  return `${dayOfWeek} ${day} ${month} ${hours}:${minutes} ${tz}`;
+  return `${dayOfWeek} ${day} ${month} ${hours}:${minutes}`;
 }
 
-export { dateAsUrlParamString, dateAsDisplayString };
+function timezoneAsOffsetString(date : Date) {
+  const tz = String(date.getTimezoneOffset()).padStart(2, '0') + ':00';
+  return `${tz}`;
+}
+
+function timezoneAsDisplayString(date : Date) {
+
+  // Ask specifically for the long-form of the time zone name in the options
+  const dtf = Intl.DateTimeFormat(undefined, {timeZoneName: 'long'});
+
+  // Format the date to parts, and pull out the value of the time zone name
+  const tsParts = dtf.formatToParts(date);
+  return tsParts.find(
+      (part) => part.type == 'timeZoneName')?.value ?? "[undefined timezone]";
+}
+
+
+export { dateAsUrlParamString, dateAsDisplayString, timezoneAsDisplayString, timezoneAsOffsetString };

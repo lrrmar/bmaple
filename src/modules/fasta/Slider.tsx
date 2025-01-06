@@ -17,24 +17,31 @@ import {
 import type { HashTable } from './FastaHashTables';
 import {
     dateAsDisplayString,
+    timezoneAsDisplayString,
 } from './dateFormatHelpers';
 import fastaHashTableToUrl from  './fastaHashTableToUrl';
 
 const Slider = () => {
-
-    const dispatch = useDispatch();
-    const fastaHashes : HashTable[] = useSelector(selectHashTables);
-    const fastaLatestTimeslot : number = useSelector(selectLatestTimeslot);
-    const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
-    const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
-    const [currentTimeString , setCurrentTimeString] = useState('');
 
     // We display a fixed number of slots
     const nTimeslots = 19;
 
     // We default to the the latest observation slot
     const defaultSliderValue = 8;
+    
+    const dispatch = useDispatch();
+    const fastaHashes : HashTable[] = useSelector(selectHashTables);
+    const fastaLatestTimeslot : number = useSelector(selectLatestTimeslot);
+    const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
+    const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
+    const [currentTimeString , setCurrentTimeString] = useState('');
+    const [timeZoneString, setTimeZoneString] = useState('');
+    const [currentSliderValue, setCurrentSliderValue] = useState<number>(defaultSliderValue);
 
+    const [animate, setAnimate] = useState(false);
+    const [pulse, setPulse] = useState(0);
+    const [pulseInterval, setPulseInterval] = useState(1000);
+  
     useEffect(() => {
         if (fastaHashes.length === 0) {
             return
@@ -43,6 +50,7 @@ const Slider = () => {
         console.log(fastaHashes);
 
         setSelectedTimeslot(sliderTimeslots[defaultSliderValue]);
+ 
     }, [fastaHashes]);
 
 
@@ -64,6 +72,7 @@ const Slider = () => {
 
         //console.log(timeslots);
         setSliderTimeslots(timeslots);
+
     }, [fastaLatestTimeslot]);
 
 
@@ -74,10 +83,11 @@ const Slider = () => {
     
         if (selectedTimeslot) {
 
-            const strTs = new Date(selectedTimeslot).toISOString();
-            console.log("selectedTs:" + strTs);
+            const dtSelected = new Date(selectedTimeslot);
+            setCurrentTimeString(dateAsDisplayString(dtSelected));
+            setTimeZoneString(timezoneAsDisplayString(dtSelected));
 
-            // Find the CRR/RDT hash with matching effective_ts
+            // Find the CRR hash with matching effective_ts
             const crrLayerHash = fastaHashes.find( (hash : HashTable) => {
                 return hash.name === "crr"
                     && hash.effective_ts === selectedTimeslot;
@@ -87,14 +97,12 @@ const Slider = () => {
                 var url = fastaHashTableToUrl(crrLayerHash);
                 console.log(url);
                 const newCrrLayerHash = {apiRequest: url};
-
-                dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));                
-                setCurrentTimeString(dateAsDisplayString(new Date(crrLayerHash.effective_ts)));
+                dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
             } else {
                 dispatch(updateSelectedCrrId(null));
             }
 
-            // Find the CRR/RDT hash with matching effective_ts
+            // Find the RDT hash with matching effective_ts
             const rdtLayerHash = fastaHashes.find( (hash : HashTable) => {
                 return hash.name === "rdt"
                         && hash.effective_ts === selectedTimeslot;
@@ -104,16 +112,30 @@ const Slider = () => {
                 var url = fastaHashTableToUrl(rdtLayerHash);
                 console.log(url);
                 const newRdtLayerHash = {apiRequest: url};
-
-                dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));                
-                setCurrentTimeString(dateAsDisplayString(new Date(rdtLayerHash.effective_ts)));
+                dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
             } else {
                 dispatch(updateSelectedRdtId(null));
-            }
-            
+            }   
         }
-
     }, [selectedTimeslot, fastaHashes]);
+
+    useEffect(() => {
+        const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
+        const interval = setInterval(doPulse, pulseInterval);
+        return () => clearInterval(interval);
+    }, []);
+    
+    useEffect(() => {
+        if (animate) {
+            var newValue : number = 0;
+            if (currentSliderValue >= 0 && currentSliderValue < sliderTimeslots.length) {
+                newValue = currentSliderValue + 1;
+            }
+            setCurrentSliderValue(newValue);
+            setSelectedTimeslot(sliderTimeslots[newValue]);
+            console.log(" new idx:" + newValue);            
+        }
+    }, [pulse]);
 
     //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
     //const Thumb = (props, state) => <div {...props} key={state.key}></div>;;
@@ -123,6 +145,10 @@ const Slider = () => {
     return (
     <div>
     <div className="slider-time-label">{currentTimeString}</div>
+    <div className="slider-timezone-label">{timeZoneString}</div>
+    <div className="slider-controls">
+    <button className="slider-play" onClick={() => {setAnimate(!animate);}}>
+            {animate ? '\u25A0' : '\u25B6'}</button>
     <ReactSlider
         className="customSlider"
         thumbClassName="customSlider-thumb"
@@ -130,15 +156,18 @@ const Slider = () => {
         withTracks
         onChange={(value) => {
             console.log("onChange value=" + value);
+            setCurrentSliderValue(value);
             if (value >= 0  && value < sliderTimeslots.length) {
                 setSelectedTimeslot(sliderTimeslots[value]);
             }
         }}
+        value={currentSliderValue}
         defaultValue={defaultSliderValue}
         markClassName="customSlider-mark"
         marks={1}
         min={0}
         max={nTimeslots-1} />
+    </div>
     </div>
   );
 };
