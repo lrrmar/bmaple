@@ -9,17 +9,15 @@ import {
   ingest,
   Ingest
 } from '../../mapping/cacheSlice';
-import { selectBaseUrl } from './fastaSlice';
+import {
+  selectBaseUrl,
+  updateProfileCrrId,
+  updateProfileRdtId,
+  selectSelectedCrrId,
+  selectSelectedRdtId
+} from './fastaSlice';
 import openLayersMap from '../../mapping/OpenLayersMap';
 import FastaHashTablesServer from './FastaHashTables';
-
-// API to fetch from Server
-//
-//const apiCall = async (url: any) => {
-//  const response = await fetch(url);
-//  const data = await response.json();
-//  return data;
-//};
 
 interface Props {
   id: string;
@@ -31,6 +29,8 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const layerCache = useSelector(selectCache);
+  const selectedCrrRequestId : string = useSelector(selectSelectedCrrId);
+  const selectedRdtRequestId : string = useSelector(selectSelectedRdtId);
 
   const urlParams = id.split('?');
   let forecastQs = '';
@@ -41,29 +41,6 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     `https://${fastaBaseUrl}/api/v1/vts/${id.split('?')[0]}/{z}/{x}/{y}.pbf?${forecastQs}token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0`,
   );
   const hasFetched = useRef(false);
-
-  /* async function to wrap api call and add response to state (layerData) */
-  /*
-  const fetchLayerData = async (id) => {
-    try {
-      const data = await apiCall(id);
-      if (data) {
-        setLayerData(data);
-        const properties = { ...data };
-        delete properties.features;
-      }
-    } catch (error) {}
-  };
-  */
- 
-  //    useEffect(() => {
-  /* populate layerData, checking against data source and if has fetched.
-   */
-  //        if (hasFetched.current) {return};
-  //        if (layerCache[id]['source'] !== 'fasta') {return};
-  //        hasFetched.current = true;
-  //fetchLayerData(id);
-  //    }, []);
 
   useEffect(() => {
     /* create OL vector layer and add to map, then cache the layer and update
@@ -79,7 +56,9 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     hasFetched.current = true;
     const visible = false;
 
-    //console.log('FASTASourceLayer creating VectorTileLayer id:' + id);
+    console.log('FASTASourceLayer creating VectorTileLayer id:' + id
+        + ' sourceId: ' + sourceIdentifier
+        + " selectedCrrRequestId: " + selectedCrrRequestId);
 
     const vtLayer = new VectorTileLayer({
       source: new VectorTileSource({
@@ -93,12 +72,13 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
       },
     });
 
-    // NEED TO CATCH 404
-
     const map = openLayersMap.map;
     map.addLayer(vtLayer);
 
-    map.once('postrender', (event) => {
+    // 2025-01-07 : I'm removing the postrender event handler and updating the
+    // cache as soon as the layer is added to the map.
+    // Could do with a way to flag that we've finished adding layers.
+    //map.once('postrender', (event) => {
 
       const toCache : Ingest = {
         id: id,
@@ -109,14 +89,14 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
       //dispatch(cacheLayer(toCache));
       dispatch(ingest(toCache));
 
+      //console.log("Added Ingest to cache: " + id + " : " + toCache.ol_uid);
+
       setTimeout(() => {
         vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
       }, 3000);
-      //dispatch(updateFastaGraphicProfileId(id));
-    });
-    /*return () => {
-            map.removeLayer();
-        };*/
+    
+    //}); // once
+
   }, []);
 
   return null;

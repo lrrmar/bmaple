@@ -41,18 +41,6 @@ const Slider = () => {
     const [animate, setAnimate] = useState(false);
     const [pulse, setPulse] = useState(0);
     const [pulseInterval, setPulseInterval] = useState(1000);
-  
-    useEffect(() => {
-        if (fastaHashes.length === 0) {
-            return
-        };
-        console.log("fastaHashes:");
-        console.log(fastaHashes);
-
-        setSelectedTimeslot(sliderTimeslots[defaultSliderValue]);
- 
-    }, [fastaHashes]);
-
 
     useEffect(() => {
         /* Initial selection / positioning
@@ -72,7 +60,8 @@ const Slider = () => {
 
         //console.log(timeslots);
         setSliderTimeslots(timeslots);
-
+        setSelectedTimeslot(timeslots[defaultSliderValue]);
+    
     }, [fastaLatestTimeslot]);
 
 
@@ -80,7 +69,8 @@ const Slider = () => {
     useEffect(() => {
 
         console.log("Slider::useEffect(), [selectedTimeslot]");
-    
+        console.log("selectedTimeslot:" + selectedTimeslot);
+            
         if (selectedTimeslot) {
 
             const dtSelected = new Date(selectedTimeslot);
@@ -133,7 +123,6 @@ const Slider = () => {
             }
             setCurrentSliderValue(newValue);
             setSelectedTimeslot(sliderTimeslots[newValue]);
-            console.log(" new idx:" + newValue);            
         }
     }, [pulse]);
 
@@ -162,7 +151,7 @@ const Slider = () => {
             }
         }}
         value={currentSliderValue}
-        defaultValue={defaultSliderValue}
+        //defaultValue={defaultSliderValue}
         markClassName="customSlider-mark"
         marks={1}
         min={0}

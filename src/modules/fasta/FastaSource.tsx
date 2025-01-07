@@ -28,17 +28,19 @@ const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const hashTables : HashTable[] = useSelector(selectHashTables);
 
   useEffect(() => {
+    // converting "hashTables" into cache requests
     const allCacheRequests: Request[] = hashTables.map((hashTable: HashTable) => {
-      console.log(hashTableToUrl(hashTable));
+      //console.log(hashTableToUrl(hashTable));
       const request = {
         id: hashTableToUrl(hashTable),
         source: 'fasta',
       };
       return request;
     });
+
     console.log('***all cache reqs: ', allCacheRequests);
     const newCacheRequests = allCacheRequests.filter((req: Request) => !cache[req.id]);
-    console.log(newCacheRequests);
+    //console.log(newCacheRequests);
     dispatch(request(newCacheRequests));
   }, [hashTables]);
 

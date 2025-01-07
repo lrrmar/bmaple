@@ -70,13 +70,13 @@ const FastaHashTablesServer = () => {
 
     const latest = observationHashes[0];
 
-    // Filter forecast hashes, keeping only the forecasts for the latest observation
-    // (upto 10 forecasts per timeslot currently returned by API, i.e. 2.5 hours)
+    // Filter forecast hashes, keeping only the CRR forecasts for the latest observation
+    // (upto 10 forecasts per timeslot currently returned by API, i.e. 2.5 hours).
     const forecastHashes = hashes
       .filter((hash) => {
         return (
           hash.timeslot === latest.timeslot &&
-          hash.name === product &&
+          hash.name === product && product === 'crr' &&
           hash.forecast_slot !== ''
         );
       })

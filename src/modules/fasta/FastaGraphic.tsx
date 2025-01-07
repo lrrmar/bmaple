@@ -15,7 +15,7 @@ import {
   selectFastaProducts,
   FastaProduct,
 } from './fastaSlice';
-import { Entry, request, Request, selectCache } from '../../mapping/cacheSlice';
+import { Entry, Ingest, request, Request, selectCache } from '../../mapping/cacheSlice';
 
 import openLayersMap from '../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
@@ -62,64 +62,6 @@ const Graphics = () => {
     }
     return vectorTileLayer;
   }
-
-  const showHideLayers = (
-    newOlUid: string|null,
-    currentOlUid: string|null,
-    isProductVisible: boolean,
-    layerStyle: StyleLike | FlatStyleLike | null | undefined,
-    layerOpacity: number|null) : VectorTileLayer<Feature<Geometry>>|null => {
-    
-    const invisibleStyle = (feature: any, resolution: any) => [];
-
-    var newBaseLayer: BaseLayer|undefined = undefined;
-    var oldBaseLayer: BaseLayer|undefined = undefined;
-
-    var newLayer : VectorTileLayer<Feature<Geometry>>|null = null;
-
-    map
-      .getLayers()
-      .getArray()
-      .forEach((l) => {
-        //if (l.ol_uid === newOlUid) {
-        if (getUid(l) === newOlUid) {
-          newBaseLayer = l;
-        }
-        if (getUid(l) === currentOlUid) {
-          oldBaseLayer = l;
-        }
-      });
-
-    if (oldBaseLayer) {
-      var oldLayer = oldBaseLayer as VectorTileLayer<Feature<Geometry>>;
-      oldLayer.setVisible(false);
-      oldLayer.setStyle(invisibleStyle);
-    }
-  
-    if (newBaseLayer) {
-      
-      newLayer = newBaseLayer as VectorTileLayer<Feature<Geometry>>;
-
-      if (!newLayer) {
-        return null;
-      }
-
-      if (!isProductVisible) {
-        newLayer.setVisible(false);
-        newLayer.setStyle(invisibleStyle);
-        return null;
-      }
-
-      newLayer.setVisible(true);
-      newLayer.setStyle(layerStyle);
-
-      if (layerOpacity) {
-        newLayer.setOpacity(layerOpacity);
-      }
-    }
-
-    return newLayer;
-  };
 
   function createCrrStyleFunction() {
     
@@ -200,17 +142,18 @@ const Graphics = () => {
      * for new and old layers
      */
     
+    //console.log("FastaGraphic crrLayerId: " + crrLayerId);
+    
     const crrStyle = createCrrStyleFunction();
 
     var newOlUidCrr: string|null = null;
     var layer = layerCache[crrLayerId] as Entry;
-    if (layer === undefined) {
-    //  layer = { ol_uid: null };
-    }
-    else {
+    if (layer) {
       newOlUidCrr = layer.ol_uid;
     }
     
+    //console.log("FastaGraphic newOlUidCrr: " + newOlUidCrr);
+
     const crrIsVisible = isProductVisible("CRR");
     
     const oldLayer = getLayer(currentOlUidCrr);
@@ -221,9 +164,7 @@ const Graphics = () => {
       oldLayer.setStyle(invisibleStyle);
     }
 
-    //showHideLayers(newOlUidCrr, currentOlUidCrr, crrIsVisible, crrStyle, 0.7);
     if (newLayer) {
-
       if (crrIsVisible) {
         newLayer.setVisible(true);
         newLayer.setStyle(crrStyle);
@@ -242,14 +183,13 @@ const Graphics = () => {
      * for new and old layers
      */
 
+    //console.log("FastaGraphic rdtLayerId: " + rdtLayerId);
+
     const rdtStyles = createRdtStyleFunction();
 
     var newOlUidRdt: string|null = null;
     var layer = layerCache[rdtLayerId] as Entry;
-    if (layer === undefined) {
-    //  layer = { ol_uid: null };
-    }
-    else {
+    if (layer) {
       newOlUidRdt = layer.ol_uid;
     }
 
@@ -263,9 +203,7 @@ const Graphics = () => {
       oldLayer.setStyle(invisibleStyle);
     }
 
-    //showHideLayers(newOlUidCrr, currentOlUidCrr, crrIsVisible, crrStyle, 0.7);
     if (newLayer) {
-
       if (rdtIsVisible) {
         newLayer.setVisible(true);
         newLayer.setStyle(rdtStyles);
@@ -277,20 +215,13 @@ const Graphics = () => {
     }
 
     setCurrentOlUidRdt(newOlUidRdt);
-
-
   }, [rdtLayerId, products]);
 
   return <div className="FastaGraphics"></div>;
 };
 
-const Behaviours = () => {
-  return null;
-};
-
 const FastaGraphic = () => {
   const [displayedLayer, setDisplayedLayer] = useState(null);
-  //const layerId = useSelector(selectFastaGraphicProfileId)
   const map = openLayersMap.map;
   return (
     <div className="FastaGraphic">
