@@ -59,20 +59,16 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
       </Map>
-      <FloatingBox
-        style={{
-          backgroundImage:
-            'linear-gradient(to top, rgb(0, 0, 0), rgb(28, 28, 28)',
-          color: 'rgb(250, 250, 250)',
-        }}
-      >
+      <FloatingBox style={{ flexDirection: 'column-reverse', width: 'auto' }}>
         <LayerSelector />
       </FloatingBox>
       <FloatingBox minimise={'?'} style={{ top: '10px' }}>
         <ContourColourBar />
       </FloatingBox>
       <FoldOutMenu align={'left'}>
-        <TempBaseMapMenu id={'style'} />
+        <TempBaseMapMenu id={'style'} icon={'paint brush'} />
+        <TempBaseMapMenu id={'settings'} icon={'setting'} />
+        <TempBaseMapMenu id={'flight'} icon={'plane'} />
       </FoldOutMenu>
     </div>
   );

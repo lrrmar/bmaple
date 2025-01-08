@@ -1,3 +1,29 @@
 import 'semantic-ui-css/semantic.min.css' .App {
+}
+
+body {
+  font-family: "Jersey 15", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.glassTablet {
+  /*color: #90ffffc0;*/
+  color: #ff9f00;
+  text-shadow: 0px 2px 5px #afffffa0;
+  background: #0000040;
+  backdrop-filter: blur(10px);
   text-align: center;
+  border-filter: blur(10px);
+  box-shadow: 0 0  100px 5px #afffff40, inset 0 0  30px 1px #afffffa0;
+}
+
+.glassTablet::before {
+  content: "";
+  inset: 0;
+  border: solid transparent;
+  border-width: 2px 1px 0px 0px;
+  background: linear-gradient(to bottom left, #ffffff30, #107fff30) border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
 }

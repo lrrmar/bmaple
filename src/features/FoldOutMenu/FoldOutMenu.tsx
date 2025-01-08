@@ -6,6 +6,7 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react';
+import { Icon, SemanticICONS } from 'semantic-ui-react';
 import IconReference from './icons-reference';
 
 export default function FoldOutMenu({
@@ -19,24 +20,24 @@ export default function FoldOutMenu({
   const [currentFoldOut, setCurrentFoldOut] = useState<React.ReactNode | null>(
     null,
   );
-  const [foldOutIds, setFoldOutIds] = useState<string[]>([]);
+  const [icons, setIcons] = useState<{ [key: string]: SemanticICONS }>({});
   const alignment = 'FoldOutMenu ' + align;
-  const icons = [];
 
   useEffect(() => {
     // Provide each source with the cache, filtered by sourceIdentifier
-    const childrenIds: string[] | null | undefined = React.Children.map(
-      children,
-      (el) => {
-        if (React.isValidElement<{ id: string }>(el)) {
-          const id: string = el.props.id;
-          return id;
-        } else {
-          return;
+    const childrenIcons: { [key: string]: SemanticICONS } = {};
+    React.Children.forEach(children, (el) => {
+      if (React.isValidElement<{ id: string; icon: SemanticICONS }>(el)) {
+        const id: string = el.props.id;
+        const icon: SemanticICONS = el.props.icon;
+        if (id && icon) {
+          childrenIcons[id] = icon;
         }
-      },
-    );
-    if (childrenIds) setFoldOutIds(childrenIds);
+      } else {
+        return;
+      }
+    });
+    if (childrenIcons) setIcons(childrenIcons);
   }, [children]);
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function FoldOutMenu({
     <div className={alignment}>
       <IconBar
         align={align}
-        icons={foldOutIds}
+        icons={icons}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
       />
@@ -71,7 +72,7 @@ function FoldOut({
   children: React.ReactNode;
   currentFoldOutId: string | null;
 }) {
-  let className = 'FoldOut';
+  let className = 'FoldOut glassTablet';
   if (currentFoldOutId === null) {
     className += ' closed';
   }
@@ -85,20 +86,21 @@ function IconBar({
   setCurrentFoldOutId,
 }: {
   align: string;
-  icons: string[];
+  icons: { [key: string]: SemanticICONS };
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
 }) {
-  const alignment = 'IconBar ' + align;
+  const alignment = 'IconBar ' + ' ' + align;
 
   return (
     <div className={alignment}>
-      {icons.map((icon) => {
+      {Object.keys(icons).map((id) => {
         return (
           <MenuIconHandler
             align={align}
-            name={icon}
-            key={icon}
+            id={id}
+            key={id}
+            icon={icons[id]}
             currentFoldOutId={currentFoldOutId}
             setCurrentFoldOutId={setCurrentFoldOutId}
           />
@@ -110,22 +112,26 @@ function IconBar({
 
 function MenuIconHandler({
   align,
-  name,
+  id,
+  key,
+  icon,
   currentFoldOutId,
   setCurrentFoldOutId,
 }: {
   align: string;
-  name: string;
+  id: string;
+  key: string;
+  icon: SemanticICONS;
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
 }) {
   function MenuIcon({
-    name,
+    icon,
     currentFoldOutId,
     setCurrentFoldOutId,
     setIconHovered,
   }: {
-    name: string;
+    icon: SemanticICONS;
     currentFoldOutId: string | null;
     setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
     setIconHovered: Dispatch<SetStateAction<boolean>>;
@@ -133,38 +139,39 @@ function MenuIconHandler({
     const [className, setClassName] = useState('menuIcon');
 
     function onMenuIconClick(
-      name: string,
+      id: string,
       currentFoldOutId: string | null,
       setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>,
       setIconHovered: Dispatch<SetStateAction<boolean>>,
     ) {
       setIconHovered(false);
-      if (name === currentFoldOutId) {
+      if (id === currentFoldOutId) {
         setCurrentFoldOutId(null);
       } else if (currentFoldOutId === null) {
-        setCurrentFoldOutId(name);
+        setCurrentFoldOutId(id);
       } else {
         setCurrentFoldOutId(null);
         setTimeout(function () {
-          setCurrentFoldOutId(name);
+          setCurrentFoldOutId(id);
         }, 150);
       }
     }
 
     useEffect(() => {
-      if (name === currentFoldOutId) {
-        setClassName('menuIcon highlighted');
+      if (id === currentFoldOutId) {
+        setClassName('menuIcon glassTablet highlighted');
       } else {
-        setClassName('menuIcon');
+        setClassName('menuIcon glassTablet ');
       }
     }, [currentFoldOutId]);
+    console.log(id, icon);
 
     return (
       <div
         className={className}
         onClick={() =>
           onMenuIconClick(
-            name,
+            id,
             currentFoldOutId,
             setCurrentFoldOutId,
             setIconHovered,
@@ -174,7 +181,7 @@ function MenuIconHandler({
         onMouseLeave={() => setIconHovered(false)}
       >
         {/* hovered && name !== currentFoldOutId && <div className='menuIconHoverMessage'>{name}</div>*/}
-        <IconReference name={name} />
+        <Icon name={icon} size="large" />
       </div>
     );
   }
@@ -192,12 +199,12 @@ function MenuIconHandler({
   return (
     <div className={alignment}>
       <MenuIcon
-        name={name}
+        icon={icon}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
         setIconHovered={setIconHovered}
       />
-      {iconHovered && name !== currentFoldOutId && <MenuHint name={name} />}
+      {iconHovered && id !== currentFoldOutId && <MenuHint name={id} />}
     </div>
   );
 }

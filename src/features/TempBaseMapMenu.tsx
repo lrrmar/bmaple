@@ -3,6 +3,8 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../hooks';
+
+import { SemanticICONS } from 'semantic-ui-react';
 import {
   updateBaseMapId,
   selectBaseMaps,
@@ -17,7 +19,9 @@ import {
   selectOpacity,
 } from '../modules/force-geojson-field/geojsonFieldSlice';
 
-const TempBaseMapMenu = ({ id }: { id: string }) => {
+import DropDownList from './DropDownList';
+
+const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
   const dispatch = useDispatch();
   const baseMaps: string[] = useSelector(selectBaseMaps);
   const baseMapId: string = useSelector(selectBaseMapId);
@@ -31,35 +35,24 @@ const TempBaseMapMenu = ({ id }: { id: string }) => {
   };
   return (
     <div style={style}>
-      <label htmlFor="baseMap">Base Map:</label>
-      <select
-        id="baseMap"
-        value={baseMapId}
-        onChange={(e) => {
-          dispatch(updateBaseMapId(e.target.value));
-        }}
-      >
-        {[...baseMaps].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="colourPalette">Colour Palette:</label>
-      <select
-        id="colourPalette"
-        value={colourPaletteId}
-        onChange={(e) => {
-          dispatch(updateColourPaletteId(e.target.value));
-        }}
-      >
-        {[...colourPalettes].map((val) => (
-          <option key={val} value={val}>
-            {val}
-          </option>
-        ))}
-      </select>
-      <label htmlFor="opacity">Opacity:</label>
+      <span>
+        {'Base Map:  '}
+        <DropDownList
+          values={baseMaps}
+          value={baseMapId}
+          setValue={(baseMap: string) => dispatch(updateBaseMapId(baseMap))}
+        />
+      </span>
+      <span>
+        {'Colour Palette:  '}
+        <DropDownList
+          values={colourPalettes}
+          value={colourPaletteId}
+          setValue={(colourPalette: string) =>
+            dispatch(updateColourPaletteId(colourPalette))
+          }
+        />
+      </span>
       <input
         type="range"
         id="opacity"

@@ -22,19 +22,17 @@ const FloatingBox = (props: Props) => {
     position: 'absolute',
     right: right,
     bottom: bottom,
-    overflow: 'auto',
+    //overflow: 'auto',
     padding: '3px',
     display: 'flex',
     flexDirection: 'row-reverse',
-    backgroundColor: 'rgba(100, 100, 150, 0.5)',
     borderRadius: '5px',
     zIndex: 10,
     ...props.style,
   };
 
-  console.log(style);
   return (
-    <div style={style}>
+    <div style={style} className={'glassTablet'}>
       <button
         onClick={(e) => {
           setIsMinimised(!isMinimised);

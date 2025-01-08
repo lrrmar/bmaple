@@ -1,8 +1,8 @@
 :root {
   /* Icons */
-  --menu-icon-width: 72px;
-  --menu-icon-height: 24px;
-  --menu-icon-margin: 4px;
+  --menu-icon-width: 48px;
+  --menu-icon-height: 48px;
+  --menu-icon-margin: 12px;
   /* Hints */
   --menu-hint-width: 64px;
   --menu-hint-height: --menu-icon-height;
@@ -48,8 +48,8 @@ ul {
   display: flex;
   flex-direction: row;
   position: absolute;
+  top: 100px;
   z-index: 1;
-  background-image: linear-gradient(to top, --bg-color-1, --bg-color-2);
 }
 
 .FoldOutMenu.right {
@@ -60,9 +60,7 @@ ul {
 
 .IconBar {
   width: var(--menu-bar-width);
-  height: 100vh;
-  background-color: var(--bg-color-1);
-  background-image: linear-gradient(to top, rgb(0, 0, 0), rgb(28, 28, 28));
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -98,9 +96,7 @@ ul {
 .menuIcon {
   width: var(--menu-icon-width);
   height: var(--menu-icon-height);
-  color: var(--icon-plain);
-  border-radius: var(--border-radius);
-  background-color: var(--bg-color-2);
+  border-radius: 100px;
   transition: color 0.2s;
   display: flex;
   justify-content: center;
@@ -145,17 +141,18 @@ ul {
 }
 
 .FoldOut {
-  width: 144px;
-  height: 100vh;
-  color: rgb(200, 200, 200);
-  background-color: var(--bg-color-2);
-  border-color: 'red';
+  width: 180px;
+  height: auto;
+  padding: 10px;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   transition: width 0.2s;
   overflow: hidden;
+  margin: 5px 10px 5px 10px;
 }
 
 .FoldOut.closed {
   width: 0px;
+  padding: 0px;
 }

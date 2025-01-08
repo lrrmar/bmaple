@@ -1,6 +1,6 @@
-import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, Dropdown } from 'semantic-ui-react';
+import { Button, ButtonGroup, Icon, Dropdown } from 'semantic-ui-react';
+import DropDownList from '../../features/DropDownList';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
@@ -22,38 +22,7 @@ import {
   selectHashesFlag,
 } from './geojsonFieldSlice';
 
-type DropDownListProps = {
-  value: string;
-  setValue:
-    | React.Dispatch<React.SetStateAction<string>>
-    | ((arg: string) => void);
-  //    | ActionCreatorWithPayload<string>;
-  values: string[];
-};
-
 const isString = (x: any) => !!x && typeof x === 'string';
-
-const DropDownList = ({
-  value,
-  setValue,
-  values,
-}: DropDownListProps): React.ReactElement => (
-  <Dropdown
-    id={value.toString()}
-    placeholder={value.toString()}
-    search
-    onChange={(e, d) => {
-      if (typeof d.value === 'string') {
-        setValue(d.value);
-      }
-    }}
-    options={[...values].map((val) => ({
-      key: val,
-      text: val,
-      value: val,
-    }))}
-  />
-);
 
 const LayerSelector = () => {
   const dispatch = useDispatch();
@@ -75,6 +44,12 @@ const LayerSelector = () => {
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
   const [pulseInterval, setPulseInterval] = useState(1000);
+  const style: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    width: 'auto',
+    fontSize: '18px',
+  };
 
   useEffect(() => {
     /* Initial selection / positioning
@@ -153,11 +128,6 @@ const LayerSelector = () => {
     }
   }, [varname, startTime, validTime, verticalLevel, domain]);
 
-  const style: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
   useEffect(() => {
     const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
     const interval = setInterval(doPulse, pulseInterval);
@@ -193,14 +163,16 @@ const LayerSelector = () => {
         value={varname}
         setValue={setVarname}
       />
-      <label htmlFor="Domain">Domain:</label>
-      <DropDownList
-        values={availableDomains}
-        value={domain}
-        setValue={setDomain}
-      />
-      <div>
+      <span>
+        Domain:
+        <DropDownList
+          values={availableDomains}
+          value={domain}
+          setValue={setDomain}
+        />
         <Button
+          icon
+          size="mini"
           onClick={() => {
             const currentIndex = availableDomains.indexOf(domain);
             if (currentIndex === 0) {
@@ -209,9 +181,11 @@ const LayerSelector = () => {
             setDomain(availableDomains[currentIndex - 1]);
           }}
         >
-          -
+          <Icon name="angle left" />
         </Button>
         <Button
+          icon
+          size="mini"
           onClick={() => {
             const currentIndex = availableDomains.indexOf(domain);
             if (currentIndex === availableDomains.length - 1) {
@@ -220,90 +194,94 @@ const LayerSelector = () => {
             setDomain(availableDomains[currentIndex + 1]);
           }}
         >
-          +
+          <Icon name="angle right" />
         </Button>
-      </div>
-      <label htmlFor="startTime">Start time:</label>
-      <div>
+      </span>
+      <span>
+        <label htmlFor="startTime">Start time:</label>
         <DropDownList
           values={availableStartTimes}
           value={startTime}
           setValue={setStartTime}
         />
-      </div>
-      <label htmlFor="validTime">Valid time:</label>
-      <div>
+      </span>
+      <span>
+        Valid time:
         <DropDownList
           values={availableValidTimes}
           value={validTime}
           setValue={(time: string) => dispatch(updateDisplayTime(time))}
         />
-        <div>
-          <Button
-            onClick={() => {
-              const currentIndex = availableValidTimes.indexOf(validTime);
-              if (currentIndex === 0) {
-                return;
-              }
-              dispatch(
-                updateDisplayTime(availableValidTimes[currentIndex - 1]),
-              );
-            }}
-          >
-            -
-          </Button>
-          <Button
-            onClick={() => {
-              const currentIndex = availableValidTimes.indexOf(validTime);
-              if (currentIndex === availableValidTimes.length - 1) {
-                return;
-              }
-              dispatch(
-                updateDisplayTime(availableValidTimes[currentIndex + 1]),
-              );
-            }}
-          >
-            +
-          </Button>
-          <Button
-            onClick={() => {
-              setAnimate(!animate);
-            }}
-          >
-            {animate ? '\u25A0' : '\u25B6'}
-          </Button>
-        </div>
-        <label htmlFor="Vertical Level">Level:</label>
-        <div>
-          <DropDownList
-            values={availableLevels}
-            value={verticalLevel}
-            setValue={(level: string) => dispatch(updateVerticalLevel(level))}
-          />
-          <Button
-            onClick={() => {
-              const currentIndex = availableLevels.indexOf(verticalLevel);
-              if (currentIndex === 0) {
-                return;
-              }
-              dispatch(updateVerticalLevel(availableLevels[currentIndex - 1]));
-            }}
-          >
-            -
-          </Button>
-          <Button
-            onClick={() => {
-              const currentIndex = availableLevels.indexOf(verticalLevel);
-              if (currentIndex === availableLevels.length - 1) {
-                return;
-              }
-              dispatch(updateVerticalLevel(availableLevels[currentIndex + 1]));
-            }}
-          >
-            +
-          </Button>
-        </div>
-      </div>
+        <Button
+          icon
+          size="mini"
+          onClick={() => {
+            const currentIndex = availableValidTimes.indexOf(validTime);
+            if (currentIndex === 0) {
+              return;
+            }
+            dispatch(updateDisplayTime(availableValidTimes[currentIndex - 1]));
+          }}
+        >
+          <Icon name="angle left" />
+        </Button>
+        <Button
+          icon
+          size="mini"
+          onClick={() => {
+            const currentIndex = availableValidTimes.indexOf(validTime);
+            if (currentIndex === availableValidTimes.length - 1) {
+              return;
+            }
+            dispatch(updateDisplayTime(availableValidTimes[currentIndex + 1]));
+          }}
+        >
+          <Icon name="angle right" />
+        </Button>
+        <Button
+          icon
+          size="mini"
+          onClick={() => {
+            setAnimate(!animate);
+          }}
+        >
+          {animate ? '\u25A0' : '\u25B6'}
+        </Button>
+      </span>
+      <span>
+        {'Level:  '}
+        <DropDownList
+          values={availableLevels}
+          value={verticalLevel}
+          setValue={(level: string) => dispatch(updateVerticalLevel(level))}
+        />
+        <Button
+          icon
+          size="mini"
+          onClick={() => {
+            const currentIndex = availableLevels.indexOf(verticalLevel);
+            if (currentIndex === 0) {
+              return;
+            }
+            dispatch(updateVerticalLevel(availableLevels[currentIndex - 1]));
+          }}
+        >
+          <Icon name="angle left" />
+        </Button>
+        <Button
+          icon
+          size="mini"
+          onClick={() => {
+            const currentIndex = availableLevels.indexOf(verticalLevel);
+            if (currentIndex === availableLevels.length - 1) {
+              return;
+            }
+            dispatch(updateVerticalLevel(availableLevels[currentIndex + 1]));
+          }}
+        >
+          <Icon name="angle right" />
+        </Button>
+      </span>
     </div>
   );
 };
