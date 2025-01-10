@@ -17,6 +17,7 @@ export interface HashTable {
   forecast_slot: string;
   effective_ts: number;
   is_available: boolean;
+  completeness: number;
 }
 
 
@@ -25,6 +26,10 @@ const FastaHashTablesServer = () => {
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const [hashTablesToKeep, setHashTablesToKeep] = useState<HashTable[]>([]);
   const [latestTimeslot, setLatestTimeslot] = useState<string|null>(null);
+
+  // timer to refresh hashtables every minute
+  const [pulse, setPulse] = useState(0);
+  const [pulseInterval, setPulseInterval] = useState(1000 * 60);
 
   const getFastaHashTables = () => {
     var fastaHashes = sessionStorage.getItem('fastaHashes');
@@ -35,6 +40,8 @@ const FastaHashTablesServer = () => {
       return JSON.parse(fastaHashes);
     }
   };
+
+  const [fastaHashes, setFastaHashes] = useState(getFastaHashTables);
 
   const appendFastaHash = (val : HashTable) => {
     const fastaHashes = getFastaHashTables();
@@ -103,7 +110,6 @@ const FastaHashTablesServer = () => {
     dispatch(updateLatestTimeslot(latestTimeslot));
   }, [latestTimeslot]);
 
-  const [fastaHashes, setFastaHashes] = useState(getFastaHashTables);
 
   const fetchFastaHashes = async () => {
 
@@ -168,6 +174,17 @@ const FastaHashTablesServer = () => {
   useEffect(() => {
     fetchFastaHashes();
   }, []);
+
+  useEffect(() => {
+    const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
+    const interval = setInterval(doPulse, pulseInterval);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    console.log("AUTO REFRESH");
+    fetchFastaHashes();
+  }, [pulse]);
 
   return <div className='FastaHashTables'></div>;
 };
