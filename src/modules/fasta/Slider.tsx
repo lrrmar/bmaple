@@ -13,10 +13,13 @@ import {
     selectLatestTimeslot,
     updateSelectedCrrId,
     updateSelectedRdtId,
+    selectCrrVisible,
+    selectRdtVisible,
 } from './fastaSlice';
 import type { HashTable } from './FastaHashTables';
 import {
     dateAsDisplayString,
+    timeAsDisplayString,
     timezoneAsDisplayString,
 } from './dateFormatHelpers';
 import fastaHashTableToUrl from  './fastaHashTableToUrl';
@@ -37,7 +40,12 @@ const Slider = () => {
     const [currentTimeString , setCurrentTimeString] = useState('');
     const [timeZoneString, setTimeZoneString] = useState('');
     const [currentSliderValue, setCurrentSliderValue] = useState<number>(defaultSliderValue);
-
+    const [userMessageCrr, setUserMessageCrr] = useState<string|undefined>();
+    const [userMessageRdt, setUserMessageRdt] = useState<string|undefined>();
+  
+    const crrIsVisible = useSelector(selectCrrVisible);
+    const rdtIsVisible = useSelector(selectRdtVisible);
+  
     const [animate, setAnimate] = useState(false);
     const [pulse, setPulse] = useState(0);
     const [pulseInterval, setPulseInterval] = useState(1000);
@@ -84,11 +92,21 @@ const Slider = () => {
             });
     
             if (crrLayerHash) {
-                var url = fastaHashTableToUrl(crrLayerHash);
-                console.log(url);
-                const newCrrLayerHash = {apiRequest: url};
-                dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
+                if (crrLayerHash.is_available) {
+                    var url = fastaHashTableToUrl(crrLayerHash);
+                    console.log(url);
+                    const newCrrLayerHash = {apiRequest: url};
+                    setUserMessageCrr(undefined);
+                    dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
+                }
+                else {
+                    setUserMessageCrr("CRR: data not available for "
+                        + timeAsDisplayString(new Date(crrLayerHash.effective_ts))
+                        + " slot");
+                    dispatch(updateSelectedCrrId(null));    
+                }
             } else {
+                setUserMessageCrr("CRR: data not available");
                 dispatch(updateSelectedCrrId(null));
             }
 
@@ -97,13 +115,35 @@ const Slider = () => {
                 return hash.name === "rdt"
                         && hash.effective_ts === selectedTimeslot;
             });
-                
+
             if (rdtLayerHash) {
-                var url = fastaHashTableToUrl(rdtLayerHash);
-                console.log(url);
-                const newRdtLayerHash = {apiRequest: url};
-                dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
+                if (rdtLayerHash.is_available) {
+                    var url = fastaHashTableToUrl(rdtLayerHash);
+                    console.log(url);
+                    const newRdtLayerHash = {apiRequest: url};
+                    dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
+
+                    if (rdtLayerHash.completeness && rdtLayerHash.completeness < 92) {
+                        setUserMessageRdt("RDT: data incomplete "
+                            + rdtLayerHash.completeness + "% for "
+                            + timeAsDisplayString(new Date(rdtLayerHash.effective_ts))
+                            + " slot");
+                    } else {
+                        setUserMessageRdt(undefined);
+                    }
+                }
+                else {
+                    setUserMessageRdt("RDT: data not available for "
+                        + timeAsDisplayString(new Date(rdtLayerHash.effective_ts)) + " slot");
+                }
             } else {
+                // No forecasts for RDT
+                if (selectedTimeslot > fastaLatestTimeslot) {
+                    setUserMessageRdt("RDT: data not available");
+                }
+                else {
+                    setUserMessageRdt("RDT: forecasts are not displayed for RDT");
+                }
                 dispatch(updateSelectedRdtId(null));
             }   
         }
@@ -126,6 +166,7 @@ const Slider = () => {
         }
     }, [pulse]);
 
+
     //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
     //const Thumb = (props, state) => <div {...props} key={state.key}></div>;;
     //renderTrack={Track}
@@ -133,30 +174,36 @@ const Slider = () => {
 
     return (
     <div>
-    <div className="slider-time-label">{currentTimeString}</div>
-    <div className="slider-timezone-label">{timeZoneString}</div>
-    <div className="slider-controls">
-    <button className="slider-play" onClick={() => {setAnimate(!animate);}}>
-            {animate ? '\u25A0' : '\u25B6'}</button>
-    <ReactSlider
-        className="customSlider"
-        thumbClassName="customSlider-thumb"
-        trackClassName="customSlider-track"
-        withTracks
-        onChange={(value) => {
-            console.log("onChange value=" + value);
-            setCurrentSliderValue(value);
-            if (value >= 0  && value < sliderTimeslots.length) {
-                setSelectedTimeslot(sliderTimeslots[value]);
-            }
-        }}
-        value={currentSliderValue}
-        //defaultValue={defaultSliderValue}
-        markClassName="customSlider-mark"
-        marks={1}
-        min={0}
-        max={nTimeslots-1} />
-    </div>
+        <div className="slider-message">
+            {crrIsVisible && userMessageCrr && <div className="slider-message-label">{userMessageCrr}</div>}
+            {rdtIsVisible && userMessageRdt && <div className="slider-message-label">{userMessageRdt}</div>}
+        </div>
+        <div className="slider">
+            <div className="slider-time-label">{currentTimeString}</div>
+            <div className="slider-timezone-label">{timeZoneString}</div>
+            <div className="slider-controls">
+            <button className="slider-play" onClick={() => {setAnimate(!animate);}}>
+                    {animate ? '\u25A0' : '\u25B6'}</button>
+            <ReactSlider
+                className="customSlider"
+                thumbClassName="customSlider-thumb"
+                trackClassName="customSlider-track"
+                withTracks
+                onChange={(value) => {
+                    console.log("onChange value=" + value);
+                    setCurrentSliderValue(value);
+                    if (value >= 0  && value < sliderTimeslots.length) {
+                        setSelectedTimeslot(sliderTimeslots[value]);
+                    }
+                }}
+                value={currentSliderValue}
+                //defaultValue={defaultSliderValue}
+                markClassName="customSlider-mark"
+                marks={1}
+                min={0}
+                max={nTimeslots-1} />
+            </div>
+        </div>
     </div>
   );
 };

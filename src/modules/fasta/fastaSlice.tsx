@@ -93,5 +93,17 @@ export const selectProfileRdtId = (state: RootState) =>
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
 export const selectLatestTimeslot = (state: RootState) => state.fasta.latestTimeslot;
 export const selectFastaProducts = (state: RootState) => state.fasta.fastaProducts;
+export const selectCrrVisible = (state: RootState) => isProductVisible(state, "CRR");
+export const selectRdtVisible = (state: RootState) => isProductVisible(state, "RDT");
+
+const isProductVisible = (state: RootState, productName : string) => {        
+  const idxProduct = state.fasta.fastaProducts.findIndex((pr) => pr.name === productName);
+  if (idxProduct !== -1) {
+      return state.fasta.fastaProducts[idxProduct].visible;
+  }
+  else {
+      return false;
+  }
+}
 
 export default fastaSlice.reducer;

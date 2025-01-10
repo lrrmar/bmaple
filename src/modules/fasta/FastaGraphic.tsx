@@ -13,6 +13,8 @@ import {
   selectProfileCrrId,
   selectProfileRdtId,
   selectFastaProducts,
+  selectCrrVisible,
+  selectRdtVisible,
   FastaProduct,
 } from './fastaSlice';
 import { Entry, Ingest, request, Request, selectCache } from '../../mapping/cacheSlice';
@@ -38,6 +40,8 @@ const Graphics = () => {
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string|null>(null);
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string|null>(null);
+  const crrIsVisible = useSelector(selectCrrVisible);
+  const rdtIsVisible = useSelector(selectRdtVisible);
   const products : FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
 
@@ -127,16 +131,6 @@ const Graphics = () => {
   }
 
 
-  const isProductVisible = (productName : string) => {        
-    const idxProduct = products.findIndex((pr) => pr.name === productName);
-    if (idxProduct !== -1) {
-        return products[idxProduct].visible;
-    }
-    else {
-        return false;
-    }
-}
-
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
@@ -154,8 +148,6 @@ const Graphics = () => {
     
     //console.log("FastaGraphic newOlUidCrr: " + newOlUidCrr);
 
-    const crrIsVisible = isProductVisible("CRR");
-    
     const oldLayer = getLayer(currentOlUidCrr);
     const newLayer = getLayer(newOlUidCrr);
 
@@ -192,8 +184,6 @@ const Graphics = () => {
     if (layer) {
       newOlUidRdt = layer.ol_uid;
     }
-
-    const rdtIsVisible = isProductVisible("RDT");
     
     const oldLayer = getLayer(currentOlUidRdt);
     const newLayer = getLayer(newOlUidRdt);

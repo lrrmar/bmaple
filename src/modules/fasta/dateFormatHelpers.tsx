@@ -40,6 +40,12 @@ function dateAsDisplayString(date : Date) {
   return `${dayOfWeek} ${day} ${month} ${hours}:${minutes}`;
 }
 
+function timeAsDisplayString(date : Date) {
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 function timezoneAsOffsetString(date : Date) {
   const tz = String(date.getTimezoneOffset()).padStart(2, '0') + ':00';
   return `${tz}`;
@@ -57,4 +63,4 @@ function timezoneAsDisplayString(date : Date) {
 }
 
 
-export { dateAsUrlParamString, dateAsDisplayString, timezoneAsDisplayString, timezoneAsOffsetString };
+export { dateAsUrlParamString, dateAsDisplayString, timeAsDisplayString, timezoneAsDisplayString, timezoneAsOffsetString };

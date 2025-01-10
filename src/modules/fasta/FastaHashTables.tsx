@@ -11,11 +11,12 @@ import {
 } from './fastaSlice';
 
 export interface HashTable {
-  [key: string]: string | number;
+  [key: string]: string | number | boolean;
   name: string; // product
   timeslot: number; // unix timestamp
   forecast_slot: string;
   effective_ts: number;
+  is_available: boolean;
 }
 
 
@@ -130,11 +131,14 @@ const FastaHashTablesServer = () => {
       product.timeslots.forEach((timeslot: any) => {
         const timestamp = new Date(timeslot.timeslot).getTime();
         const isLatest = timeslot.timeslot === product.latest_timeslot;
+        const isAvailable = (timeslot.available === "Yes");
         const hash : HashTable = {
           name: name,
           timeslot: timestamp, // new Date(timestamp).toISOString(), //timeslot.timeslot,
           forecast_slot: '',
           effective_ts: timestamp,
+          is_available: isAvailable,
+          completeness: timeslot.product_completeness,
         };
         //console.log("Adding hash:" + timestamp);
         hashes.push(hash);
