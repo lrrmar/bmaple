@@ -64,6 +64,37 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           dispatch(updateOpacity(parseFloat(e.target.value)));
         }}
       ></input>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
+      <p>1101</p>
     </div>
   );
 };

@@ -21,6 +21,8 @@ interface InitialState {
   featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
   baseMapId: string;
+  themes: string[];
+  themeId: string;
 }
 
 const initialState: InitialState = {
@@ -32,7 +34,9 @@ const initialState: InitialState = {
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
-  baseMapId: 'OSM',
+  baseMapId: 'dark',
+  themes: [],
+  themeId: 'glassTablet',
 };
 
 export const mapSlice = createSlice({
@@ -73,6 +77,12 @@ export const mapSlice = createSlice({
     updateBaseMapId: (state, baseMapId: PayloadAction<string>) => {
       state.baseMapId = baseMapId.payload;
     },
+    updateThemes: (state, themes: PayloadAction<string[]>) => {
+      state.themes = themes.payload;
+    },
+    updateThemeId: (state, themeId: PayloadAction<string>) => {
+      state.themeId = themeId.payload;
+    },
   },
 });
 
@@ -86,6 +96,8 @@ export const {
   updateFeaturesAtClick,
   updateBaseMaps,
   updateBaseMapId,
+  updateThemes,
+  updateThemeId,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;
@@ -102,4 +114,6 @@ export const selectFeaturesAtClick = (state: RootState) =>
   state.map.featuresAtClick;
 export const selectBaseMaps = (state: RootState) => state.map.baseMaps;
 export const selectBaseMapId = (state: RootState) => state.map.baseMapId;
+export const selectThemes = (state: RootState) => state.map.themes;
+export const selectThemeId = (state: RootState) => state.map.themeId;
 export default mapSlice.reducer;

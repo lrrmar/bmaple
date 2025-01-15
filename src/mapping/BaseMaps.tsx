@@ -4,7 +4,12 @@ import {
   useAppSelector as useSelector,
 } from '../hooks';
 
-import { updateBaseMaps, selectBaseMapId } from './mapSlice';
+import {
+  updateBaseMaps,
+  selectBaseMapId,
+  updateThemeId,
+  selectThemeId,
+} from './mapSlice';
 
 type Props = {
   children?: React.ReactNode | React.ReactNode[];
@@ -13,6 +18,7 @@ type Props = {
 const BaseMaps = ({ children }: Props) => {
   const dispatch = useDispatch();
   const baseMapId: string | null = useSelector(selectBaseMapId);
+  const themeId: string | null = useSelector(selectThemeId);
   const [selectedBaseMap, setSelectedBaseMap] =
     useState<React.ReactNode | null>(null);
   useEffect(() => {
@@ -27,6 +33,11 @@ const BaseMaps = ({ children }: Props) => {
     );
     if (idList) dispatch(updateBaseMaps(idList));
   }, []);
+
+  useEffect(() => {
+    const theme: string = themeId.split(' ')[0];
+    dispatch(updateThemeId(theme + ' ' + baseMapId));
+  }, [baseMapId]);
 
   useEffect(() => {
     React.Children.forEach(children, (el) => {

@@ -6,16 +6,20 @@ import React, {
   Dispatch,
   SetStateAction,
 } from 'react';
+import { useAppSelector as useSelector } from '../../hooks';
 import { Icon, SemanticICONS } from 'semantic-ui-react';
 import IconReference from './icons-reference';
+import { selectThemeId } from '../../mapping/mapSlice';
 
 export default function FoldOutMenu({
   children,
   align,
 }: {
   children?: React.ReactNode | React.ReactNode[];
+  theme: string;
   align: string;
 }) {
+  const theme: string = useSelector(selectThemeId);
   const [currentFoldOutId, setCurrentFoldOutId] = useState<string | null>(null);
   const [currentFoldOut, setCurrentFoldOut] = useState<React.ReactNode | null>(
     null,
@@ -57,22 +61,27 @@ export default function FoldOutMenu({
       <IconBar
         align={align}
         icons={icons}
+        theme={theme}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
       />
-      <FoldOut currentFoldOutId={currentFoldOutId}>{currentFoldOut}</FoldOut>
+      <FoldOut theme={theme} currentFoldOutId={currentFoldOutId}>
+        {currentFoldOut}
+      </FoldOut>
     </div>
   );
 }
 
 function FoldOut({
   children,
+  theme,
   currentFoldOutId,
 }: {
   children: React.ReactNode;
+  theme: string;
   currentFoldOutId: string | null;
 }) {
-  let className = 'FoldOut glassTablet';
+  let className = 'FoldOut ' + theme;
   if (currentFoldOutId === null) {
     className += ' closed';
   }
@@ -82,15 +91,17 @@ function FoldOut({
 function IconBar({
   align,
   icons,
+  theme,
   currentFoldOutId,
   setCurrentFoldOutId,
 }: {
   align: string;
   icons: { [key: string]: SemanticICONS };
+  theme: string;
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
 }) {
-  const alignment = 'IconBar ' + ' ' + align;
+  const alignment = 'IconBar ' + align;
 
   return (
     <div className={alignment}>
@@ -101,6 +112,7 @@ function IconBar({
             id={id}
             key={id}
             icon={icons[id]}
+            theme={theme}
             currentFoldOutId={currentFoldOutId}
             setCurrentFoldOutId={setCurrentFoldOutId}
           />
@@ -115,6 +127,7 @@ function MenuIconHandler({
   id,
   key,
   icon,
+  theme,
   currentFoldOutId,
   setCurrentFoldOutId,
 }: {
@@ -122,16 +135,19 @@ function MenuIconHandler({
   id: string;
   key: string;
   icon: SemanticICONS;
+  theme: string;
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
 }) {
   function MenuIcon({
     icon,
+    theme,
     currentFoldOutId,
     setCurrentFoldOutId,
     setIconHovered,
   }: {
     icon: SemanticICONS;
+    theme: string;
     currentFoldOutId: string | null;
     setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
     setIconHovered: Dispatch<SetStateAction<boolean>>;
@@ -159,12 +175,11 @@ function MenuIconHandler({
 
     useEffect(() => {
       if (id === currentFoldOutId) {
-        setClassName('menuIcon glassTablet highlighted');
+        setClassName('menuIcon highlighted ' + theme);
       } else {
-        setClassName('menuIcon glassTablet ');
+        setClassName('menuIcon ' + theme);
       }
     }, [currentFoldOutId]);
-    console.log(id, icon);
 
     return (
       <div
@@ -189,9 +204,10 @@ function MenuIconHandler({
   const [iconHovered, setIconHovered] = useState(false);
   const alignment = 'menuIconHandler ' + align;
 
-  function MenuHint({ name }: { name: string }) {
+  function MenuHint({ name, theme }: { name: string; theme: string }) {
+    const className = 'menuHint ' + theme;
     return (
-      <div className="menuHint">
+      <div className={className}>
         <p className="menuHintText"> {name} </p>
       </div>
     );
@@ -200,11 +216,14 @@ function MenuIconHandler({
     <div className={alignment}>
       <MenuIcon
         icon={icon}
+        theme={theme}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
         setIconHovered={setIconHovered}
       />
-      {iconHovered && id !== currentFoldOutId && <MenuHint name={id} />}
+      {iconHovered && id !== currentFoldOutId && (
+        <MenuHint name={id} theme={theme} />
+      )}
     </div>
   );
 }

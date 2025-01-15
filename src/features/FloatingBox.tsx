@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAppSelector as useSelector } from '../hooks';
+import { selectThemeId } from '../mapping/mapSlice';
 
 interface Props {
   children?: React.ReactElement;
@@ -7,6 +9,7 @@ interface Props {
 }
 
 const FloatingBox = (props: Props) => {
+  const theme: string = useSelector(selectThemeId);
   const minimise = props.minimise;
   const [isMinimised, setIsMinimised] = useState(false);
   let right: string | undefined = '10px';
@@ -32,14 +35,16 @@ const FloatingBox = (props: Props) => {
   };
 
   return (
-    <div style={style} className={'glassTablet'}>
-      <button
-        onClick={(e) => {
-          setIsMinimised(!isMinimised);
-        }}
-      >
-        {minimise}
-      </button>
+    <div style={style} className={theme}>
+      {minimise && (
+        <button
+          onClick={(e) => {
+            setIsMinimised(!isMinimised);
+          }}
+        >
+          {minimise}
+        </button>
+      )}
       {!isMinimised && props.children}
     </div>
   );
