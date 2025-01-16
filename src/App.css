@@ -2,7 +2,7 @@ import 'semantic-ui-css/semantic.min.css' .App {
 }
 
 body {
-  font-family: 'Poppins', serif;
+  font-family: 'Nunito Sans', serif;
   font-weight: 400;
   font-style: normal;
 }
@@ -75,4 +75,3 @@ body {
 .glassTablet.OSM {
   color: rgba(0, 0, 0, 0.5);
 }
-

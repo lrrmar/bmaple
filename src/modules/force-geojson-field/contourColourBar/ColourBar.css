@@ -1,18 +1,15 @@
 .ColourBar {
-  color: rgba(255, 255, 255, 1);
-  opacity: 70%;
+  opacity: 100%;
   border-radius: 10px;
-  border-color: black;
-  border-style: solid;
-  border-width: 5px;
   width: auto;
   height: auto;
-  max-height: 90vh;
+  max-width: 70vw;
+  max-height: 7vh;
   margin: 10px;
   font-size: 12px;
   display: flex;
-  flex-direction: column;
-  overflow: auto;
+  flex-direction: row;
+  overflow: hidden;
   align-items: flex-start;
   z-index: 12;
   position: absolute;

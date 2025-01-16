@@ -61,11 +61,11 @@ const App = () => {
       </Map>
       <FloatingBox
         minimise={''}
-        style={{ flexDirection: 'column-reverse', width: 'auto' }}
+        style={{ top: '10px', flexDirection: 'column-reverse', width: 'auto' }}
       >
         <LayerSelector />
       </FloatingBox>
-      <FloatingBox style={{ top: '10px' }}>
+      <FloatingBox style={{ bottom: '80px', borderWidth: '0px' }}>
         <ContourColourBar />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>

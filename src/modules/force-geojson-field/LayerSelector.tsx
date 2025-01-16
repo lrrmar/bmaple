@@ -46,7 +46,7 @@ const LayerSelector = () => {
   const [pulseInterval, setPulseInterval] = useState(1000);
   const style: React.CSSProperties = {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     width: 'auto',
     fontSize: '18px',
   };

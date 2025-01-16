@@ -25,6 +25,19 @@ const getContrastingColour = (hex: string) => {
   //Return black or white depending on the brightness
   return brightness > 128 ? '#000000' : '#FFFFFF';
 };
+
+const getTextWidth = (text: string, font = '12px Arial') => {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  if (context) {
+    context.font = font; // Set the font style
+    const metrics = context.measureText(text);
+    return metrics.width; // Returns the width of the text in pixels
+  } else {
+    return null;
+  }
+};
+
 interface Props {
   level: string;
   lowerHexCode: string;
@@ -33,14 +46,14 @@ interface Props {
 }
 const ColourPanel = ({ level, lowerHexCode, upperHexCode, numKeys }: Props) => {
   const style: React.CSSProperties = {
-    width: '50px',
-    height: new String(60 / numKeys) + 'vh',
-    background: `linear-gradient(to bottom, ${lowerHexCode}, ${upperHexCode})`,
+    width: new String(60 / numKeys) + 'vw',
+    height: '5vh',
+    background: `linear-gradient(to right, ${lowerHexCode}, ${upperHexCode})`,
     color: getContrastingColour(lowerHexCode),
-    fontFamily: 'Courier New, Monospace',
     zIndex: '12',
     position: 'relative',
     textAlign: 'center',
+    padding: '0px',
   };
   return <div style={style}>{parseInt(level.split('_')[1])}</div>;
 };
@@ -48,15 +61,17 @@ const ColourPanel = ({ level, lowerHexCode, upperHexCode, numKeys }: Props) => {
 const Units = ({ unit }: { unit: string }) => {
   const style: React.CSSProperties = {
     width: '50px',
-    height: '30px',
-    background: 'black',
+    height: '5vh',
     color: 'white',
-    fontFamily: 'Courier New, Monospace',
     zIndex: '12',
     position: 'relative',
     textAlign: 'center',
   };
-  return <div style={style}>{unit}</div>;
+  return (
+    <div className="glassTablet" style={style}>
+      {unit}
+    </div>
+  );
 };
 
 const ContourColourBar = () => {
@@ -64,6 +79,7 @@ const ContourColourBar = () => {
   const colourPalette = useSelector(selectColourPalette);
   const units = useSelector(selectUnits);
   const [components, setComponents] = useState<React.ReactNode[]>([]);
+  const [linearGradientString, setLinearGradientString] = useState<string>('');
 
   useEffect(() => {
     const numContours: number = Object.keys(contours).length;
@@ -73,8 +89,6 @@ const ContourColourBar = () => {
     } else {
       const keys = Object.keys(contours);
       const index = Array.from({ length: keys.length }, (e, i) => i);
-      console.log(keys);
-      console.log(index);
       const panels = index
         .slice(1)
         .reverse()
@@ -103,7 +117,101 @@ const ContourColourBar = () => {
     }
   }, [contours, colourPalette]);
 
-  return <div className="ContourColourBar">{components}</div>;
+  useEffect(() => {
+    const numContours: number = Object.keys(contours).length;
+    const numColours: number = Object.keys(colourPalette).length;
+    if (numContours === 0 || numColours === 0 || numColours !== numContours) {
+      setComponents([]);
+    } else {
+      const contourStrings: string[] = Object.values(contours);
+      const contourLimits: Set<string> = new Set();
+      contourStrings.forEach((contour) =>
+        contour.split('_').forEach((part) => contourLimits.add(part)),
+      );
+      const contourLimitWidths: number[] = [...contourLimits]
+        .map((limit) => getTextWidth(limit, '12px Nunito'))
+        .map((width) => (width ? width : 0));
+      const maxStringWidth: number = contourLimitWidths.reduce((a, b) =>
+        Math.max(a, b),
+      );
+      const totalStringWidth: number = contourLimitWidths.reduce(
+        (a, b) => a + b,
+      );
+
+      const meanStringWidth: number = totalStringWidth / (numContours + 1);
+      const vh: number = window.innerHeight;
+      const vw: number = window.innerWidth;
+      const fontsize = meanStringWidth;
+      const fontWidth = fontsize;
+      const barLengthDec = 0.6;
+      const colourPanelWidthPerc: number =
+        (100 * (0.6 * vw - (numContours + 1) * fontWidth)) /
+        (0.6 * vw * numContours);
+      const fontWidthPerc = (100 * fontWidth) / (0.6 * vw);
+      let linearGradientString = 'linear-gradient(to left, ';
+      Object.values(colourPalette).forEach((colour, i) => {
+        const basePerc =
+          i * (fontWidthPerc + colourPanelWidthPerc) + fontWidthPerc;
+        linearGradientString += `${colour} ${basePerc}% ${basePerc + fontWidthPerc}%, `;
+      });
+      linearGradientString = linearGradientString.slice(0, -2) + ')';
+      setLinearGradientString(linearGradientString);
+
+      const divs: React.ReactNode[] = [];
+      [...contourLimits].forEach((lim, ind) => {
+        const panelColour: string | null = colourPalette[ind.toString()];
+        const fontColour: string = panelColour
+          ? getContrastingColour(panelColour)
+          : getContrastingColour(colourPalette[(ind - 1).toString()]);
+        const div: React.ReactNode = (
+          <div
+            style={{
+              width: 'auto',
+              display: 'flex',
+              flexDirection: 'row-reverse',
+            }}
+          >
+            <div
+              style={{
+                width: (0.6 * fontWidthPerc).toString() + 'vw',
+                color: fontColour,
+                textAlign: 'center',
+                overflow: 'allow',
+              }}
+            >
+              {lim}
+            </div>
+            {ind < numContours && (
+              <div
+                style={{
+                  width: (0.6 * colourPanelWidthPerc).toString() + 'vw',
+                }}
+              >
+                {' '}
+              </div>
+            )}
+          </div>
+        );
+        divs.push(div);
+        setComponents(divs);
+      });
+    }
+  }, [contours, colourPalette]);
+
+  return (
+    <div
+      className="ColourBar"
+      style={{
+        width: '60vw',
+        height: '20px',
+        background: linearGradientString,
+        display: 'flex',
+        flexDirection: 'row-reverse',
+      }}
+    >
+      {components}
+    </div>
+  );
 };
 
 export default ContourColourBar;
