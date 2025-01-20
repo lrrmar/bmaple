@@ -9,6 +9,10 @@ import {
   updateBaseMapId,
   selectBaseMaps,
   selectBaseMapId,
+  updateThemeId,
+  selectThemes,
+  selectThemeId,
+  selectMenuStyle,
 } from '../mapping/mapSlice';
 
 import {
@@ -25,6 +29,8 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
   const dispatch = useDispatch();
   const baseMaps: string[] = useSelector(selectBaseMaps);
   const baseMapId: string = useSelector(selectBaseMapId);
+  const themes: string[] = useSelector(selectThemes);
+  const themeId: string = useSelector(selectThemeId);
   const colourPalettes: string[] = useSelector(selectColourPalettes);
   const colourPaletteId: string = useSelector(selectColourPaletteId);
   const opacity: number = useSelector(selectOpacity);
@@ -41,6 +47,14 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           values={baseMaps}
           value={baseMapId}
           setValue={(baseMap: string) => dispatch(updateBaseMapId(baseMap))}
+        />
+      </span>
+      <span>
+        {'Theme:  '}
+        <DropDownList
+          values={themes}
+          value={themeId}
+          setValue={(theme: string) => dispatch(updateThemeId(theme))}
         />
       </span>
       <span>

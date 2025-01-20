@@ -9,7 +9,7 @@ import React, {
 import { useAppSelector as useSelector } from '../../hooks';
 import { Icon, SemanticICONS } from 'semantic-ui-react';
 import IconReference from './icons-reference';
-import { selectThemeId } from '../../mapping/mapSlice';
+import { selectMenuStyle } from '../../mapping/mapSlice';
 
 export default function FoldOutMenu({
   children,
@@ -19,7 +19,7 @@ export default function FoldOutMenu({
   theme: string;
   align: string;
 }) {
-  const theme: string = useSelector(selectThemeId);
+  const theme: string = useSelector(selectMenuStyle);
   const [currentFoldOutId, setCurrentFoldOutId] = useState<string | null>(null);
   const [currentFoldOut, setCurrentFoldOut] = useState<React.ReactNode | null>(
     null,

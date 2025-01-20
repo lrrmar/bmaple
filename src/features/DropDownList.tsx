@@ -18,8 +18,8 @@ const DropDownList = ({
 }: DropDownListProps): React.ReactElement => {
   const style = {
     borderRadius: '5px',
+    backdropFilter: 'blur(8px) !important',
     backgroundColor: 'rgba(255, 255, 255, 0.027)',
-    backdropFilter: 'blur(8px)',
     textAlign: 'center',
     borderFilter: 'blur(10px)',
     boxShadow: 'inset 0 0 30px 1px rgba(255, 255, 255, 0.1)',
@@ -30,8 +30,9 @@ const DropDownList = ({
       text={val}
       value={val}
       style={{
-        backgroundColor: 'rgba(125, 125, 125, 0.5)',
+        backgroundColor: 'rgba(255, 255, 255, 0.027)',
         borderFilter: 'blur(10px)',
+        backdropFilter: 'blur(8px) !important',
         zIndex: 20,
       }}
       onClick={(e, d) => {
@@ -49,6 +50,7 @@ const DropDownList = ({
       style={{
         ...style,
         border: 'transparent',
+        backdropFilter: 'blur(8px) !important',
       }}
       selection
       fluid
@@ -64,8 +66,9 @@ const DropDownList = ({
         fluid
         inline
         style={{
-          backgroundColor: 'rgba(125, 125, 125, 0.5)',
-          borderFilter: 'blur(10px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.027)',
+          border: 'transparent',
+          backdropFilter: 'blur(8px) !important',
         }}
       >
         {items}

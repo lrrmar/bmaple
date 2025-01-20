@@ -5,22 +5,24 @@ import {
 } from '../hooks';
 
 import {
-  updateBaseMaps,
-  selectBaseMapId,
-  updateThemeId,
+  updateThemes,
   selectThemeId,
+  updateThemeId,
+  selectBaseMapId,
+  updateBaseMapId,
 } from './mapSlice';
 
 type Props = {
   children?: React.ReactNode | React.ReactNode[];
 };
 
-const BaseMaps = ({ children }: Props) => {
+const Themes = ({ children }: Props) => {
   const dispatch = useDispatch();
-  const baseMapId: string | null = useSelector(selectBaseMapId);
   const themeId: string | null = useSelector(selectThemeId);
-  const [selectedBaseMap, setSelectedBaseMap] =
-    useState<React.ReactNode | null>(null);
+  const baseMapId: string | null = useSelector(selectBaseMapId);
+  const [selectedTheme, setSelectedTheme] = useState<React.ReactNode | null>(
+    null,
+  );
   useEffect(() => {
     const idList: string[] | null | undefined = React.Children.map(
       children,
@@ -31,17 +33,17 @@ const BaseMaps = ({ children }: Props) => {
         }
       },
     );
-    if (idList) dispatch(updateBaseMaps(idList));
+    if (idList) dispatch(updateThemes(idList));
   }, []);
 
   useEffect(() => {
     React.Children.forEach(children, (el) => {
       if (React.isValidElement<{ id: string }>(el)) {
-        if (el.props.id === baseMapId) setSelectedBaseMap(el);
+        if (el.props.id === themeId) setSelectedTheme(el);
       }
     });
-  }, [baseMapId]);
-  return <div className="BaseMaps">{selectedBaseMap}</div>;
+  }, [themeId]);
+  return <div className="Themes">{selectedTheme}</div>;
 };
 
-export default BaseMaps;
+export default Themes;

@@ -10,6 +10,9 @@ import BaseMaps from './mapping/BaseMaps';
 import DarkBaseMap from './mapping/DarkBaseMap';
 import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
+import Themes from './mapping/Themes';
+import SoftBlockTheme from './mapping/SoftBlockTheme';
+import GlassTabletTheme from './mapping/GlassTabletTheme';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
 import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
@@ -73,6 +76,10 @@ const App = () => {
         <TempBaseMapMenu id={'settings'} icon={'setting'} />
         <TempBaseMapMenu id={'flight'} icon={'plane'} />
       </FoldOutMenu>
+      <Themes>
+        <SoftBlockTheme id={'softBlock'} />
+        <GlassTabletTheme id={'glassTablet'} />
+      </Themes>
     </div>
   );
 };

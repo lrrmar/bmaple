@@ -36,7 +36,7 @@ const initialState: InitialState = {
   baseMaps: [],
   baseMapId: 'dark',
   themes: [],
-  themeId: 'glassTablet',
+  themeId: 'softBlock',
 };
 
 export const mapSlice = createSlice({
@@ -116,4 +116,6 @@ export const selectBaseMaps = (state: RootState) => state.map.baseMaps;
 export const selectBaseMapId = (state: RootState) => state.map.baseMapId;
 export const selectThemes = (state: RootState) => state.map.themes;
 export const selectThemeId = (state: RootState) => state.map.themeId;
+export const selectMenuStyle = (state: RootState) =>
+  state.map.themeId + ' ' + state.map.baseMapId;
 export default mapSlice.reducer;

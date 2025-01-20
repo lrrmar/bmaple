@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppSelector as useSelector } from '../hooks';
-import { selectThemeId } from '../mapping/mapSlice';
+import { selectMenuStyle } from '../mapping/mapSlice';
 
 interface Props {
   children?: React.ReactElement;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const FloatingBox = (props: Props) => {
-  const theme: string = useSelector(selectThemeId);
+  const menuStyle: string = useSelector(selectMenuStyle);
   const minimise = props.minimise;
   const [isMinimised, setIsMinimised] = useState(false);
   let right: string | undefined = '10px';
@@ -35,7 +35,7 @@ const FloatingBox = (props: Props) => {
   };
 
   return (
-    <div style={style} className={theme}>
+    <div style={style} className={menuStyle}>
       {minimise && (
         <button
           onClick={(e) => {
