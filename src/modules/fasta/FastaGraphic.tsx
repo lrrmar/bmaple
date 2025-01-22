@@ -26,6 +26,7 @@ import Fill from 'ol/style/Fill';
 import { FeatureLike } from 'ol/Feature';
 import { FlatStyleLike } from 'ol/style/flat';
 import Stroke from 'ol/style/Stroke';
+import missingDataImage from './no_satellites_64.png';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -82,20 +83,37 @@ const Graphics = () => {
     const style50_plus = new Style({fill: new Fill({color:'#b31b27'})});
     const fallback = new Style({fill: new Fill({color:'#000'})});
       
+    var cnv = document.createElement('canvas');
+    var ctx = cnv.getContext('2d');
+    var img = new Image();
+    img.src = missingDataImage;
+    var pattern;
+    if (ctx) {
+       pattern = ctx.createPattern(img, 'repeat');
+    }
+    const missingDataStyle = new Style({fill: new Fill({color:pattern})});
+
     return (feature: FeatureLike) => {
-      const rainRate = feature.get('rain_rate');
-      if (rainRate === 'CRR_02_1') { return style02_1; }
-      else if (rainRate === 'CRR_1_2') { return style1_2; }
-      else if (rainRate === 'CRR_2_3') { return style2_3 ; }
-      else if (rainRate === 'CRR_3_5') { return style3_5 ; }
-      else if (rainRate === 'CRR_5_7') { return style5_7 ; }
-      else if (rainRate === 'CRR_7_10') { return style7_10 ; }
-      else if (rainRate === 'CRR_10_15') { return style10_15 ; }
-      else if (rainRate === 'CRR_15_20') { return style15_20; }
-      else if (rainRate === 'CRR_20_30') { return style20_30; }
-      else if (rainRate === 'CRR_30_50') { return style30_50; }
-      else if (rainRate === 'CRR_50_plus') { return style50_plus; }
-      else { return fallback; }
+
+      const objectType = feature.get('object_type');
+      if (objectType === 'CRR-missing-data') {
+        return missingDataStyle;
+      }
+      else {
+        const rainRate = feature.get('rain_rate');
+        if (rainRate === 'CRR_02_1') { return style02_1; }
+        else if (rainRate === 'CRR_1_2') { return style1_2; }
+        else if (rainRate === 'CRR_2_3') { return style2_3 ; }
+        else if (rainRate === 'CRR_3_5') { return style3_5 ; }
+        else if (rainRate === 'CRR_5_7') { return style5_7 ; }
+        else if (rainRate === 'CRR_7_10') { return style7_10 ; }
+        else if (rainRate === 'CRR_10_15') { return style10_15 ; }
+        else if (rainRate === 'CRR_15_20') { return style15_20; }
+        else if (rainRate === 'CRR_20_30') { return style20_30; }
+        else if (rainRate === 'CRR_30_50') { return style30_50; }
+        else if (rainRate === 'CRR_50_plus') { return style50_plus; }
+        else { return fallback; }
+      }
     }
   }
 

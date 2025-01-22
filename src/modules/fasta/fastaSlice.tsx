@@ -46,14 +46,12 @@ export const fastaSlice = createSlice({
   initialState,
   reducers: {
     updateSelectedCrrId: (state, id: PayloadAction<string | null>) => {
-      console.log("updateSelectedCrrId:" + id.payload);
       state.selectedCrrId = id.payload;
     },
     updateSelectedRdtId: (state, id: PayloadAction<string | null>) => {
       state.selectedRdtId = id.payload;
     },
     updateProfileCrrId: (state, id: PayloadAction<string | null>) => {
-      console.log("updateProfileCrrId:" + id.payload);
       state.profileCrrId = id.payload;
     },
     updateProfileRdtId: (state, id: PayloadAction<string | null>) => {

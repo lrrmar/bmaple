@@ -1,9 +1,10 @@
 :root {
     --main-color: rgb(104, 117, 217);
     --main-color-hover: rgb(104, 117, 217, 0.2);
-    --track-color: #ddd;
+    --track-color: #bbb;
     --text-color: black;
     --mid-blue-color: #276AB3;
+    --slider-width-large: 950px;
   }
 
   .slider-message {
@@ -25,65 +26,175 @@
   }
 
   .slider {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: 10px;
+    padding-right: 5px;
     padding-bottom: 10px;
   }
 
+  .slider-controls {
+    display:flex;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .slider-play {
+    font-size: large;
+    width: 40px;
+    height: 40px;
+  }
+
+  .slider-container {
+    position: relative;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  @media (max-width: 1023px){
+    .slider-container {
+      flex: 1;
+    }
+  }
+  @media (min-width: 1024px){
+    .slider-container {
+      width: var(--slider-width-large);
+    }
+  }
+
+
+
+  .slider-ticks-above-labels {
+      display: none;
+  }
+  @media (min-width: 1024px){
+    .slider-ticks-above-labels {
+      margin: 0;
+      padding: 0;
+      position:relative;
+      text-align: center;
+      width: var(--slider-width-large);
+      display: block;
+    }
+  }
+  .slider-ticks-above-label-item {
+    font-size: small;
+    margin: 0;
+    width: 50px;
+    display: inline-block;
+    color: black;
+    vertical-align: bottom;
+  }
+
+  .slider-ticks-above-marks {
+    display: none;
+  }
+  /*
+  @media (min-width: 1024px){
+    .slider-ticks-above-marks {
+      margin-top: 0px;
+      position:relative;
+      text-align: center;
+      display: block;
+    }
+  }
+  */
+  .slider-ticks-above-mark-item {
+    margin: 0;
+    width: 50px;
+    display: inline-block;
+    color: black;
+    vertical-align: bottom;
+    font-size: xx-small;
+  }
+  .slider-ticks-above-mark-item-bigger {
+    margin: 0;
+    width: 50px;
+    display: inline-block;
+    color: black;
+    vertical-align: bottom;
+    font-size: small;
+  }
+
+
+  .slider-ticks-below {
+    margin-top: 22px;
+    position:relative;
+    vertical-align: top;
+    text-align: center;
+  }
+  @media (min-width: 1024px){
+    .slider-ticks-below {
+      width: var(--slider-width-large);
+    }
+  }
+  .slider-ticks-below-item {
+    font-size: medium;
+    display: inline-block;
+    color: black;
+    vertical-align: top;
+  }
+
   .customSlider {
-    /* max width of your slider */
-    /* max-width: 600px; */
     /* Optional: Only If you want to center your slider in the page */
    /* margin: auto; */
     /* position: absolute;  */
     /* bottom: 10px; */
     /*right: 10px;*/
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    /*height: 10px;*/
-    flex: 1;
+    margin-top: 4px;
+    margin-bottom: 0px;
   }
+  @media (min-width: 1024px){
+    .customSlider  {
+      width: calc(var(--slider-width-large) - 25px);
+    }
+  }
+
+
   
   .customSlider-track {
-    top: 5px;
-    bottom: 5px;
+    top: 1px;
+    bottom: 0px;
     height: 10px;
     background: var(--track-color);
+    text-align: center;
   }
   
   /* color of the track before the thumb */
+  /*
   .customSlider-track.customSlider-track-0 {
     background: var(--mid-blue-color);
   }
+  */
 
 
   .customSlider-mark {
-    width: 1px;
+    width: 2px;
     height: 20px;
     background-color: rgb(0, 0, 0);
     cursor: pointer;
     /*border-radius: 50%;*/
     vertical-align: middle;
+    margin-left: 0px;
+    margin-right: 0px;
+
+    /* margin: 0px 24px; the left/right margins centre the mark */
   }
 
-  /*
-  .customSlider.customSlider-mark {
-    margin: 0px calc(19px);
-    bottom: calc(50% - 6px);
-  }
-*/
-
+  
+    /*bottom: calc(50% - 6px);*/
+  
   .customSlider-thumb {
     cursor: pointer;
     /*color for the thumb */
     background: var(--mid-blue-color);
     /* shape of the thumb: circle */
-    width: 20px;
     height: 20px;
     border-radius: 100%;
+    width: 20px;
+    
     /* remove default outline when selected */
     outline: none;
+    margin-top: -4px;
+    margin-left: 15px;
+    margin-right: 15px;
     text-align: center;
 
   }
@@ -111,15 +222,4 @@
   }
 
 
-  .slider-play {
-    font-size: large;
-    width: 40px;
-    height: 40px;
-  }
-
-  .slider-controls {
-    display:flex;
-    text-align: left;
-    vertical-align: middle;
-  }
 
