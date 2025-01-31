@@ -4,7 +4,11 @@ import { Provider } from 'react-redux';
 
 import './index.css';
 import App, { store } from './App';
+import AppTimelines from './AppTimelines';
+
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter, Routes, Route } from 'react-router';
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
@@ -12,10 +16,16 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <BrowserRouter basename='/app'>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="timelines" element={<AppTimelines />} />
+        </Routes>
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>,
 );
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

@@ -1,0 +1,71 @@
+.timeline-report {
+    margin: 25px 10px;
+    text-align: left;
+}
+
+.timeline {
+    margin: 25px 0px;
+}
+
+.timeline-title {
+    font-size: x-large;
+    font-style: bold;
+}
+
+.timeline-timezone-label {
+    font-size: medium;
+}
+
+.timeline-location {
+    text-align: left;
+}
+
+.location-name {
+    font-size: large;
+    font-style: bold;
+}
+
+.location-latlon {
+    font-size: medium;
+}
+
+.timeline table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    text-align: center;
+}
+
+.timeline th {
+    padding: 5px 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #eee;
+}
+
+.timeline-day {
+    text-align: left;
+}
+
+.timeline td {
+    padding: 5px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.timeline td.icon {
+    padding: 0px 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.timeline-slot-time {
+    font-size: large;
+    font-style: bold;
+}
+.timeline-slot-text {
+    font-size: medium;
+    font-style: italic;
+}
+
+.timeline-issued-text {
+    margin-top: 5px;
+    font-size: small;
+    font-style: italic;
+}

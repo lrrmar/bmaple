@@ -31,7 +31,8 @@ const months = [
   'December',
 ];
 
-function dateAsDisplayString(date : Date) {
+function dateAsDisplayString(date : Date | undefined) {
+  if (!date) { return ''; }
   const dayOfWeek = days[date.getUTCDay()];
   const day = String(date.getUTCDate()).padStart(2, '0');
   const month = months[date.getUTCMonth()];
@@ -40,10 +41,31 @@ function dateAsDisplayString(date : Date) {
   return `${dayOfWeek} ${day} ${month} ${hours}:${minutes}`;
 }
 
-function timeAsDisplayString(date : Date) {
+function timeAsDisplayString(date : Date | undefined) {
+  if (!date) { return '' }
   const hours = String(date.getUTCHours()).padStart(2, '0');
   const minutes = String(date.getUTCMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
+}
+
+function timestampAsDisplayString(timestamp : number | undefined) {
+  if (!timestamp) { return '' };
+  return timeAsDisplayString(new Date(timestamp));
+}
+
+function timestampAsDateTimeDisplayString(timestamp : number | undefined) {
+  if (!timestamp) { return '' };
+  const dt = new Date(timestamp);
+  return dateAsDisplayString(dt);
+}
+
+function timestampAsDateDisplayString(timestamp : number | undefined) {
+  if (!timestamp) { return '' };
+  const date = new Date(timestamp);
+  const dayOfWeek = days[date.getUTCDay()];
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const month = months[date.getUTCMonth()];
+  return `${dayOfWeek} ${day} ${month}`;
 }
 
 function timezoneAsOffsetString(date : Date) {
@@ -63,4 +85,11 @@ function timezoneAsDisplayString(date : Date) {
 }
 
 
-export { dateAsUrlParamString, dateAsDisplayString, timeAsDisplayString, timezoneAsDisplayString, timezoneAsOffsetString };
+export { dateAsUrlParamString,
+  dateAsDisplayString,
+  timeAsDisplayString,
+  timestampAsDisplayString,
+  timestampAsDateTimeDisplayString,
+  timestampAsDateDisplayString,
+  timezoneAsDisplayString,
+  timezoneAsOffsetString };
