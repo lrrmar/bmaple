@@ -44,6 +44,7 @@ const Slider = () => {
     const [selectedTimeString , setSelectedTimeString] = useState('');
     const [timeZoneString, setTimeZoneString] = useState('');
     const [currentSliderValue, setCurrentSliderValue] = useState<number>(defaultSliderValue);
+    const [userMessageGeneral, setUserMessageGeneral] = useState<string|undefined>();
     const [userMessageCrr, setUserMessageCrr] = useState<string|undefined>();
     const [userMessageRdt, setUserMessageRdt] = useState<string|undefined>();
   
@@ -96,7 +97,12 @@ const Slider = () => {
             const strSelected = dateAsDisplayString(dtSelected);
             setSelectedTimeString(strSelected);
 
-            console.log("setSelectedTimeslot:" + strSelected);
+            const latestSlotMsecs = (new Date(fastaLatestTimeslot).getTime());        
+            if (Date.now() - latestSlotMsecs >= (60 * 1000 * 60)) {
+                setUserMessageGeneral("WARNING: latest data is from > 1 hour ago.");
+            }
+
+            //console.log("setSelectedTimeslot:" + strSelected);
 
             setTimeZoneString(timezoneAsDisplayString(dtSelected));
 
@@ -235,6 +241,7 @@ const Slider = () => {
     return (
     <div>
         <div className="slider-message">
+            {userMessageGeneral && <div className="slider-message-label">{userMessageGeneral}</div>}
             {crrIsVisible && userMessageCrr && <div className="slider-message-label">{userMessageCrr}</div>}
             {rdtIsVisible && userMessageRdt && <div className="slider-message-label">{userMessageRdt}</div>}
         </div>
