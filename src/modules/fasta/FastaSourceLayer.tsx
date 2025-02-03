@@ -29,9 +29,7 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const layerCache = useSelector(selectCache);
-  const selectedCrrRequestId : string = useSelector(selectSelectedCrrId);
-  const selectedRdtRequestId : string = useSelector(selectSelectedRdtId);
-
+ 
   const urlParams = id.split('?');
   let forecastQs = '';
   if (urlParams[1]) {
@@ -56,13 +54,16 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     hasFetched.current = true;
     const visible = false;
 
-    console.log('FASTASourceLayer creating VectorTileLayer id:' + id
-        + ' sourceId: ' + sourceIdentifier
-        + " selectedCrrRequestId: " + selectedCrrRequestId);
+    console.log('FASTASourceLayer creating VectorTileLayer id:' + id);
 
+    var maxZoom = 4;
+    if (id.startsWith("rdt")) {
+      maxZoom = 3;
+    }
+    
     const vtLayer = new VectorTileLayer({
       source: new VectorTileSource({
-        maxZoom: 15,
+        maxZoom: maxZoom,
         format: new MVT(),
         url: url,
       }),
