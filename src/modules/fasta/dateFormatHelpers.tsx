@@ -31,53 +31,55 @@ const months = [
   'December',
 ];
 
-function dateAsDisplayString(date : Date | undefined) {
-  if (!date) { return ''; }
-  const dayOfWeek = days[date.getUTCDay()];
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const month = months[date.getUTCMonth()];
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  return `${dayOfWeek} ${day} ${month} ${hours}:${minutes}`;
-}
-
-function timeAsDisplayString(date : Date | undefined) {
-  if (!date) { return '' }
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-  return `${hours}:${minutes}`;
-}
-
-function timestampAsDisplayString(timestamp : number | undefined) {
-  if (!timestamp) { return '' };
-  return timeAsDisplayString(new Date(timestamp));
-}
-
-function timestampAsDateTimeDisplayString(timestamp : number | undefined) {
-  if (!timestamp) { return '' };
-  const dt = new Date(timestamp);
-  return dateAsDisplayString(dt);
-}
-
-function timestampAsDateDisplayString(timestamp : number | undefined) {
+// Return timestamp as local date string 
+function dateDisplayString(timestamp : number | undefined) {
   if (!timestamp) { return '' };
   const date = new Date(timestamp);
-  const dayOfWeek = days[date.getUTCDay()];
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  const month = months[date.getUTCMonth()];
+  if (!date) { return ''; }
+  const dayOfWeek = days[date.getDay()];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = months[date.getMonth()];
   return `${dayOfWeek} ${day} ${month}`;
 }
 
-function timezoneAsOffsetString(date : Date) {
+// Return timestamp as local date and time string 
+function dateTimeDisplayString(timestamp : number  | undefined) {
+  if (!timestamp) { return '' };
+  const date = new Date(timestamp);
+  if (!date) { return ''; }
+  const dayOfWeek = days[date.getDay()];
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = months[date.getMonth()];
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${dayOfWeek} ${day} ${month} ${hours}:${minutes}`;
+}
+
+// Return timestamp as local time string 
+function timeDisplayString(timestamp : number  | undefined) {
+  if (!timestamp) { return '' };
+  const date = new Date(timestamp);
+  if (!date) { return ''; }
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  var str = `${hours}:${minutes}`;
+  return str;
+}
+
+
+function timezoneOffsetString(date : Date) {
   const tz = String(date.getTimezoneOffset()).padStart(2, '0') + ':00';
   return `${tz}`;
 }
 
-function timezoneAsDisplayString(date : Date) {
+function timezoneDisplayString(timestamp : number | undefined) {
 
   // Ask specifically for the long-form of the time zone name in the options
   const dtf = Intl.DateTimeFormat(undefined, {timeZoneName: 'long'});
 
+  if (!timestamp) { return '' };
+  const date = new Date(timestamp);
+  
   // Format the date to parts, and pull out the value of the time zone name
   const tsParts = dtf.formatToParts(date);
   return tsParts.find(
@@ -85,11 +87,10 @@ function timezoneAsDisplayString(date : Date) {
 }
 
 
-export { dateAsUrlParamString,
-  dateAsDisplayString,
-  timeAsDisplayString,
-  timestampAsDisplayString,
-  timestampAsDateTimeDisplayString,
-  timestampAsDateDisplayString,
-  timezoneAsDisplayString,
-  timezoneAsOffsetString };
+export {
+  dateAsUrlParamString,
+  dateDisplayString,
+  dateTimeDisplayString,
+  timeDisplayString,
+  timezoneDisplayString,
+  timezoneOffsetString };

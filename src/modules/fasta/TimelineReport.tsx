@@ -6,21 +6,9 @@ import {
     useDispatch,
     useSelector
 } from 'react-redux';
-import {
-    selectBaseUrl,
-    selectHashTables,
-    selectLatestTimeslot,
-    updateSelectedCrrId,
-    updateSelectedRdtId,
-    selectCrrVisible,
-    selectRdtVisible,
-} from './fastaSlice';
 import { Timeline, MapLocation, TimelineTable } from './TimelineTable';
 import {
-    dateAsDisplayString,
-    timeAsDisplayString,
-    timestampAsDisplayString,
-    timezoneAsDisplayString,
+    timezoneDisplayString,
 } from './dateFormatHelpers';
 import './Timeline.css';
 
@@ -29,7 +17,7 @@ import { isMissingDeclaration } from 'typescript';
 
 export const TimelineReport = () => {
 
-    const timeZoneString = timezoneAsDisplayString(new Date(Date.now()));
+    const timeZoneString = timezoneDisplayString(Date.now());
     
     var places : MapLocation[] = [
         { name: "1. Lusaka, Lusaka Province", lat: -15.407, lon: 28.287},

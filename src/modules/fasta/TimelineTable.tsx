@@ -11,12 +11,9 @@ import {
 } from './fastaSlice';
 import './Timeline.css';
 import {
-    dateAsDisplayString,
-    timeAsDisplayString,
-    timestampAsDisplayString,
-    timestampAsDateTimeDisplayString,
-    timestampAsDateDisplayString,
-    timezoneAsDisplayString,
+    timeDisplayString,
+    dateDisplayString,
+    dateTimeDisplayString,
 } from './dateFormatHelpers';
 import heavyRainImage from './timeline_images/heavy_rain.png';
 import noRainDayImage from './timeline_images/no_rain_day.png';
@@ -123,13 +120,13 @@ export const TimelineTable = ({ location } : Props) => {
             <table>
                 <thead>
                 <tr>
-                    <th className='timeline-day' colSpan={4}>{timestampAsDateDisplayString(timeline?.slot1Time)}</th>
+                    <th className='timeline-day' colSpan={4}>{dateDisplayString(timeline?.slot1Time)}</th>
                 </tr>
                 <tr>
-                    <th className='timeline-slot-time'>{timestampAsDisplayString(timeline?.slot1Time)}</th>
-                    <th className='timeline-slot-time'>{timestampAsDisplayString(timeline?.slot2Time)}</th>
-                    <th className='timeline-slot-time'>{timestampAsDisplayString(timeline?.slot3Time)}</th>
-                    <th className='timeline-slot-time'>{timestampAsDisplayString(timeline?.slot4Time)}</th>
+                    <th className='timeline-slot-time'>{timeDisplayString(timeline?.slot1Time)}</th>
+                    <th className='timeline-slot-time'>{timeDisplayString(timeline?.slot2Time)}</th>
+                    <th className='timeline-slot-time'>{timeDisplayString(timeline?.slot3Time)}</th>
+                    <th className='timeline-slot-time'>{timeDisplayString(timeline?.slot4Time)}</th>
                 </tr>
                 <tr>
                     <th className='timeline-slot-text'>-1 hour</th>
@@ -156,7 +153,7 @@ export const TimelineTable = ({ location } : Props) => {
             </table>
             <div>
                 <span className='timeline-issued-text'>Issued at:</span>&nbsp;
-                <span className='timeline-issued-text'>{timestampAsDateTimeDisplayString(timeline?.issuedAt)}</span>
+                <span className='timeline-issued-text'>{dateTimeDisplayString(timeline?.issuedAt)}</span>
             </div>
         </div>
     );

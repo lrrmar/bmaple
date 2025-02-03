@@ -25,7 +25,7 @@ const FastaHashTablesServer = () => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const [hashTablesToKeep, setHashTablesToKeep] = useState<HashTable[]>([]);
-  const [latestTimeslot, setLatestTimeslot] = useState<string|null>(null);
+  const [latestTimeslot, setLatestTimeslot] = useState<number|null>(null);
 
   // timer to refresh hashtables every minute
   const [pulse, setPulse] = useState(0);
@@ -123,7 +123,7 @@ const FastaHashTablesServer = () => {
     );
     const json = await response.json();
 
-    var latestTs : string = '';
+    var latestTs : number|null = null;
     var hashes : HashTable[] = [];
 
     json.tilesets.forEach((product: any) => {
@@ -132,11 +132,12 @@ const FastaHashTablesServer = () => {
       if (name === 'crr') {
         // The UI will need to know latest available timeslot to calibrate selector controls.
         // CRR and RDT may differ but CRR takes priority.
-        latestTs = product.latest_timeslot;
+        latestTs = new Date(product.latest_timeslot)?.getTime();
       }
+
       product.timeslots.forEach((timeslot: any) => {
         const timestamp = new Date(timeslot.timeslot).getTime();
-        const isLatest = timeslot.timeslot === product.latest_timeslot;
+        const isLatest = timestamp === latestTs;
         const isAvailable = (timeslot.available === "Yes");
         const hash : HashTable = {
           name: name,

@@ -12,7 +12,7 @@ interface InitialState {
   profileCrrId: string | null;
   profileRdtId: string | null;
   hashTables: HashTable[];
-  latestTimeslot: string | null;
+  latestTimeslot: number | null; // latest as a unix timestamp
   fastaProducts: FastaProduct[];
 }
 
@@ -23,7 +23,7 @@ export interface FastaProduct {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'dev.fastaweather.com',
+  baseUrl: 'fastaweather.com',
   selectedCrrId: null,
   selectedRdtId: null,
   profileCrrId: null,
@@ -60,7 +60,7 @@ export const fastaSlice = createSlice({
     updateHashTables: (state, id: PayloadAction<HashTable[]>) => {
       state.hashTables = id.payload;
     },
-    updateLatestTimeslot: (state, timeslot: PayloadAction<string | null>) => {
+    updateLatestTimeslot: (state, timeslot: PayloadAction<number | null>) => {
       state.latestTimeslot = timeslot.payload;
     },
     updateFastaProducts: (state, products : FastaProduct[]) => {

@@ -18,9 +18,10 @@ import {
 } from './fastaSlice';
 import type { HashTable } from './FastaHashTables';
 import {
-    dateAsDisplayString,
-    timeAsDisplayString,
-    timezoneAsDisplayString,
+    dateDisplayString,
+    dateTimeDisplayString,
+    timeDisplayString,
+    timezoneDisplayString,
 } from './dateFormatHelpers';
 import fastaHashTableToUrl from  './fastaHashTableToUrl';
 import { isMissingDeclaration } from 'typescript';
@@ -76,8 +77,7 @@ const Slider = () => {
         console.log("fastaLatestTimeslot:" + fastaLatestTimeslot);
 
         // Start the slider 2 hours (8 slots) previous of latest slot:
-        const latestSlotMsecs = (new Date(fastaLatestTimeslot).getTime());        
-        const firstMsecs = latestSlotMsecs - (8 * slot_ms);
+        const firstMsecs = fastaLatestTimeslot - (8 * slot_ms);
         const timeslots = Array(nTimeslots).fill(0).map((_, i) => firstMsecs + (i * slot_ms));
         //console.log(timeslots);
         setSliderTimeslots(timeslots);
@@ -92,19 +92,17 @@ const Slider = () => {
         console.log("selectedTimeslot:" + selectedTimeslot);
             
         if (selectedTimeslot) {
-
-            const dtSelected = new Date(selectedTimeslot);
-            const strSelected = dateAsDisplayString(dtSelected);
+    
+            const strSelected = dateTimeDisplayString(selectedTimeslot);
             setSelectedTimeString(strSelected);
 
-            const latestSlotMsecs = (new Date(fastaLatestTimeslot).getTime());        
-            if (Date.now() - latestSlotMsecs >= (60 * 1000 * 60)) {
+            if (Date.now() - fastaLatestTimeslot >= (60 * 1000 * 60)) {
                 setUserMessageGeneral("WARNING: latest data is from > 1 hour ago.");
             }
 
             //console.log("setSelectedTimeslot:" + strSelected);
 
-            setTimeZoneString(timezoneAsDisplayString(dtSelected));
+            setTimeZoneString(timezoneDisplayString(selectedTimeslot));
 
             // Find the CRR hash with matching effective_ts
             const crrLayerHash = fastaHashes.find( (hash : HashTable) => {
@@ -121,7 +119,7 @@ const Slider = () => {
                 }
                 else {
                     setUserMessageCrr("CRR: data not available for "
-                        + timeAsDisplayString(new Date(crrLayerHash.effective_ts))
+                        + timeDisplayString(crrLayerHash.effective_ts)
                         + " slot");
                     dispatch(updateSelectedCrrId(null));    
                 }
@@ -146,7 +144,7 @@ const Slider = () => {
                     if (rdtLayerHash.completeness && rdtLayerHash.completeness < 92) {
                         setUserMessageRdt("RDT: data incomplete "
                             + rdtLayerHash.completeness + "% for "
-                            + timeAsDisplayString(new Date(rdtLayerHash.effective_ts))
+                            + timeDisplayString(rdtLayerHash.effective_ts)
                             + " slot");
                     } else {
                         setUserMessageRdt(undefined);
@@ -154,7 +152,7 @@ const Slider = () => {
                 }
                 else {
                     setUserMessageRdt("RDT: data not available for "
-                        + timeAsDisplayString(new Date(rdtLayerHash.effective_ts)) + " slot");
+                        + timeDisplayString(rdtLayerHash.effective_ts) + " slot");
                     dispatch(updateSelectedRdtId(null));
                 }
             } else {
@@ -226,11 +224,8 @@ const Slider = () => {
 
         // We have 19 slots, each time label spans 2 slots, we work in percentages
         const labelWidthPct = 1/19 * 100;
-
         const lblDblWidthPctRounded = Math.round(((labelWidthPct) + Number.EPSILON) * 100) / 100;
-
         setLblDblWidth(lblDblWidthPctRounded + '%');
-
 }, []);
 
     //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
@@ -256,7 +251,7 @@ const Slider = () => {
                     <div className='slider-ticks-above-labels'>
                         {sliderTimeslots.map((object, i) =>
                             <div className='slider-ticks-above-label-item'>
-                                {timeAsDisplayString(new Date(object))}
+                                {timeDisplayString(object)}
                             </div>
                         )}
                     </div>
