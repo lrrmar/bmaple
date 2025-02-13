@@ -115,7 +115,7 @@
 
 
   .slider-ticks-below {
-    margin-top: 22px;
+    margin-top: 18px;
     position:relative;
     vertical-align: top;
     text-align: center;
@@ -140,6 +140,7 @@
     /*right: 10px;*/
     margin-top: 4px;
     margin-bottom: 0px;
+    margin-left: 12.5px; /* new */
   }
   @media (min-width: 1024px){
     .customSlider  {
@@ -158,12 +159,14 @@
   }
   
   /* color of the track before the thumb */
-  /*
+  
   .customSlider-track.customSlider-track-0 {
     background: var(--mid-blue-color);
   }
-  */
-
+  
+  .customSlider-track.customSlider-track-2 {
+    background: red;
+  }
 
   .customSlider-mark {
     width: 2px;
@@ -193,10 +196,15 @@
     /* remove default outline when selected */
     outline: none;
     margin-top: -4px;
-    margin-left: 15px;
-    margin-right: 15px;
+    /*margin-left: 15px;
+    margin-right: 15px;*/
     text-align: center;
 
+  }
+
+  .customSlider-thumb-1 {
+    display: none;
+    background: red;
   }
   
   .customSlider-thumb:hover {
