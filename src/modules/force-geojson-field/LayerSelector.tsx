@@ -37,9 +37,9 @@ const LayerSelector = () => {
   const [availableStartTimes, setAvailableStartTimes] = useState<string[]>([]);
   const [availableValidTimes, setAvailableValidTimes] = useState<string[]>([]);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
-  const [varname, setVarname] = useState<string>('');
-  const [domain, setDomain] = useState<string>('');
-  const [startTime, setStartTime] = useState<string>('');
+  const varname = useRef<string>('');
+  const domain = useRef<string>('');
+  const startTime = useRef<string>('');
   const variableHashes: HashTable[] = useSelector(selectHashTables);
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
@@ -48,7 +48,6 @@ const LayerSelector = () => {
     display: 'flex',
     flexDirection: 'column',
     width: 'auto',
-    fontSize: '18px',
   };
 
   useEffect(() => {
@@ -57,9 +56,9 @@ const LayerSelector = () => {
     if (variableHashes.length === 0) {
       return;
     }
-    setVarname(variableHashes[0].varname);
-    setDomain(variableHashes[0].grid_id.toString());
-    setStartTime(variableHashes[0].sim_start_time);
+    varname.current == '' ? (varname.current = variableHashes[0].varname) : {};
+    domain.current = variableHashes[0].grid_id.toString();
+    startTime.current = variableHashes[0].sim_start_time;
     dispatch(updateDisplayTime(variableHashes[0].valid_time));
     dispatch(updateVerticalLevel(variableHashes[0].level_type));
     setAvailableVarnames([
@@ -109,12 +108,13 @@ const LayerSelector = () => {
     /* Handle selection change
      *          */
     const layerMetaData = {
-      varname: varname,
-      sim_start_time: startTime,
+      varname: varname.current,
+      //sim_start_time: startTime.current,
       valid_time: validTime,
       level_type: verticalLevel,
-      grid_id: parseInt(domain),
+      grid_id: domain.current,
     };
+    console.log(layerMetaData);
     const layerHash = variableHashes.find((dict) =>
       Object.entries(layerMetaData).every(
         ([key, value]) => dict[key] === value,
@@ -160,25 +160,25 @@ const LayerSelector = () => {
       <label htmlFor="varname">Variable:</label>
       <DropDownList
         values={availableVarnames}
-        value={varname}
-        setValue={setVarname}
+        value={varname.current}
+        setValue={(v: string) => (varname.current = v)}
       />
       <span>
         Domain:
         <DropDownList
           values={availableDomains}
-          value={domain}
-          setValue={setDomain}
+          value={domain.current}
+          setValue={(d: string) => (domain.current = d)}
         />
         <Button
           icon
           size="mini"
           onClick={() => {
-            const currentIndex = availableDomains.indexOf(domain);
+            const currentIndex = availableDomains.indexOf(domain.current);
             if (currentIndex === 0) {
               return;
             }
-            setDomain(availableDomains[currentIndex - 1]);
+            domain.current = availableDomains[currentIndex - 1];
           }}
         >
           <Icon name="angle left" />
@@ -187,11 +187,11 @@ const LayerSelector = () => {
           icon
           size="mini"
           onClick={() => {
-            const currentIndex = availableDomains.indexOf(domain);
+            const currentIndex = availableDomains.indexOf(domain.current);
             if (currentIndex === availableDomains.length - 1) {
               return;
             }
-            setDomain(availableDomains[currentIndex + 1]);
+            domain.current = availableDomains[currentIndex + 1];
           }}
         >
           <Icon name="angle right" />
@@ -201,8 +201,8 @@ const LayerSelector = () => {
         <label htmlFor="startTime">Start time:</label>
         <DropDownList
           values={availableStartTimes}
-          value={startTime}
-          setValue={setStartTime}
+          value={startTime.current}
+          setValue={(s: string) => (startTime.current = s)}
         />
       </span>
       <span>

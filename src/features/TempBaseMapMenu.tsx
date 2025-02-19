@@ -49,6 +49,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           setValue={(baseMap: string) => dispatch(updateBaseMapId(baseMap))}
         />
       </span>
+      <br />
       <span>
         {'Theme:  '}
         <DropDownList
@@ -57,6 +58,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           setValue={(theme: string) => dispatch(updateThemeId(theme))}
         />
       </span>
+      <br />
       <span>
         {'Colour Palette:  '}
         <DropDownList
@@ -67,6 +69,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           }
         />
       </span>
+      <br />
       <input
         type="range"
         id="opacity"
@@ -78,37 +81,6 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           dispatch(updateOpacity(parseFloat(e.target.value)));
         }}
       ></input>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
-      <p>1101</p>
     </div>
   );
 };

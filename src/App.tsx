@@ -21,7 +21,7 @@ import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 import FloatingBox from './features/FloatingBox';
-import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
+import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import './App.css';
@@ -65,16 +65,17 @@ const App = () => {
       <FloatingBox
         minimise={''}
         style={{ top: '10px', flexDirection: 'column-reverse', width: 'auto' }}
-      >
-        <LayerSelector />
-      </FloatingBox>
+      ></FloatingBox>
       <FloatingBox style={{ bottom: '80px', borderWidth: '0px' }}>
         <ContourColourBar />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
-        <TempBaseMapMenu id={'style'} icon={'paint brush'} />
-        <TempBaseMapMenu id={'settings'} icon={'setting'} />
-        <TempBaseMapMenu id={'flight'} icon={'plane'} />
+        <FoldOutItem id={'Style'} icon={'paint brush'}>
+          <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
+        </FoldOutItem>
+        <FoldOutItem id={'Overlays'} icon={'images outline'}>
+          <LayerSelector />
+        </FoldOutItem>
       </FoldOutMenu>
       <Themes>
         <SoftBlockTheme id={'softBlock'} />

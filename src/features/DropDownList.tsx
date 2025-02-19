@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { Dropdown, Item } from 'semantic-ui-react';
+import { useAppSelector as useSelector } from '../hooks';
+import { selectMenuStyle } from '../mapping/mapSlice';
 
 type DropDownListProps = {
   value: string;
@@ -16,64 +18,67 @@ const DropDownList = ({
   setValue,
   values,
 }: DropDownListProps): React.ReactElement => {
+  const menuStyle: string = useSelector(selectMenuStyle);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const style = {
     borderRadius: '5px',
     backdropFilter: 'blur(8px) !important',
     backgroundColor: 'rgba(255, 255, 255, 0.027)',
-    textAlign: 'center',
     borderFilter: 'blur(10px)',
     boxShadow: 'inset 0 0 30px 1px rgba(255, 255, 255, 0.1)',
+    overflow: 'auto',
+    maxHeight: '50%',
   };
   const items = values.map((val) => (
-    <Dropdown.Item
+    <div
       key={val}
-      text={val}
-      value={val}
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.027)',
-        borderFilter: 'blur(10px)',
-        backdropFilter: 'blur(8px) !important',
-        zIndex: 20,
+        zIndex: '20',
+        width: '100%',
+        position: 'relative',
       }}
-      onClick={(e, d) => {
-        if (typeof d.value === 'string') {
-          setValue(d.value);
-        }
+      className={menuStyle}
+      onClick={(e) => {
+        setValue(val);
+        setIsOpen((val) => !val);
       }}
     >
       {val}
-    </Dropdown.Item>
+    </div>
   ));
   return (
-    <Dropdown
-      id={value.toString()}
+    <div
       style={{
-        ...style,
-        border: 'transparent',
-        backdropFilter: 'blur(8px) !important',
-      }}
-      selection
-      fluid
-      scrolling
-      text={value.toString()}
-      onChange={(e, d) => {
-        if (typeof d.value === 'string') {
-          setValue(d.value);
-        }
+        borderRadius: '5px',
+        overflow: 'hidden',
+        borderColor: 'red',
       }}
     >
-      <Dropdown.Menu
-        fluid
-        inline
+      <div
+        id={value}
+        onClick={(e) => setIsOpen((val) => !val)}
+        className={menuStyle}
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.027)',
-          border: 'transparent',
-          backdropFilter: 'blur(8px) !important',
+          position: 'relative',
         }}
       >
-        {items}
-      </Dropdown.Menu>
-    </Dropdown>
+        {value}
+      </div>
+      {isOpen && (
+        <div
+          className={menuStyle}
+          style={{
+            overflow: 'auto',
+            width: '100%',
+            height: '100%',
+            zIndex: '10',
+            maxHeight: '18vh',
+          }}
+        >
+          {items}
+        </div>
+      )}
+    </div>
   );
 };
 

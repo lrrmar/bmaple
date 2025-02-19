@@ -11,19 +11,35 @@ import { Icon, SemanticICONS } from 'semantic-ui-react';
 import IconReference from './icons-reference';
 import { selectMenuStyle } from '../../mapping/mapSlice';
 
-export default function FoldOutMenu({
+function FoldOutItem({
+  children,
+  id,
+  icon,
+}: {
+  children: React.ReactNode | React.ReactNode[];
+  id: string;
+  icon: string;
+}) {
+  return <div>{children}</div>;
+}
+
+function FoldOutMenu({
   children,
   align,
+  max,
 }: {
   children?: React.ReactNode | React.ReactNode[];
   theme: string;
   align: string;
+  max?: number;
 }) {
   const theme: string = useSelector(selectMenuStyle);
   const [currentFoldOutId, setCurrentFoldOutId] = useState<string | null>(null);
+  const [currentFoldOutIds, setCurrentFoldOutIds] = useState<string[]>([]);
   const [currentFoldOut, setCurrentFoldOut] = useState<React.ReactNode | null>(
     null,
   );
+  const [currentFoldOuts, setCurrentFoldOuts] = useState<React.ReactNode[]>([]);
   const [icons, setIcons] = useState<{ [key: string]: SemanticICONS }>({});
   const alignment = 'FoldOutMenu ' + align;
 
@@ -45,17 +61,67 @@ export default function FoldOutMenu({
   }, [children]);
 
   useEffect(() => {
-    // Provide each source with the cache, filtered by sourceIdentifier
-    let filler: React.ReactNode | null;
+    let filler: React.ReactNode[] | null = null;
     React.Children.forEach(children, (el) => {
-      if (React.isValidElement<{ id: string }>(el)) {
-        if (el.props.id === currentFoldOutId) filler = el;
-        return el;
+      if (
+        React.isValidElement<{
+          children: React.ReactNode[];
+          id: string;
+          icon: string;
+        }>(el)
+      ) {
+        if (el.props.id === currentFoldOutId) filler = el.props.children;
       }
     });
     setCurrentFoldOut(filler);
   }, [currentFoldOutId]);
 
+  useEffect(() => {
+    //remove duplicates
+    const totals: { [key: string]: number } = {};
+    currentFoldOutIds.forEach((id) => (totals[id] = 0));
+    currentFoldOutIds.forEach((id) => (totals[id] += 1));
+    let filteredFoldOutIds: string[] = currentFoldOutIds.filter(
+      (id) => totals[id] % 2 === 1,
+    );
+    //reorder to match order of icons
+    filteredFoldOutIds = Object.keys(icons).filter((id) =>
+      filteredFoldOutIds.includes(id),
+    );
+    const fillers: React.ReactNode[] = [];
+    React.Children.forEach(children, (el) => {
+      if (
+        React.isValidElement<{
+          children: React.ReactNode[];
+          id: string;
+          icon: string;
+        }>(el)
+      ) {
+        if (filteredFoldOutIds.includes(el.props.id)) fillers.push(el);
+      }
+    });
+    let foldOuts: React.ReactNode[] = [];
+    foldOuts = fillers.map((f) => {
+      if (React.isValidElement(f)) {
+        const id = f.props.id;
+        return (
+          <FoldOut
+            key={id}
+            style={{
+              minHeight: `${44 / filteredFoldOutIds.length}vh`,
+              maxHeight: `${88 / filteredFoldOutIds.length}vh`,
+              height: 'fit-content',
+            }}
+            theme={theme}
+            currentFoldOutId={id}
+          >
+            {f}
+          </FoldOut>
+        );
+      }
+    });
+    setCurrentFoldOuts(foldOuts);
+  }, [currentFoldOutIds, theme]);
   return (
     <div className={alignment}>
       <IconBar
@@ -64,10 +130,19 @@ export default function FoldOutMenu({
         theme={theme}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
+        currentFoldOutIds={currentFoldOutIds}
+        setCurrentFoldOutIds={setCurrentFoldOutIds}
       />
-      <FoldOut theme={theme} currentFoldOutId={currentFoldOutId}>
-        {currentFoldOut}
-      </FoldOut>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+      >
+        {currentFoldOuts}
+      </div>
     </div>
   );
 }
@@ -75,17 +150,23 @@ export default function FoldOutMenu({
 function FoldOut({
   children,
   theme,
+  style,
   currentFoldOutId,
 }: {
   children: React.ReactNode;
   theme: string;
+  style: { [key: string]: string };
   currentFoldOutId: string | null;
 }) {
   let className = 'FoldOut ' + theme;
   if (currentFoldOutId === null) {
     className += ' closed';
   }
-  return <div className={className}>{children}</div>;
+  return (
+    <div style={style} className={className}>
+      {children}
+    </div>
+  );
 }
 
 function IconBar({
@@ -94,12 +175,16 @@ function IconBar({
   theme,
   currentFoldOutId,
   setCurrentFoldOutId,
+  currentFoldOutIds,
+  setCurrentFoldOutIds,
 }: {
   align: string;
   icons: { [key: string]: SemanticICONS };
   theme: string;
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
+  currentFoldOutIds: string[];
+  setCurrentFoldOutIds: Dispatch<SetStateAction<string[]>>;
 }) {
   const alignment = 'IconBar ' + align;
 
@@ -115,6 +200,8 @@ function IconBar({
             theme={theme}
             currentFoldOutId={currentFoldOutId}
             setCurrentFoldOutId={setCurrentFoldOutId}
+            currentFoldOutIds={currentFoldOutIds}
+            setCurrentFoldOutIds={setCurrentFoldOutIds}
           />
         );
       })}
@@ -130,6 +217,8 @@ function MenuIconHandler({
   theme,
   currentFoldOutId,
   setCurrentFoldOutId,
+  currentFoldOutIds,
+  setCurrentFoldOutIds,
 }: {
   align: string;
   id: string;
@@ -138,18 +227,24 @@ function MenuIconHandler({
   theme: string;
   currentFoldOutId: string | null;
   setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
+  currentFoldOutIds: string[];
+  setCurrentFoldOutIds: Dispatch<SetStateAction<string[]>>;
 }) {
   function MenuIcon({
     icon,
     theme,
     currentFoldOutId,
     setCurrentFoldOutId,
+    currentFoldOutIds,
+    setCurrentFoldOutIds,
     setIconHovered,
   }: {
     icon: SemanticICONS;
     theme: string;
     currentFoldOutId: string | null;
     setCurrentFoldOutId: Dispatch<SetStateAction<string | null>>;
+    currentFoldOutIds: string[];
+    setCurrentFoldOutIds: Dispatch<SetStateAction<string[]>>;
     setIconHovered: Dispatch<SetStateAction<boolean>>;
   }) {
     const [className, setClassName] = useState('menuIcon');
@@ -171,15 +266,23 @@ function MenuIconHandler({
           setCurrentFoldOutId(id);
         }, 150);
       }
+      setCurrentFoldOutIds([...currentFoldOutIds, id]);
     }
 
     useEffect(() => {
-      if (id === currentFoldOutId) {
+      //remove duplicates
+      const totals: { [key: string]: number } = {};
+      currentFoldOutIds.forEach((id) => (totals[id] = 0));
+      currentFoldOutIds.forEach((id) => (totals[id] += 1));
+      const filteredFoldOutIds: string[] = currentFoldOutIds.filter(
+        (id) => totals[id] % 2 === 1,
+      );
+      if (filteredFoldOutIds.includes(id)) {
         setClassName('menuIcon highlighted ' + theme);
       } else {
         setClassName('menuIcon ' + theme);
       }
-    }, [currentFoldOutId]);
+    }, [currentFoldOutIds]);
 
     return (
       <div
@@ -219,6 +322,8 @@ function MenuIconHandler({
         theme={theme}
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
+        currentFoldOutIds={currentFoldOutIds}
+        setCurrentFoldOutIds={setCurrentFoldOutIds}
         setIconHovered={setIconHovered}
       />
       {iconHovered && id !== currentFoldOutId && (
@@ -227,3 +332,5 @@ function MenuIconHandler({
     </div>
   );
 }
+
+export { FoldOutMenu, FoldOutItem };

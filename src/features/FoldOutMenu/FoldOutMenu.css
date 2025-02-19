@@ -46,10 +46,10 @@ ul {
 
 .FoldOutMenu {
   display: flex;
-  height: 33vh;
+  height: 90vh;
+  padding: 5vh 0px;
   flex-direction: row;
   position: absolute;
-  top: 100px;
   z-index: 1;
 }
 
@@ -64,6 +64,7 @@ ul {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
 }
 
 .IconBar.right {
@@ -141,15 +142,14 @@ ul {
 
 .FoldOut {
   width: 180px;
-  height: auto;
   padding: 10px;
   border-radius: 5px;
   display: flex;
   flex-direction: column;
   transition: width 0.2s;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: clip;
-  margin: 5px;
+  margin: 1vh;
   direction: ltr;
   z-index: 5;
 }
