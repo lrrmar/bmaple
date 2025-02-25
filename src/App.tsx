@@ -78,7 +78,6 @@ const App = () => {
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>
-        <SoftBlockTheme id={'softBlock'} />
         <GlassTabletTheme id={'glassTablet'} />
       </Themes>
     </div>

@@ -1,6 +1,9 @@
 import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
-import { useAppDispatch as useDispatch } from '../../hooks';
-import { updateHashesFlag } from './geojsonFieldSlice';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector,
+} from '../../hooks';
+import { updateHashesFlag, selectApiUrl } from './geojsonFieldSlice';
 
 export interface HashTable {
   [key: string]: string | number;
@@ -18,6 +21,7 @@ const GeojsonFieldHashTablesServer = () => {
   const [hashTables, setHashTables] = useState([]);
   const [exportHashTables, setExportHashTables] = useState([]);
   const [initRender, setInitRender] = useState(true);
+  const apiUrl: string = useSelector(selectApiUrl);
 
   const getHashTables = (): HashTable[] | null => {
     let hashes = sessionStorage.getItem('geojsonFieldHashes');
@@ -66,7 +70,7 @@ const GeojsonFieldHashTablesServer = () => {
 
   useEffect(() => {
     const fetchVariables = async () => {
-      const response = await fetch('http://localhost:8080/getVariables/');
+      const response = await fetch(`http://${apiUrl}/getVariables/`);
       const json = await response.json();
       setVariables(json);
     };
@@ -75,7 +79,7 @@ const GeojsonFieldHashTablesServer = () => {
 
   const fetchVariableHashes = async (varname: string) => {
     const response = await fetch(
-      `http://localhost:8080/variableHash?varname=${varname}`,
+      `http://${apiUrl}/variableHash?varname=${varname}`,
       {
         method: 'GET',
         headers: {

@@ -36,7 +36,7 @@ const initialState: InitialState = {
   baseMaps: [],
   baseMapId: 'dark',
   themes: [],
-  themeId: 'softBlock',
+  themeId: 'glassTablet',
 };
 
 export const mapSlice = createSlice({

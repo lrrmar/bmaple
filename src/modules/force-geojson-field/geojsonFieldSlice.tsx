@@ -12,7 +12,15 @@ interface InitialState {
   colourPalette: { [key: string]: string };
   units: string;
   opacity: number;
+  apiUrl: string;
 }
+
+const GEOJSON_API_URL = process.env['GEOJSON_API_URL'];
+console.log(GEOJSON_API_URL);
+const apiUrl = GEOJSON_API_URL
+  ? GEOJSON_API_URL
+  : 'force-test.ddns.net/geojson';
+console.log(apiUrl);
 
 const initialState: InitialState = {
   selectedId: null,
@@ -24,6 +32,7 @@ const initialState: InitialState = {
   colourPalette: {},
   units: '',
   opacity: 0.8,
+  apiUrl: apiUrl,
 };
 
 export const geojsonFieldSlice = createSlice({
@@ -97,4 +106,5 @@ export const selectColourPalette = (state: RootState) =>
   state.geojsonField.colourPalette;
 export const selectUnits = (state: RootState) => state.geojsonField.units;
 export const selectOpacity = (state: RootState) => state.geojsonField.opacity;
+export const selectApiUrl = (state: RootState) => state.geojsonField.apiUrl;
 export default geojsonFieldSlice.reducer;

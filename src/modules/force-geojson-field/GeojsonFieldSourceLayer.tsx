@@ -14,7 +14,7 @@ import {
 } from '../../hooks';
 
 import { ingest, Ingest } from '../../mapping/cacheSlice';
-import { updateProfileId } from './geojsonFieldSlice';
+import { updateProfileId, selectApiUrl } from './geojsonFieldSlice';
 
 type Properties = {
   [key: string]: Properties | string[] | string | number[] | number;
@@ -31,18 +31,6 @@ interface Json {
   [key: string]: string | number | string[] | number[] | Json;
 }
 
-//API to fetch from Server
-const apiCall = async (id: string) => {
-  const response = await fetch(`http://localhost:8080/layerById?id=${id}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
-  const data = await response.json();
-  return data;
-};
-
 interface Props {
   id: string;
   sourceIdentifier: string;
@@ -55,6 +43,19 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     useState<LayerProperties | null>(null);
   const [map, setMap] = useState<MapType | null>(OpenLayersMap.map);
   const hasFetched = useRef(false);
+  const apiUrl = useSelector(selectApiUrl);
+
+  //API to fetch from Server
+  const apiCall = async (id: string) => {
+    const response = await fetch(`http://${apiUrl}/layerById?id=${id}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+    const data = await response.json();
+    return data;
+  };
 
   const fetchLayerData = async (id: string) => {
     /* async function to wrap api call and add response to state (layerData) */

@@ -20,6 +20,7 @@ import {
   selectSelectedId,
   selectHashTables,
   selectHashesFlag,
+  selectApiUrl,
 } from './geojsonFieldSlice';
 
 const isString = (x: any) => !!x && typeof x === 'string';
@@ -41,6 +42,7 @@ const LayerSelector = () => {
   const domain = useRef<string>('');
   const startTime = useRef<string>('');
   const variableHashes: HashTable[] = useSelector(selectHashTables);
+  const apiUrl: string = useSelector(selectApiUrl);
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
   const [pulseInterval, setPulseInterval] = useState(1000);
