@@ -1,16 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../App';
 
+export interface FeatureAtClick {
+  ol_uid: string;
+  geometry: string;
+  [key: string]: string | number;
+}
+
+export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
+  return !!x && typeof x.ol_uid === 'string' && x.geometry === 'string';
+};
+
 interface InitialState {
   center: number[] | null;
   zoom: number | null;
   units: string | null;
-  positioning: {
-    time: string;
-    verticalLevel: string;
-  };
+  displayTime: string;
+  verticalLevel: string;
   clickEvent: { longitude: number; latitude: number } | null;
-  featuresAtClick: ({ [key: string]: string } | undefined)[] | void[]; // Need to tackle the values / properties object from features to filter out undefined!
+  featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
   baseMapId: string;
 }
@@ -19,10 +27,8 @@ const initialState: InitialState = {
   center: [-3, 54],
   zoom: 5,
   units: null,
-  positioning: {
-    time: '',
-    verticalLevel: '',
-  },
+  displayTime: '',
+  verticalLevel: '',
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
@@ -43,11 +49,11 @@ export const mapSlice = createSlice({
     updateUnits: (state, units: PayloadAction<string | null>) => {
       state.units = units.payload;
     },
-    updatePositioning: (
-      state,
-      positioning: PayloadAction<{ time: string; verticalLevel: string }>,
-    ) => {
-      state.positioning = positioning.payload;
+    updateDisplayTime: (state, displayTime: PayloadAction<string>) => {
+      state.displayTime = displayTime.payload;
+    },
+    updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
+      state.verticalLevel = verticalLevel.payload;
     },
     updateClickEvent: (
       state,
@@ -57,9 +63,7 @@ export const mapSlice = createSlice({
     },
     updateFeaturesAtClick: (
       state,
-      features: PayloadAction<
-        ({ [key: string]: string } | undefined)[] | void[]
-      >,
+      features: PayloadAction<FeatureAtClick[]>,
     ) => {
       state.featuresAtClick = features.payload;
     },
@@ -76,7 +80,8 @@ export const {
   //updateDataLevels,
   //updateColourPalette,
   updateUnits,
-  updatePositioning,
+  updateDisplayTime,
+  updateVerticalLevel,
   updateClickEvent,
   updateFeaturesAtClick,
   updateBaseMaps,
@@ -85,7 +90,9 @@ export const {
 
 export const selectCenter = (state: RootState) => state.map.center;
 export const selectZoom = (state: RootState) => state.map.zoom;
-export const selectPositioning = (state: RootState) => state.map.positioning;
+export const selectDisplayTime = (state: RootState) => state.map.displayTime;
+export const selectVerticalLevel = (state: RootState) =>
+  state.map.verticalLevel;
 export const selectUnits = (state: RootState) => state.map.units;
 //export const selectColourPalette = (state: RootState) => {
 //  return null;
