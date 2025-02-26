@@ -10,10 +10,15 @@ import BaseMaps from './mapping/BaseMaps';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import './App.css';
 
+import waypointReducer from './modules/waypoints/waypointSlice';
+import WaypointSource from './modules/waypoints/WaypointSource';
+import WaypointProfile from './modules/waypoints/WaypointProfile';
+
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
+    waypoint: waypointReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -30,8 +35,12 @@ const App = () => {
   return (
     <div className="App">
       <Map>
-        <Profiles></Profiles>
-        <Sources></Sources>
+        <Profiles>
+          <WaypointProfile />
+        </Profiles>
+        <Sources>
+          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+        </Sources>
         <BaseMaps>
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
