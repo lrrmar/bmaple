@@ -79,9 +79,11 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
         mode: mode,
         id: uid,
         ...clickEvent,
-        time: displayTime,
-        verticalLevel: verticalLevel,
-        ...featureData,
+        properties: {
+          ...featureData,
+          time: displayTime,
+          verticalLevel: verticalLevel,
+        },
       }),
     );
   }, [clickEvent]);

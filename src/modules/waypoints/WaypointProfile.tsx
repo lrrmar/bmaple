@@ -23,23 +23,21 @@ import {
 interface Waypoint extends Entry {
   longitude: string;
   latitude: string;
-  time: string;
-  verticalLevel: string;
-  dataSource?: string;
-  dataType?: string;
-  dataValue?: string;
-  dataVariable?: string;
-  dataUnit?: string;
+  properties?: {
+    time?: string;
+    verticalLevel?: string;
+    dataSource?: string;
+    dataType?: string;
+    dataValue?: string;
+    dataVariable?: string;
+    dataUnit?: string;
+  };
 }
 
 export const isWaypoint = (element: any): element is Waypoint => {
   const keys: string[] = Object.keys(element);
   return (
-    isEntry(element) &&
-    keys.includes('latitude') &&
-    keys.includes('longitude') &&
-    keys.includes('time') &&
-    keys.includes('verticalLevel')
+    isEntry(element) && keys.includes('latitude') && keys.includes('longitude')
   );
 };
 
