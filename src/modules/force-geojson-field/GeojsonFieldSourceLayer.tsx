@@ -47,7 +47,7 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
   //API to fetch from Server
   const apiCall = async (id: string) => {
-    const response = await fetch(`http://${apiUrl}/layerById?id=${id}`, {
+    const response = await fetch(`https://${apiUrl}/layerById?id=${id}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
