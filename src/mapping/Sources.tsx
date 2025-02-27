@@ -35,10 +35,10 @@ const Sources = ({ children }: Props) => {
       React.Children.map(children, (el) => {
         if (React.isValidElement<ChildProps>(el)) {
           const sourceIdentifier: string = el.props.sourceIdentifier;
-          const cacheForChild: Cache = cache;
+          const cacheForChild: Cache = {};
           Object.keys(cache).forEach((key) => {
-            if (cacheForChild[key].source !== sourceIdentifier) {
-              delete cacheForChild[key];
+            if (cache[key].source === sourceIdentifier) {
+              cacheForChild[key] = cache[key];
             }
           });
           return React.cloneElement(el, {

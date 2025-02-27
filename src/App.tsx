@@ -6,7 +6,6 @@ import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
-import TileLayer from './mapping/TileLayer';
 import './App.css';
 import fastaReducer from './modules/fasta/fastaSlice';
 import Slider from './modules/fasta/Slider';
@@ -23,11 +22,16 @@ import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
 import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
 
+import waypointReducer from './modules/waypoints/waypointSlice';
+import WaypointSource from './modules/waypoints/WaypointSource';
+import WaypointProfile from './modules/waypoints/WaypointProfile';
+
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
     fasta: fastaReducer,
+    waypoint: waypointReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -56,9 +60,11 @@ const App = () => {
       <Map>
         <Profiles>
           <FastaProfile/>
+          <WaypointProfile/>
         </Profiles>
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
+          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
@@ -71,7 +77,6 @@ const App = () => {
         <FoldOutMenu align={'left'}>
           <ColourSchemeMenu id={'style'} />
         </FoldOutMenu>
-        <TileLayer />
       </Map>
       <FastaMainMenu>
         <Slider />

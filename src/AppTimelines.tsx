@@ -6,7 +6,6 @@ import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
-import TileLayer from './mapping/TileLayer';
 import './App.css';
 import fastaReducer from './modules/fasta/fastaSlice';
 import FastaProfile from './modules/fasta/FastaGraphic';
