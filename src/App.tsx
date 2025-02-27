@@ -13,6 +13,9 @@ import './App.css';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
+import WaypointApiCall from './modules/waypoints/WaypointApiCall';
+
+import FloatingBox from './features/FloatingBox';
 
 export const store = configureStore({
   reducer: {
@@ -45,6 +48,9 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
       </Map>
+      <FloatingBox>
+        <WaypointApiCall />
+      </FloatingBox>
     </div>
   );
 };
