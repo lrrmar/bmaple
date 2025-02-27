@@ -19,6 +19,8 @@ import LightBaseMap from './mapping/LightBaseMap';
 import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import FloatingBox from './features/FloatingBox';
+import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
+import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
 
 export const store = configureStore({
@@ -66,6 +68,9 @@ const App = () => {
         <FloatingBox style={floatingBoxStyle}>
           <ProductSelector></ProductSelector>
         </FloatingBox>
+        <FoldOutMenu align={'left'}>
+          <ColourSchemeMenu id={'style'} />
+        </FoldOutMenu>
         <TileLayer />
       </Map>
       <FastaMainMenu>
