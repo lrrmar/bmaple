@@ -111,7 +111,7 @@ const LayerSelector = () => {
      *          */
     const layerMetaData = {
       varname: varname.current,
-      //sim_start_time: startTime.current,
+      sim_start_time: startTime.current,
       valid_time: validTime,
       level_type: verticalLevel,
       grid_id: domain.current,
