@@ -55,8 +55,6 @@ const ColourPanel = ({ level, lowerHexCode, upperHexCode, numKeys }: Props) => {
     textAlign: 'center',
     padding: '0px',
   };
-  console.log(level);
-  console.log(level.split('_'));
   return <div style={style}>{level.split('_')[1]}</div>;
 };
 
@@ -158,11 +156,9 @@ const ContourColourBar = () => {
       });
       linearGradientString = linearGradientString.slice(0, -2) + ')';
       setLinearGradientString(linearGradientString);
-      console.log(contourLimits);
 
       const divs: React.ReactNode[] = [];
       [...contourLimits].forEach((lim, ind) => {
-        console.log(lim);
         const panelColour: string | null = colourPalette[ind.toString()];
         const fontColour: string = panelColour
           ? getContrastingColour(panelColour)

@@ -75,8 +75,11 @@ const Graphics = () => {
     // new layer ---> current layer
     // extract formatting data from new layer
     if (currentLayer) setOldLayer(currentLayer);
+    if (!newLayer) {
+      setCurrentLayer(null);
+      return;
+    }
     if (!geojsonFieldCacheEntry) return;
-    if (!newLayer) return;
     setCurrentLayer(newLayer);
     dispatch(updateContours(geojsonFieldCacheEntry.levels));
     setDefaultColourPalette(geojsonFieldCacheEntry.hex_palette);
@@ -103,7 +106,6 @@ const Graphics = () => {
     if (colourPaletteId !== 'default') {
       const numColours = Object.keys(defaultColourPalette).length;
       const paletteColours = colourPalettes[colourPaletteId](numColours);
-      console.log(paletteColours);
       for (let i = 0; i < numColours; i++)
         hexPalette[i.toString()] = paletteColours[i];
     } else {

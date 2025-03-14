@@ -70,7 +70,7 @@ const GeojsonFieldHashTablesServer = () => {
 
   useEffect(() => {
     const fetchVariables = async () => {
-      const response = await fetch(`https://${apiUrl}/getVariables/`);
+      const response = await fetch(`${apiUrl}/getVariables/`);
       const json = await response.json();
       setVariables(json);
     };
@@ -78,15 +78,12 @@ const GeojsonFieldHashTablesServer = () => {
   }, []);
 
   const fetchVariableHashes = async (varname: string) => {
-    const response = await fetch(
-      `https://${apiUrl}/variableHash?varname=${varname}`,
-      {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
+    const response = await fetch(`${apiUrl}/variableHash?varname=${varname}`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
       },
-    );
+    });
     const json = await response.json();
     appendHashes(json);
   };

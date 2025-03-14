@@ -15,12 +15,10 @@ interface InitialState {
   apiUrl: string;
 }
 
-const GEOJSON_API_URL = process.env['GEOJSON_API_URL'];
-console.log(GEOJSON_API_URL);
-const apiUrl = GEOJSON_API_URL
-  ? GEOJSON_API_URL
-  : 'force-test.ddns.net/geojson';
-console.log(apiUrl);
+let GEOJSON_API_URL: string | undefined | null = null;
+GEOJSON_API_URL = process.env.GEOJSON_API_URL;
+console.log(window);
+const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://force-test.ddns.net/geojson';
 
 const initialState: InitialState = {
   selectedId: null,

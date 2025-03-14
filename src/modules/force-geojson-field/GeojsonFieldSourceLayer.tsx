@@ -47,7 +47,7 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
   //API to fetch from Server
   const apiCall = async (id: string) => {
-    const response = await fetch(`https://${apiUrl}/layerById?id=${id}`, {
+    const response = await fetch(`${apiUrl}/layerById?id=${id}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -62,8 +62,7 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     try {
       const data = await apiCall(id);
       if (data) {
-        const properties = { ...data };
-        delete properties.features;
+        const properties = data['properties'];
         setLayerProperties(properties);
         setLayerData(data);
       }
@@ -135,22 +134,15 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     vectorLayer.setVisible(false);
     const add = map.addLayer(vectorLayer);
 
-    console.log('pre post render');
-
     map.once('postrender', (event) => {
-      console.log('post render');
-      const properties = { ...layerData };
-      delete properties.features;
       const ol_uid: string | null = getUid(vectorLayer);
-      console.log(vectorLayer);
-      console.log(ol_uid);
       // Big error... how can we handle?
       if (!ol_uid) return;
       const toCache = {
         id: id,
         ol_uid: ol_uid,
         source: sourceIdentifier,
-        ...properties,
+        ...layerProperties,
       };
 
       dispatch(ingest(toCache));
