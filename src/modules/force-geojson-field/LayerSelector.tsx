@@ -64,9 +64,9 @@ const LayerSelector = () => {
     if (variableHashes.length === 0) {
       return;
     }
-    dispatch(updateVarname(variableHashes[0].varname);
-    dispatch(updateDomain(variableHashes[0].grid_id.toString());
-    dispatch(updateStartTime(variableHashes[0].sim_start_time);
+    dispatch(updateVarname(variableHashes[0].varname));
+    dispatch(updateDomain(variableHashes[0].grid_id.toString()));
+    dispatch(updateStartTime(variableHashes[0].sim_start_time));
     dispatch(updateDisplayTime(variableHashes[0].valid_time));
     dispatch(updateVerticalLevel(variableHashes[0].level_type));
     setAvailableVarnames([

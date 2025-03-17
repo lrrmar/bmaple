@@ -21,7 +21,9 @@ interface InitialState {
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
 console.log(window);
-const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://force-test.ddns.net/geojson';
+const apiUrl = GEOJSON_API_URL
+  ? GEOJSON_API_URL
+  : 'https://force-test.ddns.net/geojson';
 
 const initialState: InitialState = {
   selectedId: null,
@@ -124,6 +126,7 @@ export const selectUnits = (state: RootState) => state.geojsonField.units;
 export const selectOpacity = (state: RootState) => state.geojsonField.opacity;
 export const selectApiUrl = (state: RootState) => state.geojsonField.apiUrl;
 export const selectVarname = (state: RootState) => state.geojsonField.varname;
-export const selectStartTime = (state: RootState) => state.geojsonField.startTime;
+export const selectStartTime = (state: RootState) =>
+  state.geojsonField.startTime;
 export const selectDomain = (state: RootState) => state.geojsonField.domain;
 export default geojsonFieldSlice.reducer;
