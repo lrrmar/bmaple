@@ -24,6 +24,7 @@ import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
+import ScrollingScale from './features/ScrollingScale';
 import './App.css';
 
 export const store = configureStore({
@@ -66,8 +67,11 @@ const App = () => {
         minimise={''}
         style={{ top: '10px', flexDirection: 'column-reverse', width: 'auto' }}
       ></FloatingBox>
-      <FloatingBox style={{ bottom: '80px', borderWidth: '0px' }}>
+      <FloatingBox style={{ bottom: '130px', borderWidth: '0px' }}>
         <ContourColourBar />
+      </FloatingBox>
+      <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
+        <ScrollingScale />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         <FoldOutItem id={'Style'} icon={'paint brush'}>

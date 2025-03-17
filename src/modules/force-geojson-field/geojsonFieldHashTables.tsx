@@ -22,6 +22,11 @@ const GeojsonFieldHashTablesServer = () => {
   const [exportHashTables, setExportHashTables] = useState([]);
   const [initRender, setInitRender] = useState(true);
   const apiUrl: string = useSelector(selectApiUrl);
+  const [hashes, setHashes] = useState<HashTable[] | null>([]);
+
+  useEffect(() => {
+    setHashes(getHashTables());
+  }, []);
 
   const getHashTables = (): HashTable[] | null => {
     let hashes = sessionStorage.getItem('geojsonFieldHashes');
@@ -59,14 +64,16 @@ const GeojsonFieldHashTablesServer = () => {
     setHashes(updatedHashes);
   };
 
-  const [hashes, setHashes] = useState(getHashTables);
-
   const memoizedVariables = useMemo(
     () => ({
       variables,
     }),
     [variables],
   );
+
+  useEffect(() => {
+    dispatch(updateHashesFlag());
+  }, [hashes]);
 
   useEffect(() => {
     const fetchVariables = async () => {

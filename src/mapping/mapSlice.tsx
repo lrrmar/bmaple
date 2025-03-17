@@ -23,6 +23,9 @@ interface InitialState {
   baseMapId: string;
   themes: string[];
   themeId: string;
+  displayTimes: {
+    [source: string]: number[];
+  };
 }
 
 const initialState: InitialState = {
@@ -37,6 +40,7 @@ const initialState: InitialState = {
   baseMapId: 'dark',
   themes: [],
   themeId: 'glassTablet',
+  displayTimes: {},
 };
 
 export const mapSlice = createSlice({
@@ -53,8 +57,10 @@ export const mapSlice = createSlice({
     updateUnits: (state, units: PayloadAction<string | null>) => {
       state.units = units.payload;
     },
-    updateDisplayTime: (state, displayTime: PayloadAction<string>) => {
-      state.displayTime = displayTime.payload;
+    updateDisplayTime: (state, displayTime: PayloadAction<number>) => {
+      const iso = new Date(displayTime.payload).toISOString();
+      const reducedIso = iso.substring(0, iso.length - 2);
+      state.displayTime = reducedIso;
     },
     updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
       state.verticalLevel = verticalLevel.payload;
@@ -83,6 +89,12 @@ export const mapSlice = createSlice({
     updateThemeId: (state, themeId: PayloadAction<string>) => {
       state.themeId = themeId.payload;
     },
+    updateDisplayTimes: (
+      state,
+      update: PayloadAction<{ source: string; times: number[] }>,
+    ) => {
+      state.displayTimes[update.payload.source] = update.payload.times;
+    },
   },
 });
 
@@ -98,6 +110,7 @@ export const {
   updateBaseMapId,
   updateThemes,
   updateThemeId,
+  updateDisplayTimes,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;
@@ -118,4 +131,5 @@ export const selectThemes = (state: RootState) => state.map.themes;
 export const selectThemeId = (state: RootState) => state.map.themeId;
 export const selectMenuStyle = (state: RootState) =>
   state.map.themeId + ' ' + state.map.baseMapId;
+export const selectDisplayTimes = (state: RootState) => state.map.displayTimes;
 export default mapSlice.reducer;

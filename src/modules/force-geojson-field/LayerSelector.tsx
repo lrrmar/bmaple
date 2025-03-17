@@ -64,11 +64,17 @@ const LayerSelector = () => {
     if (variableHashes.length === 0) {
       return;
     }
-    dispatch(updateVarname(variableHashes[0].varname));
-    dispatch(updateDomain(variableHashes[0].grid_id.toString()));
-    dispatch(updateStartTime(variableHashes[0].sim_start_time));
-    dispatch(updateDisplayTime(variableHashes[0].valid_time));
-    dispatch(updateVerticalLevel(variableHashes[0].level_type));
+    if (varname === '') dispatch(updateVarname(variableHashes[0].varname));
+    if (domain === '')
+      dispatch(updateDomain(variableHashes[0].grid_id.toString()));
+    if (startTime === '')
+      dispatch(updateStartTime(variableHashes[0].sim_start_time));
+    if (validTime === '')
+      dispatch(
+        updateDisplayTime(new Date(variableHashes[0].valid_time).getTime()),
+      );
+    if (verticalLevel === '')
+      dispatch(updateVerticalLevel(variableHashes[0].level_type));
     setAvailableVarnames([
       ...new Set(
         variableHashes.map((hash) => {
@@ -122,18 +128,20 @@ const LayerSelector = () => {
       level_type: verticalLevel,
       grid_id: domain,
     };
+    console.log(layerMetaData);
     const layerHash = variableHashes.find((dict) =>
       Object.entries(layerMetaData).every(
         ([key, value]) => dict[key] === value,
       ),
     );
+    console.log(layerHash);
     if (layerHash) {
       const newHash = { ...layerHash, id: layerHash.id };
       dispatch(updateSelectedId(newHash.id));
     } else {
       dispatch(updateSelectedId(null));
     }
-  }, [varname, startTime, validTime, verticalLevel, domain]);
+  }, [variableHashes, varname, startTime, validTime, verticalLevel, domain]);
 
   useEffect(() => {
     const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
@@ -147,7 +155,7 @@ const LayerSelector = () => {
       if (currentIndex === availableValidTimes.length - 1) {
         return;
       }
-      dispatch(updateDisplayTime(availableValidTimes[currentIndex + 1]));
+      // dispatch(updateDisplayTime(availableValidTimes[currentIndex + 1]));
     }
   }, [pulse]);
 
@@ -212,6 +220,7 @@ const LayerSelector = () => {
           setValue={(s: string) => dispatch(updateStartTime(s))}
         />
       </span>
+      {/*
       <span>
         Valid time:
         <DropDownList
@@ -255,6 +264,7 @@ const LayerSelector = () => {
           {animate ? '\u25A0' : '\u25B6'}
         </Button>
       </span>
+        */}
       <span>
         {'Level:  '}
         <DropDownList

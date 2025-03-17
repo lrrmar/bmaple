@@ -7,6 +7,7 @@ import {
 import {
   selectHashTables,
   updateProfileId,
+  selectProfileId,
   selectSelectedId,
   selectVarname,
   selectStartTime,
@@ -14,6 +15,7 @@ import {
 } from './geojsonFieldSlice';
 
 import { request, Request, Cache } from '../../mapping/cacheSlice';
+import { updateDisplayTimes } from '../../mapping/mapSlice';
 
 import HashTablesServer from './geojsonFieldHashTables';
 import SourceLayer from './GeojsonFieldSourceLayer';
@@ -26,7 +28,8 @@ interface Props {
 const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
   const requestId = useSelector(selectSelectedId);
-  const variableHashes: HashTable[] = useSelector(selectHashTables);
+  const profileId = useSelector(selectProfileId);
+  const allHashes: HashTable[] = useSelector(selectHashTables);
 
   const varname = useSelector(selectVarname);
   const startTime = useSelector(selectStartTime);
@@ -47,11 +50,24 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
       sim_start_time: startTime,
       grid_id: domain,
     };
-    const layerHashes = variableHashes.find((dict) =>
+    const selectedHashes: HashTable[] = allHashes.filter((dict) =>
       Object.entries(metaData).every(([key, value]) => dict[key] === value),
     );
-    console.log(layerHashes);
-  }, [varname, startTime, domain]);
+    if (selectedHashes && selectedHashes.length > 0) {
+      // for each layer hash that matches the metadata, convert string time
+      // to int and then make this collection unique i.e. convert to set
+      // and back to array
+      //
+      const times = [
+        ...new Set(
+          selectedHashes.map(
+            (hash) => new Date(hash['valid_time']).getTime(), // unix timestamp
+          ),
+        ),
+      ].sort();
+      dispatch(updateDisplayTimes({ source: sourceIdentifier, times: times }));
+    }
+  }, [varname, startTime, domain, profileId]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {
     return <SourceLayer sourceIdentifier={sourceIdentifier} id={id} key={id} />;

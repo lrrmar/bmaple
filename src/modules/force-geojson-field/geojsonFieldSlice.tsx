@@ -21,9 +21,7 @@ interface InitialState {
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
 console.log(window);
-const apiUrl = GEOJSON_API_URL
-  ? GEOJSON_API_URL
-  : 'https://force-test.ddns.net/geojson';
+const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8181';
 
 const initialState: InitialState = {
   selectedId: null,
