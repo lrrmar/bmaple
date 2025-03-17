@@ -21,6 +21,12 @@ import {
   selectHashTables,
   selectHashesFlag,
   selectApiUrl,
+  updateVarname,
+  selectVarname,
+  updateStartTime,
+  selectStartTime,
+  updateDomain,
+  selectDomain,
 } from './geojsonFieldSlice';
 
 const isString = (x: any) => !!x && typeof x === 'string';
@@ -29,6 +35,9 @@ const LayerSelector = () => {
   const dispatch = useDispatch();
   const validTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const varname = useSelector(selectVarname);
+  const startTime = useSelector(selectStartTime);
+  const domain = useSelector(selectDomain);
   const geojsonFieldHashesFlag = useSelector(selectHashesFlag);
   const profileId = useSelector(selectProfileId);
   const selectedId = useSelector(selectSelectedId);
@@ -38,9 +47,6 @@ const LayerSelector = () => {
   const [availableStartTimes, setAvailableStartTimes] = useState<string[]>([]);
   const [availableValidTimes, setAvailableValidTimes] = useState<string[]>([]);
   const [availableLevels, setAvailableLevels] = useState<string[]>([]);
-  const [varname, setVarname] = useState<string>('');
-  const [startTime, setStartTime] = useState<string>('');
-  const [domain, setDomain] = useState<string>('');
   const variableHashes: HashTable[] = useSelector(selectHashTables);
   const apiUrl: string = useSelector(selectApiUrl);
   const [animate, setAnimate] = useState(false);
@@ -58,9 +64,9 @@ const LayerSelector = () => {
     if (variableHashes.length === 0) {
       return;
     }
-    setVarname(variableHashes[0].varname);
-    setDomain(variableHashes[0].grid_id.toString());
-    setStartTime(variableHashes[0].sim_start_time);
+    dispatch(updateVarname(variableHashes[0].varname);
+    dispatch(updateDomain(variableHashes[0].grid_id.toString());
+    dispatch(updateStartTime(variableHashes[0].sim_start_time);
     dispatch(updateDisplayTime(variableHashes[0].valid_time));
     dispatch(updateVerticalLevel(variableHashes[0].level_type));
     setAvailableVarnames([
@@ -162,14 +168,14 @@ const LayerSelector = () => {
       <DropDownList
         values={availableVarnames}
         value={varname}
-        setValue={(v: string) => setVarname(v)}
+        setValue={(v: string) => dispatch(updateVarname(v))}
       />
       <span>
         Domain:
         <DropDownList
           values={availableDomains}
           value={domain}
-          setValue={(d: string) => setDomain(d)}
+          setValue={(d: string) => dispatch(updateDomain(d))}
         />
         <Button
           icon
@@ -179,7 +185,7 @@ const LayerSelector = () => {
             if (currentIndex === 0) {
               return;
             }
-            setDomain(availableDomains[currentIndex - 1]);
+            dispatch(updateDomain(availableDomains[currentIndex - 1]));
           }}
         >
           <Icon name="angle left" />
@@ -192,7 +198,7 @@ const LayerSelector = () => {
             if (currentIndex === availableDomains.length - 1) {
               return;
             }
-            setDomain(availableDomains[currentIndex + 1]);
+            dispatch(updateDomain(availableDomains[currentIndex + 1]));
           }}
         >
           <Icon name="angle right" />
@@ -203,7 +209,7 @@ const LayerSelector = () => {
         <DropDownList
           values={availableStartTimes}
           value={startTime}
-          setValue={(s: string) => setStartTime(s)}
+          setValue={(s: string) => dispatch(updateStartTime(s))}
         />
       </span>
       <span>

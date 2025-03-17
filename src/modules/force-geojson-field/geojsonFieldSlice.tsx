@@ -13,6 +13,9 @@ interface InitialState {
   units: string;
   opacity: number;
   apiUrl: string;
+  varname: string;
+  startTime: string;
+  domain: string;
 }
 
 let GEOJSON_API_URL: string | undefined | null = null;
@@ -31,6 +34,9 @@ const initialState: InitialState = {
   units: '',
   opacity: 0.8,
   apiUrl: apiUrl,
+  varname: '',
+  startTime: '',
+  domain: '',
 };
 
 export const geojsonFieldSlice = createSlice({
@@ -70,6 +76,15 @@ export const geojsonFieldSlice = createSlice({
     updateOpacity: (state, opacity: PayloadAction<number>) => {
       state.opacity = opacity.payload;
     },
+    updateVarname: (state, varname: PayloadAction<string>) => {
+      state.varname = varname.payload;
+    },
+    updateStartTime: (state, startTime: PayloadAction<string>) => {
+      state.startTime = startTime.payload;
+    },
+    updateDomain: (state, domain: PayloadAction<string>) => {
+      state.domain = domain.payload;
+    },
   },
 });
 
@@ -83,6 +98,9 @@ export const {
   updateColourPalette,
   updateUnits,
   updateOpacity,
+  updateVarname,
+  updateStartTime,
+  updateDomain,
 } = geojsonFieldSlice.actions;
 
 export const selectHashTables = createSelector(
@@ -105,4 +123,7 @@ export const selectColourPalette = (state: RootState) =>
 export const selectUnits = (state: RootState) => state.geojsonField.units;
 export const selectOpacity = (state: RootState) => state.geojsonField.opacity;
 export const selectApiUrl = (state: RootState) => state.geojsonField.apiUrl;
+export const selectVarname = (state: RootState) => state.geojsonField.varname;
+export const selectStartTime = (state: RootState) => state.geojsonField.startTime;
+export const selectDomain = (state: RootState) => state.geojsonField.domain;
 export default geojsonFieldSlice.reducer;

@@ -20,7 +20,6 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
   const requestId = useSelector(selectSelectedId);
 
   useEffect(() => {
-    console.log(requestId);
     if (requestId && !cache[requestId]) {
       dispatch(request({ id: requestId, source: sourceIdentifier }));
     } else {
