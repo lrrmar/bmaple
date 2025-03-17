@@ -25,6 +25,7 @@ import ProductSelector from './modules/fasta/ProductSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
+import LocationsList from './modules/fasta/LocationsList';
 
 export const store = configureStore({
   reducer: {
@@ -49,7 +50,7 @@ interface SourceProps {
 const floatingBoxStyle = { top: '20px', right: '20px',
   borderColor: 'black', borderWidth: '2px',
   borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
-
+  
 const App = () => {
   useEffect(() => {
     sessionStorage.clear();

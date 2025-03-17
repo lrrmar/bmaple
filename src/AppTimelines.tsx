@@ -21,6 +21,12 @@ import ProductSelector from './modules/fasta/ProductSelector';
 import TimelineReport from './modules/fasta/TimelineReport';
 import { color } from 'openlayers';
 
+import waypointReducer from './modules/waypoints/waypointSlice';
+import WaypointSource from './modules/waypoints/WaypointSource';
+import WaypointProfile from './modules/waypoints/WaypointProfile';
+import LocationsList from './modules/fasta/LocationsList';
+
+
 /*
 export const store = configureStore({
   reducer: {
@@ -48,6 +54,10 @@ const floatingBoxStyle = { top: '20px', right: '20px',
 
 const pStyle = { color: '#000' };
 
+const locationsFloatingBoxStyle = { top: '50px', right: '20px',
+    borderColor: 'black', borderWidth: '2px',
+    borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
+
 const AppTimelines = () => {
   useEffect(() => {
     sessionStorage.clear();
@@ -55,7 +65,28 @@ const AppTimelines = () => {
   }, []);
   return (
     <div className="App">
-        <TimelineReport />
+      <Map>
+        <Profiles>
+          <FastaProfile/>
+          <WaypointProfile/>
+        </Profiles>
+        <Sources>
+          <FastaSource cache={{}} sourceIdentifier={'fasta'} />
+          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+        </Sources>
+        <BaseMaps>
+          <DarkBaseMap id={'dark'} />
+          <LightBaseMap id={'light'} />
+          <OSMBaseMap id={'OSM'} />
+        </BaseMaps>
+        <FloatingBox style={floatingBoxStyle}>
+          <ProductSelector></ProductSelector>
+        </FloatingBox>
+      </Map>
+      <FloatingBox style={locationsFloatingBoxStyle}>
+          <LocationsList sourceIdentifier={'waypoint'}></LocationsList>
+        </FloatingBox>
+      <TimelineReport />
     </div>
   );
 };

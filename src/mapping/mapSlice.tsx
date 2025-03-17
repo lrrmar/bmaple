@@ -24,7 +24,9 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  center: [-3, 54],
+  //center: [-3, 54],
+  //center: [36.817223, -1.286389], // Nairobi
+  center: [28.2872, -15.4082], // Lusaka
   zoom: 5,
   units: null,
   displayTime: '',
