@@ -8,7 +8,7 @@ export interface FeatureAtClick {
 }
 
 export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
-  return !!x && typeof x.ol_uid === 'string' && x.geometry === 'string';
+  return !!x && typeof x.ol_uid === 'string' && typeof x.geometry === 'string';
 };
 
 interface InitialState {

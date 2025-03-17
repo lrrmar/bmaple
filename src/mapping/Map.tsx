@@ -5,6 +5,8 @@ import MapType from 'ol/Map';
 import Feature, { FeatureLike } from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';
 import { toLonLat, fromLonLat } from 'ol/proj';
+import { getUid } from 'ol/util';
+
 
 import {
   selectCenter,
@@ -110,9 +112,8 @@ const Map = ({ children }: Props) => {
         const geometry = feature.getGeometry();
         if (!geometry) return;
         const geometryType: string = geometry.getType();
-        const ol_uid: string = feature.getProperties()['ol_uid'];
+        const ol_uid: string = getUid(feature);
         if (!ol_uid) return;
-
         const values: { [key: string]: string | number } = {
           ...feature.getProperties(),
         }; // get type
@@ -125,6 +126,7 @@ const Map = ({ children }: Props) => {
         return info;
       },
     );
+
     const filteredFeaturesAtClick: FeatureAtClick[] =
       featuresAtClick.filter(isFeatureAtClick);
     dispatch(updateClickEvent(mapCoordinate));
