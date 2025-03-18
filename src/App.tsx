@@ -55,12 +55,11 @@ const App = () => {
         </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
-          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
-          <LightBaseMap id={'light'} />
-          <OSMBaseMap id={'OSM'} />
+          {/*<LightBaseMap id={'light'} />
+          <OSMBaseMap id={'OSM'} />*/}
         </BaseMaps>
       </Map>
       <FloatingBox

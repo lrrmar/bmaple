@@ -40,6 +40,9 @@ function FoldOutMenu({
     null,
   );
   const [currentFoldOuts, setCurrentFoldOuts] = useState<React.ReactNode[]>([]);
+  const [currentNotVisible, setCurrentNotVisible] = useState<React.ReactNode[]>(
+    [],
+  );
   const [icons, setIcons] = useState<{ [key: string]: SemanticICONS }>({});
   const alignment = 'FoldOutMenu ' + align;
 
@@ -89,6 +92,7 @@ function FoldOutMenu({
       filteredFoldOutIds.includes(id),
     );
     const fillers: React.ReactNode[] = [];
+    const notVisible: React.ReactNode[] = [];
     React.Children.forEach(children, (el) => {
       if (
         React.isValidElement<{
@@ -97,7 +101,11 @@ function FoldOutMenu({
           icon: string;
         }>(el)
       ) {
-        if (filteredFoldOutIds.includes(el.props.id)) fillers.push(el);
+        if (filteredFoldOutIds.includes(el.props.id)) {
+          fillers.push(el);
+        } else {
+          notVisible.push(el);
+        }
       }
     });
     let foldOuts: React.ReactNode[] = [];
@@ -121,6 +129,7 @@ function FoldOutMenu({
       }
     });
     setCurrentFoldOuts(foldOuts);
+    setCurrentNotVisible(notVisible);
   }, [currentFoldOutIds, theme]);
   return (
     <div className={alignment}>
@@ -142,6 +151,9 @@ function FoldOutMenu({
         }}
       >
         {currentFoldOuts}
+      </div>
+      <div style={{ position: 'absolute', top: '-5000px' }}>
+        {currentNotVisible}
       </div>
     </div>
   );

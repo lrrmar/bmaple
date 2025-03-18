@@ -4,7 +4,11 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../hooks';
-import { selectDisplayTimes, updateDisplayTime } from '../mapping/mapSlice';
+import {
+  selectDisplayTime,
+  selectDisplayTimes,
+  updateDisplayTime,
+} from '../mapping/mapSlice';
 
 const getUTCString = (timeInt: number) => {
   const dt = new Date(timeInt);
@@ -16,11 +20,16 @@ interface Mark {
 }
 const ScrollingScale = () => {
   const dispatch = useDispatch();
+  const displayTime = useSelector(selectDisplayTime);
   const displayTimes = useSelector(selectDisplayTimes);
   const [upperLim, setUpperLim] = useState<number>(0);
-  const [lowerLim, setLowerLim] = useState<number>(0);
-  const [increment, setIncrement] = useState<number>(0);
+  const [lowerLim, setLowerLim] = useState<number>(1);
+  const [dataIncrement, setDataIncrement] = useState<number>(60 * 60 * 1000);
+  const [tickIncrement, setTickIncrement] = useState<number>(0);
   const [marks, setMarks] = useState<Mark[]>([]);
+  // TODO: update based on size allocated to slider...
+  const [optimalTickCount, setOptimalTickCount] = useState<number>(10);
+
   const sources = Object.keys(displayTimes);
   let allTimeInts: number[] = [];
   Object.values(displayTimes).forEach((array) => {
@@ -42,10 +51,53 @@ const ScrollingScale = () => {
     maxDateTime.setMinutes(0);
     maxDateTime.setSeconds(0);
     setUpperLim(maxDateTime.getTime());
+  }, [displayTimes]);
 
-    //TODO: set up auto increment based on zoom level of bar
-    const oneHourInMs = 60 * 60 * 1000;
-    setIncrement(oneHourInMs);
+  useEffect(() => {
+    // Find increment based on different between lower and upper
+    // lims of scroll bar
+
+    const minDateTime = new Date(lowerLim);
+    const maxDateTime = new Date(upperLim);
+    const oneMinuteInMs = 60 * 1000;
+    const oneHourInMs = 60 * oneMinuteInMs;
+    const numHours =
+      (maxDateTime.getTime() - minDateTime.getTime()) / oneHourInMs;
+    let increments: number[] = [];
+    let spread = numHours;
+
+    if (
+      0.8 * optimalTickCount < numHours &&
+      numHours < 1.2 * optimalTickCount
+    ) {
+      // Less than hour increments
+      spread = numHours * 60; // now in minutes
+      for (let i = 1; i < 7; i++) {
+        if (60 % i === 0) increments.push(60 / i);
+      }
+      // increments rescaled to hours following modulo
+      // ops in tickCountOptions
+    } else {
+      // Greater than or equal to hour increments
+      for (let i = 1; i < numHours + 1; i++) {
+        if (24 % i === 0 || i % 24 == 0) increments.push(i);
+      }
+    }
+    const tickCountOptions = increments.map(
+      (inc: number) => (spread - (spread % inc)) / inc,
+    );
+    if (spread !== numHours) {
+      increments = increments.map((inc) => inc / 60);
+    }
+
+    // OPTIMAL TIK COUNT....
+    const tickCountCosts = tickCountOptions.map(
+      (count) => (count - optimalTickCount) ** 2,
+    );
+    const tickCountMin = Math.min(...tickCountCosts);
+    const tickCountIndex = tickCountCosts.indexOf(tickCountMin);
+
+    const increment = increments[tickCountIndex] * oneHourInMs;
     const tempMarks: Mark[] = [];
     let currentTimeInt = minDateTime.getTime();
     while (currentTimeInt <= maxDateTime.getTime()) {
@@ -61,7 +113,7 @@ const ScrollingScale = () => {
       };
       const label =
         hour === 0
-          ? `${zf(month)}-${zf(day)} ${zf(hour)}:${zf(minute)}`
+          ? `${zf(month)}-${zf(day)}\n${zf(hour)}:${zf(minute)}`
           : `${zf(hour)}:${zf(minute)}`;
       tempMarks.push({
         value: currentTimeInt,
@@ -70,21 +122,44 @@ const ScrollingScale = () => {
       currentTimeInt += increment;
       setMarks(tempMarks);
     }
-  }, [displayTimes]);
+  }, [lowerLim, upperLim]);
+
+  if (Object.keys(displayTimes).length === 0) {
+    return <div></div>;
+  }
 
   return (
-    <div style={{ width: '80vw' }}>
+    <div style={{ width: '80vw', padding: '0px 35px', color: '#f1f1f1' }}>
       <Slider
         defaultValue={0}
         min={lowerLim}
         max={upperLim}
-        step={increment}
+        step={dataIncrement}
         track={false}
         marks={marks}
+        value={new Date(displayTime).getTime()}
         valueLabelDisplay={'auto'}
         valueLabelFormat={getUTCString}
         onChange={(e: Event, value: number | number[]) => {
           if (typeof value === 'number') dispatch(updateDisplayTime(value));
+        }}
+        color={'info'}
+        sx={{
+          '& .MuiSlider-rail': {
+            //  color: '#f1f1f1', // Change mark color
+          },
+          '& .MuiSlider-thumb': {
+            //color: '#f1f1f1', // Change mark color
+          },
+          '& .MuiSlider-mark': {
+            //backgroundColor: '#a1a1a1', // Change mark color
+            //height: 4,
+            //width: 3,
+            //borderRadius: '50%',
+          },
+          '& .MuiSlider-markLabel': {
+            color: '#f1f1f1', // Change label color
+          },
         }}
       />
     </div>

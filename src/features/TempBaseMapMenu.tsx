@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Slider from '@mui/material/Slider';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
@@ -41,7 +42,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
   };
   return (
     <div style={style}>
-      <span>
+      {/*<span>
         {'Base Map:  '}
         <DropDownList
           values={baseMaps}
@@ -58,7 +59,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           setValue={(theme: string) => dispatch(updateThemeId(theme))}
         />
       </span>
-      <br />
+      <br />*/}
       <span>
         {'Colour Palette:  '}
         <DropDownList
@@ -70,17 +71,15 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
         />
       </span>
       <br />
-      <input
-        type="range"
-        id="opacity"
-        min="0"
-        max="1"
-        step="0.1"
+      <Slider
+        min={0}
+        max={1}
+        step={0.05}
         value={opacity}
-        onChange={(e) => {
-          dispatch(updateOpacity(parseFloat(e.target.value)));
+        onChange={(e: Event, value: number | number[]) => {
+          if (typeof value === 'number') dispatch(updateOpacity(value));
         }}
-      ></input>
+      ></Slider>
     </div>
   );
 };
