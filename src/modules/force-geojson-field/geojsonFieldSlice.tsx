@@ -16,6 +16,9 @@ interface InitialState {
   varname: string;
   startTime: string;
   domain: string;
+  verticalLevel: number | null;
+  verticalLevels: number[];
+  verticalLevelUnits: string;
 }
 
 let GEOJSON_API_URL: string | undefined | null = null;
@@ -37,6 +40,9 @@ const initialState: InitialState = {
   varname: '',
   startTime: '',
   domain: '',
+  verticalLevel: null,
+  verticalLevels: [],
+  verticalLevelUnits: '',
 };
 
 export const geojsonFieldSlice = createSlice({
@@ -85,6 +91,18 @@ export const geojsonFieldSlice = createSlice({
     updateDomain: (state, domain: PayloadAction<string>) => {
       state.domain = domain.payload;
     },
+    updateVerticalLevel: (state, verticalLevel: PayloadAction<number>) => {
+      state.verticalLevel = verticalLevel.payload;
+    },
+    updateVerticalLevels: (state, verticalLevels: PayloadAction<number[]>) => {
+      state.verticalLevels = verticalLevels.payload;
+    },
+    updateVerticalLevelUnits: (
+      state,
+      verticalLevelUnits: PayloadAction<string>,
+    ) => {
+      state.verticalLevelUnits = verticalLevelUnits.payload;
+    },
   },
 });
 
@@ -101,6 +119,9 @@ export const {
   updateVarname,
   updateStartTime,
   updateDomain,
+  updateVerticalLevel,
+  updateVerticalLevels,
+  updateVerticalLevelUnits,
 } = geojsonFieldSlice.actions;
 
 export const selectHashTables = createSelector(
@@ -127,4 +148,10 @@ export const selectVarname = (state: RootState) => state.geojsonField.varname;
 export const selectStartTime = (state: RootState) =>
   state.geojsonField.startTime;
 export const selectDomain = (state: RootState) => state.geojsonField.domain;
+export const selectVerticalLevel = (state: RootState) =>
+  state.geojsonField.verticalLevel;
+export const selectVerticalLevels = (state: RootState) =>
+  state.geojsonField.verticalLevels;
+export const selectVerticalLevelUnits = (state: RootState) =>
+  state.geojsonField.verticalLevelUnits;
 export default geojsonFieldSlice.reducer;

@@ -42,7 +42,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
   };
   return (
     <div style={style}>
-      {/*<span>
+      <span>
         {'Base Map:  '}
         <DropDownList
           values={baseMaps}
@@ -51,7 +51,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
         />
       </span>
       <br />
-      <span>
+      {/*<span>
         {'Theme:  '}
         <DropDownList
           values={themes}
@@ -71,6 +71,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
         />
       </span>
       <br />
+      {'Opacity: '}
       <Slider
         min={0}
         max={1}

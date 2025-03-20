@@ -6,12 +6,7 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 import LoadingSpinner from '../../features/LoadingSpinner';
-import {
-  updateDisplayTime,
-  selectDisplayTime,
-  updateVerticalLevel,
-  selectVerticalLevel,
-} from '../../mapping/mapSlice';
+import { updateDisplayTime, selectDisplayTime } from '../../mapping/mapSlice';
 import { HashTable } from './geojsonFieldHashTables';
 
 import {
@@ -27,6 +22,9 @@ import {
   selectStartTime,
   updateDomain,
   selectDomain,
+  updateVerticalLevel,
+  selectVerticalLevel,
+  selectVerticalLevels,
 } from './geojsonFieldSlice';
 
 const isString = (x: any) => !!x && typeof x === 'string';
@@ -35,6 +33,7 @@ const LayerSelector = () => {
   const dispatch = useDispatch();
   const validTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const verticalLevels: number[] = useSelector(selectVerticalLevels);
   const varname = useSelector(selectVarname);
   const startTime = useSelector(selectStartTime);
   const domain = useSelector(selectDomain);
@@ -73,8 +72,8 @@ const LayerSelector = () => {
       dispatch(
         updateDisplayTime(new Date(variableHashes[0].valid_time).getTime()),
       );
-    if (verticalLevel === '')
-      dispatch(updateVerticalLevel(variableHashes[0].level_type));
+    if (verticalLevel === null)
+      if (verticalLevels) dispatch(updateVerticalLevel(verticalLevels[0]));
     setAvailableVarnames([
       ...new Set(
         variableHashes.map((hash) => {
@@ -121,20 +120,19 @@ const LayerSelector = () => {
   useEffect(() => {
     /* Handle selection change
      *          */
+    const level = verticalLevel === 0 ? 'Single' : `P${verticalLevel}`;
     const layerMetaData = {
       varname: varname,
       sim_start_time: startTime,
       valid_time: validTime,
-      level_type: verticalLevel,
+      level_type: level,
       grid_id: domain,
     };
-    console.log(layerMetaData);
     const layerHash = variableHashes.find((dict) =>
       Object.entries(layerMetaData).every(
         ([key, value]) => dict[key] === value,
       ),
     );
-    console.log(layerHash);
     if (layerHash) {
       const newHash = { ...layerHash, id: layerHash.id };
       dispatch(updateSelectedId(newHash.id));
@@ -265,40 +263,6 @@ const LayerSelector = () => {
         </Button>
       </span>
         */}
-      <span>
-        {'Level:  '}
-        <DropDownList
-          values={availableLevels}
-          value={verticalLevel}
-          setValue={(level: string) => dispatch(updateVerticalLevel(level))}
-        />
-        <Button
-          icon
-          size="mini"
-          onClick={() => {
-            const currentIndex = availableLevels.indexOf(verticalLevel);
-            if (currentIndex === 0) {
-              return;
-            }
-            dispatch(updateVerticalLevel(availableLevels[currentIndex - 1]));
-          }}
-        >
-          <Icon name="angle left" />
-        </Button>
-        <Button
-          icon
-          size="mini"
-          onClick={() => {
-            const currentIndex = availableLevels.indexOf(verticalLevel);
-            if (currentIndex === availableLevels.length - 1) {
-              return;
-            }
-            dispatch(updateVerticalLevel(availableLevels[currentIndex + 1]));
-          }}
-        >
-          <Icon name="angle right" />
-        </Button>
-      </span>
     </div>
   );
 };
