@@ -39,10 +39,12 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
     if (!clickEvent) {
       return;
     }
+
     // detect click on exisiting point
     const pointBools: FeatureAtClick[] = featuresAtClick.filter(
       (feature: FeatureAtClick) => feature.geometry === 'Point',
     );
+
     if (pointBools.length > 0) {
       return;
     }
@@ -55,11 +57,16 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
       ObjectType: 'contour',
     };
 
+    console.log("geojsonFilter " + sourceIdentifier);
+
     const geojsonFeatures = featuresAtClick.filter((feature) =>
       Object.keys(geojsonFilter)
         .map((key) => feature[key] === geojsonFilter[key])
         .every(Boolean),
     );
+
+    console.log("geojsonFeatures:" + geojsonFeatures.length);
+
     const geojsonFeature = geojsonFeatures[0];
 
     let featureData;
@@ -73,19 +80,25 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
       };
     }
     const uid = 'id' + new Date().getTime();
-    dispatch(
-      request({
-        source: sourceIdentifier,
-        mode: mode,
-        id: uid,
-        ...clickEvent,
-        properties: {
-          ...featureData,
-          time: displayTime,
-          verticalLevel: verticalLevel,
-        },
-      }),
-    );
+
+    if (mode === "edit") {
+      dispatch(
+        request({
+          source: sourceIdentifier,
+          mode: mode,
+          id: uid,
+          ...clickEvent,
+          properties: {
+            ...featureData,
+            time: displayTime,
+            verticalLevel: verticalLevel,
+          },
+        }),
+      );
+
+      console.log("Added request ... id:" + uid);
+      
+    }
   }, [clickEvent]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {

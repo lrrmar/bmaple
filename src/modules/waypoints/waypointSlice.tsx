@@ -45,10 +45,13 @@ export const waypointSlice = createSlice({
       profileIds.concat(toAppend);
       state.profileIds = profileIds;
     },
+    updateMode: (state, mode: PayloadAction<string | undefined>) => {
+      state.mode = mode.payload;
+    },
   },
 });
 
-export const { appendProfileIds } = waypointSlice.actions;
+export const { appendProfileIds, updateMode } = waypointSlice.actions;
 export const selectProfileIds = (state: RootState) => state.waypoint.profileIds;
 export const selectMode = (state: RootState) => state.waypoint.mode;
 export const selectWaypoints = (state: RootState) =>

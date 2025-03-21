@@ -71,8 +71,12 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   }, [cache]);
 
   useEffect(() => {
-    if (!layerData) return;
-    if (isEntry(layerData)) return;
+    if (!layerData) {
+      return;
+    }
+    if (isEntry(layerData)) {
+      return;
+    }
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
@@ -88,7 +92,9 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!map) {
       return;
     }
-    if (!layerData) return;
+    if (!layerData) {
+      return;
+    }
     if (!coordinates) {
       return;
     }
@@ -111,8 +117,16 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
     map.addLayer(vectorLayer);
     dispatch(ingest({ ...layerData, id: id, ol_uid: getUid(vectorLayer) }));
+
     return () => {
-      map.removeLayer(vectorLayer);
+      // TODO: cleanup
+      // For now removing the cleanup code.
+      // Need to consider the case of the component being reloaded.
+      // If we remove map layers, what do we do to the cache entries?
+      // Do we delete them too, or do we change them back to requests?
+      // What if we reload the component? We would need to recreate the layer from
+      // the cache, update the ol_uid, etc.
+      //map.removeLayer(vectorLayer);
     };
   }, [coordinates]);
 

@@ -20,7 +20,7 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-interface Waypoint extends Entry {
+export interface Waypoint extends Entry {
   longitude: string;
   latitude: string;
   properties?: {
