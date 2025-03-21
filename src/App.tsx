@@ -21,7 +21,7 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
-import WaypointsProfile from './modules/waypoints/WaypointProfile';
+import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
@@ -54,7 +54,7 @@ const App = () => {
       <Map>
         <Profiles>
           <GeojsonFieldProfile />
-          <WaypointsProfile />
+          <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />

@@ -3,7 +3,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../App';
 
 export interface Generic {
-  [key: string]: Generic | string[] | string | number[] | number | undefined;
+  [key: string]:
+    | Generic
+    | string[]
+    | string
+    | number[]
+    | number
+    | undefined
+    | null;
 }
 
 export interface Pending {

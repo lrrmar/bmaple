@@ -10,9 +10,10 @@ import {
   selectClickEvent,
   selectFeaturesAtClick,
   selectDisplayTime,
-  selectVerticalLevel,
   FeatureAtClick,
 } from '../../mapping/mapSlice';
+
+import { selectVerticalLevel } from '../force-geojson-field/geojsonFieldSlice';
 import { fromLonLat } from 'ol/proj';
 import Feature from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';

@@ -67,7 +67,6 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
 
   useEffect(() => {
-    console.log(cache);
     setLayerData(cache[id]);
   }, [cache]);
 
@@ -89,7 +88,6 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!map) {
       return;
     }
-    console.log(coordinates);
     if (!layerData) return;
     if (!coordinates) {
       return;
@@ -107,7 +105,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
     const vectorLayer = new VectorLayer({
       source: vectorSource,
-      zIndex: 20,
+      zIndex: 30,
       visible: false,
     });
 
