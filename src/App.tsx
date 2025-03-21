@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
@@ -75,9 +75,6 @@ const App = () => {
         <FloatingBox style={floatingBoxStyle}>
           <ProductSelector></ProductSelector>
         </FloatingBox>
-        <FoldOutMenu align={'left'}>
-          <ColourSchemeMenu id={'style'} />
-        </FoldOutMenu>
       </Map>
       <FastaMainMenu>
         <Slider />
@@ -85,6 +82,10 @@ const App = () => {
     </div>
   );
 };
+
+//<FoldOutMenu align={'left'}>
+//<ColourSchemeMenu id={'style'} />
+//</FoldOutMenu>
 
 export default App;
 export type AppStore = typeof store;

@@ -20,10 +20,11 @@ import noRainDayImage from './timeline_images/no_rain_day.png';
 import noRainNightImage from './timeline_images/no_rain_night.png';
 import rainImage from './timeline_images/rain.png';
 import { isMissingDeclaration } from 'typescript';
+import { Location, LocationsList } from './LocationsList';
 
 export interface Timeline {
-    [key: string]: string | number;
-    location: string; // product
+    [key: string]: string | number | undefined;
+    location: string | undefined; // product
     slot1Time: number;
     slot1: string;
     slot1Icon: number;
@@ -40,31 +41,22 @@ export interface Timeline {
   }
 
 
-export interface MapLocation {
-    [key: string]: string | number;
-    name: string;
-    lat: number;
-    lon: number;
-  }
-
 interface Props {
-    location : MapLocation;
+    location : Location;
+    token : string;
   }
   
-export const TimelineTable = ({ location } : Props) => {
+export const TimelineTable = ({ location, token } : Props) => {
 
     const fastaBaseUrl = useSelector(selectBaseUrl);
 
     const [timeline, setTimeline] = useState<Timeline>();
 
-    const fetchTimelines = async (loc : MapLocation) => {
+    const fetchTimelines = async (loc : Location) => {
 
         if (!loc) { return; }
 
         console.log("fetchTimeline");
-
-        // note token is country specific, this one for ZAMBIA
-        const token = 'PKppCvO_Zln4znnSJ7a5eElfDmCkwpqmdGFb2aSf9HI';
 
         const response = await fetch(
             `https://${fastaBaseUrl}/api/v1/quicklook/?point=${loc.lat},${loc.lon}&token=${token}`,
@@ -72,7 +64,7 @@ export const TimelineTable = ({ location } : Props) => {
         const json = await response.json();
 
         var timeline : Timeline = {
-            location: loc.name,
+            location: loc.description,
             slot1Time: new Date(json.slots[0].timeslot).getTime(),
             slot1: json.slots[0].icon?.description,
             slot1Icon: json.slots[0].icon?.code,
@@ -114,7 +106,7 @@ export const TimelineTable = ({ location } : Props) => {
     return (
         <div className='timeline'>
             <div className='timeline-location'>
-                <span className='location-name'>{location.name}</span>&nbsp;
+                <span className='location-name'>{location.description}</span>&nbsp;
                 <span className='location-latlon'>(lat/lon: {location.lat}, {location.lon})</span>
             </div>
             <table>

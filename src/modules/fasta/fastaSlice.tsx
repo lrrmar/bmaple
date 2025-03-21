@@ -14,6 +14,8 @@ interface InitialState {
   hashTables: HashTable[];
   latestTimeslot: number | null; // latest as a unix timestamp
   fastaProducts: FastaProduct[];
+  zmFlag: boolean;
+  mzFlag: boolean;
 }
 
 export interface FastaProduct {
@@ -39,6 +41,8 @@ const initialState: InitialState = {
     name: 'RDT',
     visible: false
   }],
+  zmFlag: false,
+  mzFlag: false,
 };
 
 export const fastaSlice = createSlice({
@@ -66,6 +70,12 @@ export const fastaSlice = createSlice({
     updateFastaProducts: (state, products : FastaProduct[]) => {
       state.fastaProducts = products.payload;
     },
+    updateZmFlag: (state, flag: PayloadAction<boolean>) => {
+      state.zmFlag = flag.payload;
+    },
+    updateMzFlag: (state, flag: PayloadAction<boolean>) => {
+      state.mzFlag = flag.payload;
+    }
   },
 });
 
@@ -77,6 +87,8 @@ export const {
   updateHashTables,
   updateLatestTimeslot,
   updateFastaProducts,
+  updateZmFlag,
+  updateMzFlag,
 } = fastaSlice.actions;
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
@@ -93,6 +105,8 @@ export const selectLatestTimeslot = (state: RootState) => state.fasta.latestTime
 export const selectFastaProducts = (state: RootState) => state.fasta.fastaProducts;
 export const selectCrrVisible = (state: RootState) => isProductVisible(state, "CRR");
 export const selectRdtVisible = (state: RootState) => isProductVisible(state, "RDT");
+export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
+export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
 
 const isProductVisible = (state: RootState, productName : string) => {        
   const idxProduct = state.fasta.fastaProducts.findIndex((pr) => pr.name === productName);

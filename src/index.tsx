@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
-//import 'semantic-ui-css/semantic.min.css';
 
 import './index.css';
 import App, { store } from './App';
-import AppTimelines from './AppTimelines';
+import AppTimelinesMz from './AppTimelinesMz';
+import AppTimelinesZm from './AppTimelinesZm';
 
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router';
@@ -20,7 +20,9 @@ root.render(
       <BrowserRouter basename='/app'>
         <Routes>
           <Route path="/" element={<App />} />
-          <Route path="timelines" element={<AppTimelines />} />
+          <Route path="timelines/mz" element={<AppTimelinesMz />} />
+          <Route path="timelines/zm" element={<AppTimelinesZm />} />
+          <Route path="timelines" element={<AppTimelinesZm />} />
         </Routes>
       </BrowserRouter>
     </Provider>

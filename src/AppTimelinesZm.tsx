@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
@@ -7,41 +7,21 @@ import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import './App.css';
-import fastaReducer from './modules/fasta/fastaSlice';
-import FastaProfile from './modules/fasta/FastaGraphic';
-import FastaSource from './modules/fasta/FastaSource';
-import FastaMainMenu from './modules/fasta/FastaMainMenu';
-import FastaSourceLayer from './modules/fasta/FastaSourceLayer';
 import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import FloatingBox from './features/FloatingBox';
-import ProductSelector from './modules/fasta/ProductSelector';
+import DomainSelector from './modules/fasta/DomainSelector';
 import TimelineReport from './modules/fasta/TimelineReport';
 import { color } from 'openlayers';
 
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
-import LocationsList from './modules/fasta/LocationsList';
+import { Location, LocationsList } from './modules/fasta/LocationsList';
+import ZambiaLocationsSource from './modules/fasta/ZambiaLocationsSource';
 
-
-/*
-export const store = configureStore({
-  reducer: {
-    map: mapReducer,
-    cache: cacheReducer,
-    fasta: fastaReducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        warnAfter: 100, // time in milliseconds
-      },
-    }),
-});
-*/
 
 interface SourceProps {
   sourceIdentifier: string;
@@ -58,40 +38,57 @@ const locationsFloatingBoxStyle = { top: '50px', right: '20px',
     borderColor: 'black', borderWidth: '2px',
     borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
 
+const domainsFloatingBoxStyle = { top: '50px', left: '20px',
+      borderColor: 'black', borderWidth: '2px',
+      borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
+  
 const AppTimelines = () => {
   useEffect(() => {
     sessionStorage.clear();
     document.title = 'FASTA Timelines';
   }, []);
+
+  const [timelineReportMode, setTimelineReportMode] = useState(false);
+  const [locationList, setLocationList] = useState<Location[]>([]);
+  const [domain, setDomain] = useState<string>("Zambia");
+  const [token, setToken] = useState<string>("");
+
+  useEffect(() => {
+    // note API token is country specific
+    setToken('PKppCvO_Zln4znnSJ7a5eElfDmCkwpqmdGFb2aSf9HI');
+  }, []);
+
+
   return (
-    <div className="App">
+      timelineReportMode ?
+      <TimelineReport locations={locationList} token={token} setReportMode={setTimelineReportMode}/>
+      :
+      <div className="App">
       <Map>
         <Profiles>
-          <FastaProfile/>
           <WaypointProfile/>
         </Profiles>
         <Sources>
-          <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-        </Sources>
+          <ZambiaLocationsSource  sourceIdentifier={'waypoint'} />
+          </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox style={floatingBoxStyle}>
-          <ProductSelector></ProductSelector>
-        </FloatingBox>
       </Map>
       <FloatingBox style={locationsFloatingBoxStyle}>
-          <LocationsList sourceIdentifier={'waypoint'}></LocationsList>
+          <LocationsList sourceIdentifier={'waypoint'} domain={domain} locations={locationList} setLocations={setLocationList} setReportMode={setTimelineReportMode}></LocationsList>
         </FloatingBox>
-      <TimelineReport />
-    </div>
+      </div>
   );
 };
 
+/*
+<FloatingBox style={domainsFloatingBoxStyle}>
+<DomainSelector setDomain={setDomain}/>
+</FloatingBox>
+*/
+
 export default AppTimelines;
-//export type AppStore = typeof store;
-//export type RootState = ReturnType<AppStore['getState']>;
-//export type AppDispatch = AppStore['dispatch'];

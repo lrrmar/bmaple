@@ -1,0 +1,12 @@
+.location-list-item  {
+    margin-top: 10px;
+    font-size: small;
+    border-bottom: 1px solid #ddd;
+}
+
+.location-list-item-selected  {
+    margin-top: 10px;
+    font-size: small;
+    background-color: #bcbcbc;
+
+}
