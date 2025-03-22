@@ -36,18 +36,13 @@ const ScrollingScale = <T, U>({
   const [content, setContent] = useState<React.ReactNode>([]);
 
   useEffect(() => {
-    console.log(units);
     const newMarks: Mark[] = values.map((val) => {
       return { value: val, label: `${units}${val}` }; //`${val}${units}` <- swap back to this eventually
     });
-    console.log('SCROLLER');
-    console.log(values);
     setMarks(newMarks);
-    console.log(newMarks);
   }, [values, units]);
 
   useEffect(() => {
-    console.log(marks);
     setContent(
       <Slider
         step={null}
@@ -81,10 +76,6 @@ const ScrollingScale = <T, U>({
       />,
     );
   }, [marks]);
-
-  useEffect(() => {
-    console.log(content);
-  }, [content]);
 
   if (Object.keys(values).length === 0) {
     return <div></div>;

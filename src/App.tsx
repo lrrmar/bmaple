@@ -21,6 +21,7 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
+import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -59,6 +60,7 @@ const App = () => {
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
+          <FlightTrackSource cache={{}} sourceIdentifier={'flight'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />

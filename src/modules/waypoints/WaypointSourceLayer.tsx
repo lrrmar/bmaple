@@ -29,7 +29,7 @@ import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from './waypointSlice';
 
-interface Waypoint extends Pending {
+export interface Waypoint extends Pending {
   longitude: number;
   latitude: number;
   time: string;
@@ -41,10 +41,21 @@ interface Waypoint extends Pending {
   dataUnit?: string;
 }
 
-export const isWaypoint = (element: any): element is Waypoint => {
+export const isPendingWaypoint = (element: any): element is Waypoint => {
   const keys: string[] = Object.keys(element);
   return (
     isPending(element) &&
+    keys.includes('latitude') &&
+    keys.includes('longitude') &&
+    keys.includes('time') &&
+    keys.includes('verticalLevel')
+  );
+};
+
+export const isEntryWaypoint = (element: any): element is Waypoint => {
+  const keys: string[] = Object.keys(element);
+  return (
+    isEntry(element) &&
     keys.includes('latitude') &&
     keys.includes('longitude') &&
     keys.includes('time') &&
@@ -76,7 +87,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
-    if (isWaypoint(layerData)) {
+    if (isPendingWaypoint(layerData)) {
       setCoordinates({
         longitude: layerData.longitude,
         latitude: layerData.latitude,
@@ -108,8 +119,6 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
       zIndex: 30,
       visible: false,
     });
-
-    console.log('hi');
 
     map.addLayer(vectorLayer);
     dispatch(ingest({ ...layerData, id: id, ol_uid: getUid(vectorLayer) }));

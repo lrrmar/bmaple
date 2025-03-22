@@ -90,7 +90,6 @@ const OpenLayerPoint = ({ waypointData }: OpenLayerPointProps) => {
   const nowFillColour = '#1976d2';
   const futureFillColour = '#ffffff00';
   const waypointTime = new Date(waypointData.time);
-  console.log('WP LEV:', waypointData.verticalLevel);
   const waypointLevel = waypointData.verticalLevel
     ? waypointData.verticalLevel
     : 0;
