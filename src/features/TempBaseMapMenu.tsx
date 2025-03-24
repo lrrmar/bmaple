@@ -14,6 +14,7 @@ import {
   selectThemes,
   selectThemeId,
   selectMenuStyle,
+  toggleOutlineContours,
 } from '../mapping/mapSlice';
 
 import {
@@ -51,7 +52,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
         />
       </span>
       <br />
-      {/*<span>
+      <span>
         {'Theme:  '}
         <DropDownList
           values={themes}
@@ -59,7 +60,7 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           setValue={(theme: string) => dispatch(updateThemeId(theme))}
         />
       </span>
-      <br />*/}
+      <br />
       <span>
         {'Colour Palette:  '}
         <DropDownList
@@ -81,6 +82,8 @@ const TempBaseMapMenu = ({ id, icon }: { id: string; icon: SemanticICONS }) => {
           if (typeof value === 'number') dispatch(updateOpacity(value));
         }}
       ></Slider>
+      {'Outline Contours: '}
+      <button onClick={(e) => dispatch(toggleOutlineContours())}>toggle</button>
     </div>
   );
 };

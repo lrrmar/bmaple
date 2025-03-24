@@ -22,6 +22,7 @@ import {
   selectUnits,
   selectOpacity,
 } from './geojsonFieldSlice';
+import { selectOutlineContours } from '../../mapping/mapSlice';
 
 interface GeojsonFieldEntry extends Entry {
   hex_palette: { [key: string]: string };
@@ -40,6 +41,7 @@ const Graphics = () => {
   const colourPaletteId = useSelector(selectColourPaletteId);
   const opacity = useSelector(selectOpacity);
   const cache = useSelector(selectCacheEntries);
+  const outlineContours = useSelector(selectOutlineContours);
   const [currentLayer, setCurrentLayer] = useState<VectorLayer<Feature> | null>(
     null,
   );
@@ -113,12 +115,16 @@ const Graphics = () => {
     }
     source.getFeatures().map((feature) => {
       feature.setStyle(
-        getVectorStyle(feature.getProperties().level, hexPalette),
+        getVectorStyle(
+          feature.getProperties().level,
+          hexPalette,
+          outlineContours,
+        ),
       );
     });
     setIsStyling(false);
     dispatch(updateColourPalette(hexPalette));
-  }, [currentLayer, colourPaletteId]);
+  }, [currentLayer, colourPaletteId, outlineContours]);
 
   // Handle opacity
   useEffect(() => {

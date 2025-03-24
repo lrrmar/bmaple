@@ -26,6 +26,7 @@ interface InitialState {
   displayTimes: {
     [source: string]: number[];
   };
+  outlineContours: boolean;
 }
 
 const initialState: InitialState = {
@@ -41,6 +42,7 @@ const initialState: InitialState = {
   themes: [],
   themeId: 'glassTablet',
   displayTimes: {},
+  outlineContours: false,
 };
 
 export const mapSlice = createSlice({
@@ -95,6 +97,9 @@ export const mapSlice = createSlice({
     ) => {
       state.displayTimes[update.payload.source] = update.payload.times;
     },
+    toggleOutlineContours: (state) => {
+      state.outlineContours = !state.outlineContours;
+    },
   },
 });
 
@@ -111,6 +116,7 @@ export const {
   updateThemes,
   updateThemeId,
   updateDisplayTimes,
+  toggleOutlineContours,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;
@@ -132,4 +138,6 @@ export const selectThemeId = (state: RootState) => state.map.themeId;
 export const selectMenuStyle = (state: RootState) =>
   state.map.themeId + ' ' + state.map.baseMapId;
 export const selectDisplayTimes = (state: RootState) => state.map.displayTimes;
+export const selectOutlineContours = (state: RootState) =>
+  state.map.outlineContours;
 export default mapSlice.reducer;

@@ -1,9 +1,15 @@
 import { Fill, Stroke, Style } from 'ol/style';
 
-function getVectorStyle(level: string, palette: { [key: string]: string }) {
+function getVectorStyle(
+  level: string,
+  palette: { [key: string]: string },
+  outlineContours: boolean,
+) {
+  const strokeColour = outlineContours ? '#000000' : palette[level];
+  console.log(outlineContours);
   const style = new Style({
     stroke: new Stroke({
-      color: palette[level],
+      color: strokeColour,
       width: 0.5,
     }),
     fill: new Fill({

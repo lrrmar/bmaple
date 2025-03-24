@@ -11,6 +11,7 @@ import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
+import PlainTheme from './mapping/PlainTheme';
 import geojsonFieldReducer, {
   selectVerticalLevels,
   selectVerticalLevelUnits,
@@ -95,6 +96,7 @@ const App = () => {
       </FoldOutMenu>
       <Themes>
         <GlassTabletTheme id={'glassTablet'} />
+        <PlainTheme id={'Plain'} />
       </Themes>
     </div>
   );
