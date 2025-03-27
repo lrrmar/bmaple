@@ -23,10 +23,12 @@ import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
 import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
+import timeseriesReducer from './modules/timeseries/timeseriesSlice';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
+import BokehPlot from './modules/force-geojson-field/BokehPlot';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import TimeScrollBar from './features/TimeScrollBar';
 import ScrollBar from './features/ScrollBar';
@@ -38,6 +40,7 @@ export const store = configureStore({
     cache: cacheReducer,
     geojsonField: geojsonFieldReducer,
     waypoint: waypointReducer,
+    timeseries: timeseriesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -85,6 +88,9 @@ const App = () => {
           updateValue={updateVerticalLevel}
           orientation={'vertical'}
         />
+      </FloatingBox>
+      <FloatingBox style={{ top: '20px', left: '20px', borderWidth: '0px' }}>
+        <BokehPlot />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         <FoldOutItem id={'Style'} icon={'paint brush'}>

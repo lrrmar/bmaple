@@ -37,7 +37,7 @@ const ScrollingScale = <T, U>({
 
   useEffect(() => {
     const newMarks: Mark[] = values.map((val) => {
-      return { value: val, label: `${units}${val}` }; //`${val}${units}` <- swap back to this eventually
+      return { value: val, label: `${val} hPa` }; //`${val}${units}` <- swap back to this eventually
     });
     setMarks(newMarks);
   }, [values, units]);
@@ -70,7 +70,7 @@ const ScrollingScale = <T, U>({
             //borderRadius: '50%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#f1f1f1', // Change label color
+            color: '#010101', // Change label color
           },
         }}
       />,

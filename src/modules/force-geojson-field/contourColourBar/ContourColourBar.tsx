@@ -89,20 +89,18 @@ const ContourColourBar = () => {
     } else {
       const keys = Object.keys(contours);
       const index = Array.from({ length: keys.length }, (e, i) => i);
-      const panels = index
-        .slice(1)
-        .reverse()
-        .map((i: number) => {
-          return (
-            <ColourPanel
-              key={keys[i]}
-              level={contours[keys[i]]}
-              lowerHexCode={colourPalette[keys[i]]}
-              upperHexCode={colourPalette[keys[i - 1]]}
-              numKeys={keys.length}
-            />
-          );
-        });
+      console.log(index.slice(1).reverse());
+      const panels = index.slice(1).map((i: number) => {
+        return (
+          <ColourPanel
+            key={keys[i]}
+            level={contours[keys[i]]}
+            lowerHexCode={colourPalette[keys[i - 1]]}
+            upperHexCode={colourPalette[keys[i]]}
+            numKeys={keys.length}
+          />
+        );
+      });
       panels.push(
         <ColourPanel
           key={0}

@@ -68,14 +68,12 @@ const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const [endCoordinates, setEndCoordinates] =
     useState<LongitudeLatitude | null>();
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
-  console.log('yo');
 
   useEffect(() => {
     setLayerData(cache[id]);
   }, [cache]);
 
   useEffect(() => {
-    console.log(layerData);
     if (!layerData) return;
     if (isEntry(layerData)) return;
     if (layerData['source'] !== sourceIdentifier) {
@@ -126,8 +124,6 @@ const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
     const vectorSource = new VectorSource({
       features: [feature],
     });
-    console.log(startCoordinates, endCoordinates);
-
     const style = new Style({
       stroke: new Stroke({
         color: '#000000',
