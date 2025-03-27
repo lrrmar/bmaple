@@ -6,25 +6,54 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-interface Timeseries {
+export interface Timeseries {
   times: string[];
   values: number[];
+  units: string;
 }
 
 interface InitialState {
-  [key: string]: Timeseries;
+  all: { [key: string]: Timeseries };
+  displayed: string[];
 }
 
-const initialState: InitialState = {};
+const initialState: InitialState = {
+  all: {},
+  displayed: ['flight'],
+};
 
 export const timeseriesSlice = createSlice({
   name: 'timeseries',
   initialState,
-  reducers: {},
+  reducers: {
+    updateTimeseries: (
+      state,
+      update: PayloadAction<{ id: string; timeseries: Timeseries }>,
+    ) => {
+      state.all[update.payload.id] = update.payload.timeseries;
+      const ids = Object.keys(state.all);
+      const currentDisplayed = state.displayed;
+      const updatedDisplayed: string[] = [];
+      state.displayed = updatedDisplayed;
+      currentDisplayed.forEach((id) => {
+        if (ids.includes(id)) {
+          updatedDisplayed.push(id);
+        }
+      });
+    },
+    deleteTimeseries: (state, id: PayloadAction<string>) => {
+      const copy = state.all;
+      delete copy[id.payload];
+      state.all = copy;
+    },
+  },
 });
 
-//export const {  } = waypointSlice.actions;
+export const { updateTimeseries, deleteTimeseries } = timeseriesSlice.actions;
 export const selectTimeseries = (state: RootState) => {
-  return state.timeseries;
+  return state.timeseries.all;
+};
+export const selectDisplayed = (state: RootState) => {
+  return state.timeseries.displayed;
 };
 export default timeseriesSlice.reducer;

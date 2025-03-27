@@ -24,11 +24,12 @@ import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
 import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
+import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
-import BokehPlot from './modules/force-geojson-field/BokehPlot';
+import BokehPlot from './modules/timeseries/BokehPlot';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import TimeScrollBar from './features/TimeScrollBar';
 import ScrollBar from './features/ScrollBar';
@@ -104,6 +105,7 @@ const App = () => {
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />
       </Themes>
+      <VisionToolkit />
     </div>
   );
 };

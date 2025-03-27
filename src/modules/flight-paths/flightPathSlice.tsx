@@ -57,8 +57,6 @@ export const selectTimes = (state: RootState) => {
   // SOURCE PROCESSES...?
   const times = [...new Set(startWaypoints.map((waypoint) => waypoint.time))];
   times.sort();
-  console.log(startWaypoints);
-  console.log(times);
   return times;
 };
 export default flightPathSlice.reducer;
