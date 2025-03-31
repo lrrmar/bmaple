@@ -29,8 +29,11 @@ import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import TimeScrollBar from './features/TimeScrollBar';
+import Tester from './features/Tester';
 import ScrollBar from './features/ScrollBar';
 import './App.css';
+
+// Configure the reducers that will be used in the app
 
 export const store = configureStore({
   reducer: {
@@ -46,6 +49,10 @@ export const store = configureStore({
       },
     }),
 });
+
+// Configure the types that will be accepted by the cache
+
+//export interface cacheSource =
 
 const App = () => {
   useEffect(() => {
@@ -98,6 +105,7 @@ const App = () => {
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />
       </Themes>
+      <Tester />
     </div>
   );
 };

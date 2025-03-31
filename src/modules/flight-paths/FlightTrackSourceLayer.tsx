@@ -33,7 +33,7 @@ import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from '../waypoints/waypointSlice';
 import { isEntryWaypoint } from '../waypoints/WaypointSourceLayer';
 
-interface FlightTrack extends Pending {
+interface FlightTrack extends Entry {
   longitude: number;
   latitude: number;
   time: string;
@@ -48,7 +48,7 @@ interface FlightTrack extends Pending {
 export const isFlightTrack = (element: any): element is FlightTrack => {
   const keys: string[] = Object.keys(element);
   return (
-    isPending(element) &&
+    isEntry(element) &&
     keys.includes('startWaypoint') &&
     keys.includes('endWaypoint')
   );

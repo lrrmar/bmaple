@@ -16,8 +16,23 @@ import {
 import { ingest, Ingest } from '../../mapping/cacheSlice';
 import { updateProfileId, selectApiUrl } from './geojsonFieldSlice';
 
-type Properties = {
-  [key: string]: Properties | string[] | string | number[] | number;
+type GeojsonFieldType = {
+  levels: { [key: number]: string };
+  hex_palette: { [key: number]: string };
+  varname: string;
+  level_type: string;
+  grid_id: string;
+  sim_start_time: string;
+  valid_time: string;
+  units: string;
+  grid_spacing?: number;
+  grid_units?: string;
+  sigma?: number;
+};
+
+type Source = {
+  type: 'FeatureCollection';
+  properties: GeojsonFieldType;
 };
 
 interface LayerProperties extends Properties {

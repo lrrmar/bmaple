@@ -135,4 +135,16 @@ export const selectCachePending = (state: RootState) => {
   });
   return pending;
 };
+export const filteredCache =
+  <T,>(isType: (el: any) => el is T) =>
+  (state: RootState) => {
+    const cache: Cache = state.cache;
+    console.log(cache);
+    const filtered: { [key: string]: T } = {};
+    Object.keys(cache).forEach((key: string) => {
+      const element: CacheElement = cache[key];
+      if (isType(element)) filtered[key] = element;
+    });
+    return filtered;
+  };
 export default cacheSlice.reducer;
