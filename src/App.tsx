@@ -8,6 +8,7 @@ import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import BaseMaps from './mapping/BaseMaps';
 import DarkBaseMap from './mapping/DarkBaseMap';
+import SwissTopoBaseMap from './mapping/SwissTopoBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
@@ -67,12 +68,13 @@ const App = () => {
         </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
-          <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
+          <WaypointsSource sourceIdentifier={'waypoints'} />
           <FlightTrackSource cache={{}} sourceIdentifier={'flight'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
           <OSMBaseMap id={'Open Street Map'} />
+          <SwissTopoBaseMap id={'Swiss Topo'} />
         </BaseMaps>
       </Map>
       <FloatingBox

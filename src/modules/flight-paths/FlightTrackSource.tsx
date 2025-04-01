@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
@@ -10,7 +10,11 @@ import {
   Cache,
   Request,
   request,
+  Remove,
+  remove,
   Generic,
+  filteredCache,
+  Entry,
 } from '../../mapping/cacheSlice';
 
 import {
@@ -25,8 +29,11 @@ import { fromLonLat } from 'ol/proj';
 import Feature from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
-import FlightTrackSourceLayer from './FlightTrackSourceLayer';
-import { Waypoint } from '../waypoints/WaypointSourceLayer';
+import FlightTrackSourceLayer, {
+  isFlightTrack,
+  FlightTrack,
+} from './FlightTrackSourceLayer';
+import { Waypoint, isWaypoint } from '../waypoints/WaypointSourceLayer';
 interface Props {
   sourceIdentifier: string;
   cache: Cache;
@@ -34,22 +41,13 @@ interface Props {
 
 const FlightTrackSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
-  const [waypoints, setWaypoints] = useState<Cache>({});
+  const waypoints = useSelector(filteredCache(isWaypoint));
+  const flightTracks = useSelector(filteredCache(isFlightTrack));
   const trajectoryId = 0; // useSelector here in future
   const [trajectoryLookUp, setTrajectoryLookUp] = useState<{
     [key: string]: number;
   }>({});
-  const allCache = useSelector(selectCache);
-
-  useEffect(() => {
-    // Get waypoints everytime cache is updated
-    const waypointIds = Object.keys(allCache).filter(
-      (key) => allCache[key]['source'] === 'waypoints',
-    );
-    const newWaypoints: Cache = {};
-    waypointIds.forEach((id) => (newWaypoints[id] = allCache[id]));
-    setWaypoints(newWaypoints);
-  }, [allCache]);
+  const sourcesToLoad: React.MutableRefObject<React.ReactNode[]> = useRef([]);
 
   useEffect(() => {
     // tag new waypoints with trajectory id in trajectoryLookUp
@@ -79,22 +77,25 @@ const FlightTrackSource = ({ sourceIdentifier, cache }: Props) => {
       waypointLookUp[trajectoryId].push(waypointId);
     });
 
+    // TODO: In here somewhere do a check as to whether a flight track has been
+    // deleted and handle it
+
     // Ordering waypoints in each trajectory in time
     allTrajectoryIds.forEach((id: number) => {
       const waypointIds = waypointLookUp[id];
       waypointIds.sort((a: string, b: string) => {
         // this sort function takes two waypoint IDs, gets their
         // respective 'time' properties via the cache
-        const cacheEntryA: CacheElement = allCache[a];
-        const cacheEntryB: CacheElement = allCache[b];
+        const waypointA: Waypoint = waypoints[a];
+        const waypointB: Waypoint = waypoints[b];
         if (
-          cacheEntryA.time &&
-          cacheEntryB.time &&
-          typeof cacheEntryA.time == 'string' &&
-          typeof cacheEntryB.time == 'string'
+          waypointA.time &&
+          waypointB.time &&
+          typeof waypointA.time == 'string' &&
+          typeof waypointB.time == 'string'
         ) {
-          const aTime = new Date(cacheEntryA.time);
-          const bTime = new Date(cacheEntryB.time);
+          const aTime = new Date(waypointA.time);
+          const bTime = new Date(waypointB.time);
           if (aTime < bTime) {
             return -1;
           }
@@ -106,44 +107,63 @@ const FlightTrackSource = ({ sourceIdentifier, cache }: Props) => {
       });
 
       for (let i = 0; i < waypointIds.length - 1; i++) {
-        const uid = 'id' + new Date().getTime();
-        dispatch(
-          request({
-            source: sourceIdentifier,
-            id: uid,
-            startWaypoint: waypointIds[i],
-            endWaypoint: waypointIds[i + 1],
-          }),
+        // Look through flight paths to see if already generated
+        const matchingFlightTrack: FlightTrack | undefined = Object.values(
+          flightTracks,
+        ).find(
+          (ft) =>
+            ft.startWaypoint == waypointIds[i] &&
+            ft.endWaypoint == waypointIds[i + 1],
         );
+
+        // If not, request it
+        if (!matchingFlightTrack) {
+          const uid = 'id' + new Date().getTime();
+          dispatch(
+            request({
+              source: sourceIdentifier,
+              id: uid,
+              startWaypoint: waypointIds[i],
+              endWaypoint: waypointIds[i + 1],
+            }),
+          );
+        }
+
+        // Check to see if a new waypoint has arrived in between two previous ones
+        if (i < waypointIds.length - 2) {
+          const matchingFlightTrack: (FlightTrack & Entry) | undefined =
+            Object.values(flightTracks).find(
+              (ft) =>
+                ft.startWaypoint == waypointIds[i] &&
+                ft.endWaypoint == waypointIds[i + 2],
+            );
+          // If so, remove it
+          if (matchingFlightTrack) {
+            dispatch(
+              remove({
+                id: matchingFlightTrack.id,
+              }),
+            );
+          }
+        }
       }
     });
   }, [trajectoryLookUp]);
 
-  {
-    /*request({
-        source: sourceIdentifier,
-        mode: mode,
-        id: uid,
-        ...clickEvent,
-        time: displayTime,
-        verticalLevel: verticalLevel,
-        ...featureData,
-      }),
-    );
-  }, [waypoints]);*/
-  }
+  useEffect(() => {
+    const sources = Object.keys(flightTracks).map((id) => {
+      return (
+        <FlightTrackSourceLayer
+          key={id}
+          id={id}
+          sourceIdentifier={sourceIdentifier}
+        />
+      );
+    });
+    sourcesToLoad.current = sources;
+  }, [flightTracks]);
 
-  const sourcesToLoad = Object.keys(cache).map((id) => {
-    return (
-      <FlightTrackSourceLayer
-        key={id}
-        id={id}
-        sourceIdentifier={sourceIdentifier}
-      />
-    );
-  });
-
-  return <div className="FlightTrackSource">{sourcesToLoad}</div>;
+  return <div className="FlightTrackSource">{sourcesToLoad.current}</div>;
 };
 
 export default FlightTrackSource;

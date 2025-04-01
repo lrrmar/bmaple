@@ -92,8 +92,6 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
       );*/
       }
       const units = levelStrings[0].replace(/[^a-zA-Z]/g, '');
-      console.log(levels);
-      console.log(units);
 
       dispatch(updateVerticalLevels(levels));
       dispatch(updateVerticalLevelUnits(units));

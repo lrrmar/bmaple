@@ -23,6 +23,7 @@ import {
   Entry,
   isEntry,
   CacheElement,
+  filteredCache,
 } from '../../mapping/cacheSlice';
 
 import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
@@ -41,21 +42,9 @@ export interface Waypoint extends Pending {
   dataUnit?: string;
 }
 
-export const isPendingWaypoint = (element: any): element is Waypoint => {
+export const isWaypoint = (element: any): element is Waypoint => {
   const keys: string[] = Object.keys(element);
   return (
-    isPending(element) &&
-    keys.includes('latitude') &&
-    keys.includes('longitude') &&
-    keys.includes('time') &&
-    keys.includes('verticalLevel')
-  );
-};
-
-export const isEntryWaypoint = (element: any): element is Waypoint => {
-  const keys: string[] = Object.keys(element);
-  return (
-    isEntry(element) &&
     keys.includes('latitude') &&
     keys.includes('longitude') &&
     keys.includes('time') &&
@@ -70,56 +59,59 @@ interface Props {
 
 const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
-  const cache = useSelector(selectCache);
+  const waypoints = useSelector(filteredCache(isWaypoint));
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
-  const [layerData, setLayerData] = useState<CacheElement | null>();
+  const [layerData, setLayerData] = useState<Waypoint | null>();
   const [coordinates, setCoordinates] = useState<LongitudeLatitude | null>();
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
 
   useEffect(() => {
-    setLayerData(cache[id]);
-  }, [cache]);
+    if (layerData) return;
+    setLayerData(waypoints[id]);
+  }, [waypoints]);
 
   useEffect(() => {
     if (!layerData) return;
-    if (isEntry(layerData)) return;
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
-    if (isPendingWaypoint(layerData)) {
-      setCoordinates({
-        longitude: layerData.longitude,
-        latitude: layerData.latitude,
-      });
-    }
+    if (isEntry(layerData)) return;
+    setCoordinates({
+      longitude: layerData.longitude,
+      latitude: layerData.latitude,
+    });
   }, [layerData]);
 
   useEffect(() => {
-    if (!map) {
-      return;
-    }
+    // Return if map, layerData or coords not available return
+    if (!map) return;
     if (!layerData) return;
-    if (!coordinates) {
-      return;
-    }
+    if (!coordinates) return;
+
+    // Generate an Openlayers Point geometry for coordinates
     const point = new Point(
       fromLonLat([coordinates.longitude, coordinates.latitude]),
     );
+
+    // Generate OpenLayers Feature for Point
     const feature = new Feature({
       geometry: point,
     });
-    // Create a vector source and layer to hold the features
+
+    // Generate OpenLayers VectorSource
     const vectorSource = new VectorSource({
       features: [feature],
     });
 
+    // Generate OpenLayers VectorLayers
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       zIndex: 30,
       visible: false,
     });
 
+    // Add layer to map
     map.addLayer(vectorLayer);
     dispatch(ingest({ ...layerData, id: id, ol_uid: getUid(vectorLayer) }));
     return () => {

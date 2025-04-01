@@ -19,6 +19,7 @@ export interface Pending {
 
 export interface Entry extends Pending {
   ol_uid: string;
+  id: string;
 }
 
 export type CacheElement =
@@ -139,7 +140,6 @@ export const filteredCache =
   <T,>(isType: (el: any) => el is T) =>
   (state: RootState) => {
     const cache: Cache = state.cache;
-    console.log(cache);
     const filtered: { [key: string]: T } = {};
     Object.keys(cache).forEach((key: string) => {
       const element: CacheElement = cache[key];

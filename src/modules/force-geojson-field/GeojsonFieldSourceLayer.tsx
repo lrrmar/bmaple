@@ -16,7 +16,29 @@ import {
 import { ingest, Ingest } from '../../mapping/cacheSlice';
 import { updateProfileId, selectApiUrl } from './geojsonFieldSlice';
 
-type GeojsonFieldType = {
+// Generic typing for properties that come out of an openlayers
+// feature, TODO pin this down a bit more...
+type Properties = {
+  [key: string]: Properties | string[] | string | number[] | number;
+};
+
+interface GeojsonFeatureProperties extends Properties {
+  level: number;
+  // ObjectType?: string; TODO
+}
+interface GeojsonFeatureGeometry {
+  coordinates: number[][];
+  type:
+    | 'Point'
+    | 'LineString'
+    | 'Polygon'
+    | 'MultiPoint'
+    | 'MultiLineString'
+    | 'MultiPolygon'
+    | 'GeometryCollection';
+}
+
+type GeojsonProperties = {
   levels: { [key: number]: string };
   hex_palette: { [key: number]: string };
   varname: string;
@@ -30,20 +52,32 @@ type GeojsonFieldType = {
   sigma?: number;
 };
 
-type Source = {
-  type: 'FeatureCollection';
-  properties: GeojsonFieldType;
+// For cache typing
+export type GeojsonField = GeojsonProperties;
+
+export const isGeojsonField = (element: any): element is GeojsonField => {
+  const keys: string[] = Object.keys(element);
+  return (
+    keys.includes('levels') &&
+    keys.includes('varname') &&
+    keys.includes('level_type') &&
+    keys.includes('grid_id') &&
+    keys.includes('sim_start_time') &&
+    keys.includes('valid_time') &&
+    keys.includes('units')
+  );
 };
 
-interface LayerProperties extends Properties {
-  levels: { [key: string]: string[] | number[] };
-}
-interface FeatureProperties extends Properties {
-  level: string | number;
+interface GeojsonFeature {
+  type: 'Feature';
+  properties: GeojsonFeatureProperties;
+  geometry: GeojsonFeatureGeometry;
 }
 
-interface Json {
-  [key: string]: string | number | string[] | number[] | Json;
+interface Geojson {
+  type: 'FeatureCollection';
+  properties: GeojsonProperties;
+  features: GeojsonFeature[];
 }
 
 interface Props {
@@ -53,9 +87,9 @@ interface Props {
 
 const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
-  const [layerData, setLayerData] = useState<Json | null>(null);
+  const [layerData, setLayerData] = useState<Geojson | null>(null);
   const [layerProperties, setLayerProperties] =
-    useState<LayerProperties | null>(null);
+    useState<GeojsonProperties | null>(null);
   const [map, setMap] = useState<MapType | null>(OpenLayersMap.map);
   const hasFetched = useRef(false);
   const apiUrl = useSelector(selectApiUrl);
@@ -77,7 +111,7 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
     try {
       const data = await apiCall(id);
       if (data) {
-        const properties = data['properties'];
+        const properties: GeojsonProperties = data['properties'];
         setLayerProperties(properties);
         setLayerData(data);
       }
@@ -102,23 +136,41 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
    */
 
   useEffect(() => {
+    // When layerData (geojson data) changes, do the following:
+
+    // If no valid layerData, return
     if (!layerData) {
       return;
     }
+
+    //If no access to map, return
     if (!map) {
       return;
     }
+
+    // Generate an openlayers VectorSource using the geojson
+    // layerData
     const vectorSource = new VectorSource({
       features: new GeoJSON().readFeatures(layerData, {
         featureProjection: 'EPSG:3857',
       }),
     });
+
     // Add extra metadata to features
+    // If no layerProperties, return: IS THIS SORTED BY TYPING GEOJSON
+    // MORE STRICTLY????
     if (!layerProperties) {
       return;
     }
+
+    // For each feature (e.g. a polygon) in the VectorSource add the following
+    // metadata:
+    // - source e.g. 'force-geojson-field'
+    // - contour level number (for future styling)
+    // - varname
+    // - units
     vectorSource.getFeatures().map((feature) => {
-      const originalProps: FeatureProperties = {
+      const originalProps: GeojsonFeatureProperties = {
         level: 0,
         ...feature.getProperties(),
       };
@@ -128,11 +180,7 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
       };
       if (layerProperties['levels']) {
         const levels = layerProperties['levels'];
-        const levelKey: string =
-          typeof originalProps.level === 'string'
-            ? originalProps.level
-            : originalProps.level.toString();
-        newProps['contourRange'] = levels[levelKey];
+        newProps['contourRange'] = levels[originalProps.level];
       }
       if (layerProperties['varname']) {
         newProps['variable'] = layerProperties['varname'];
@@ -142,14 +190,21 @@ const WrfSourceLayer = ({ id, sourceIdentifier }: Props) => {
       }
       feature.setProperties(newProps);
     });
+
+    // Generate OpenLayers VectorLayer from the VectorSource
     const vectorLayer = new OLVectorLayer({
       source: vectorSource,
       zIndex: 20,
     });
+
+    // Set layer to be invisible
     vectorLayer.setVisible(false);
+
+    // Add the VectorLayer to the map
     const add = map.addLayer(vectorLayer);
 
     map.once('postrender', (event) => {
+      // Once rendered, push properties to cache
       const ol_uid: string | null = getUid(vectorLayer);
       // Big error... how can we handle?
       if (!ol_uid) return;

@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../hooks';
 
-import { selectCache, Cache, Request, request } from '../../mapping/cacheSlice';
+import {
+  selectCache,
+  Cache,
+  Request,
+  request,
+  filteredCache,
+} from '../../mapping/cacheSlice';
 
 import {
   selectClickEvent,
@@ -18,23 +24,24 @@ import { fromLonLat } from 'ol/proj';
 import Feature from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
-import WaypointSourceLayer from './WaypointSourceLayer';
+import WaypointSourceLayer, { isWaypoint } from './WaypointSourceLayer';
 
 import { selectMode } from './waypointSlice';
 
 interface Props {
   sourceIdentifier: string;
-  cache: Cache;
 }
 
-const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
+const WaypointSource = ({ sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const clickEvent = useSelector(selectClickEvent);
+  const waypoints = useSelector(filteredCache(isWaypoint));
   const featuresAtClick = useSelector(selectFeaturesAtClick);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
   const mode = useSelector(selectMode);
   const [clickEvents, setClickEvents] = useState([]);
+  const sourcesToLoad: React.MutableRefObject<React.ReactNode[]> = useRef([]);
 
   useEffect(() => {
     if (!clickEvent) {
@@ -87,17 +94,21 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
     );
   }, [clickEvent]);
 
-  const sourcesToLoad = Object.keys(cache).map((id) => {
-    return (
-      <WaypointSourceLayer
-        key={id}
-        id={id}
-        sourceIdentifier={sourceIdentifier}
-      />
-    );
-  });
+  useEffect(() => {
+    if (Object.keys(waypoints).length === 0) return;
+    const sources = Object.keys(waypoints).map((id) => {
+      return (
+        <WaypointSourceLayer
+          key={id}
+          id={id}
+          sourceIdentifier={sourceIdentifier}
+        />
+      );
+    });
+    sourcesToLoad.current = sources;
+  }, [waypoints]);
 
-  return <div className="WaypointSource">{sourcesToLoad}</div>;
+  return <div className="WaypointSource">{sourcesToLoad.current}</div>;
 };
 
 export default WaypointSource;
