@@ -24,6 +24,7 @@ import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
 import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
+import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -101,6 +102,9 @@ const App = () => {
         </FoldOutItem>
         <FoldOutItem id={'Overlays'} icon={'images outline'}>
           <LayerSelector />
+        </FoldOutItem>
+        <FoldOutItem id={'Flight Tracks'} icon={'paper plane outline'}>
+          <FlightTrackMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>
