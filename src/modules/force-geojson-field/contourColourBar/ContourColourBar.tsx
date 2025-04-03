@@ -60,18 +60,16 @@ const ColourPanel = ({ level, lowerHexCode, upperHexCode, numKeys }: Props) => {
 
 const Units = ({ unit }: { unit: string }) => {
   const style: React.CSSProperties = {
-    width: '50px',
+    width: '4vw',
     height: '5vh',
     color: 'white',
     zIndex: '12',
-    position: 'relative',
+    //position: 'relative',
     textAlign: 'center',
+    background: 'black',
   };
-  return (
-    <div className="glassTablet" style={style}>
-      {unit}
-    </div>
-  );
+  console.log(unit);
+  return <div style={style}>{unit}</div>;
 };
 
 const ContourColourBar = () => {
@@ -148,7 +146,7 @@ const ContourColourBar = () => {
         (100 * (0.6 * vw - (numContours + 1) * fontWidth)) /
         (0.6 * vw * numContours);
       const fontWidthPerc = (100 * fontWidth) / (0.6 * vw);
-      let linearGradientString = 'linear-gradient(to left, ';
+      let linearGradientString = 'linear-gradient(to right, ';
       Object.values(colourPalette).forEach((colour, i) => {
         const basePerc =
           i * (fontWidthPerc + colourPanelWidthPerc) + fontWidthPerc;
@@ -168,7 +166,7 @@ const ContourColourBar = () => {
             style={{
               width: 'auto',
               display: 'flex',
-              flexDirection: 'row-reverse',
+              flexDirection: 'row',
             }}
           >
             <div
@@ -202,13 +200,14 @@ const ContourColourBar = () => {
     <div
       className="ColourBar"
       style={{
-        width: '60vw',
+        width: '64vw',
         height: '20px',
         background: linearGradientString,
         display: 'flex',
-        flexDirection: 'row-reverse',
+        flexDirection: 'row',
       }}
     >
+      {components.length > 0 && <Units unit={units} />}
       {components}
     </div>
   );

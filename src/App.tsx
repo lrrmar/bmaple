@@ -103,7 +103,7 @@ const App = () => {
         <FoldOutItem id={'Overlays'} icon={'images outline'}>
           <LayerSelector />
         </FoldOutItem>
-        <FoldOutItem id={'Flight Tracks'} icon={'paper plane outline'}>
+        <FoldOutItem id={'Flight'} icon={'paper plane outline'}>
           <FlightTrackMenu />
         </FoldOutItem>
       </FoldOutMenu>
