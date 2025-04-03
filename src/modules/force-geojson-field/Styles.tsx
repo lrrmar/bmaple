@@ -6,7 +6,6 @@ function getVectorStyle(
   outlineContours: boolean,
 ) {
   const strokeColour = outlineContours ? '#000000' : palette[level];
-  console.log(outlineContours);
   const style = new Style({
     stroke: new Stroke({
       color: strokeColour,

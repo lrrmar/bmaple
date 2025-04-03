@@ -5,6 +5,7 @@ import {
   useAppSelector as useSelector,
 } from '../hooks';
 import {
+  selectVerticalLevel, // TEMP
   selectDisplayTime,
   selectDisplayTimes,
   updateDisplayTime,
@@ -32,6 +33,7 @@ const ScrollingScale = <T, U>({
   const dispatch = useDispatch();
   const values: number[] = useSelector(selectValues);
   const units: string | null = useSelector(selectUnits);
+  const verticalLevel = useSelector(selectVerticalLevel);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [content, setContent] = useState<React.ReactNode>([]);
 
@@ -39,8 +41,10 @@ const ScrollingScale = <T, U>({
     const newMarks: Mark[] = values.map((val) => {
       return { value: val, label: `${units}${val}` }; //`${val}${units}` <- swap back to this eventually
     });
-    setMarks(newMarks);
-  }, [values, units]);
+    if (verticalLevel == '' && newMarks.length > 0)
+      //dispatch(updateValue(newMarks[0].value));
+      setMarks(newMarks);
+  }, [values, units, verticalLevel]);
 
   useEffect(() => {
     setContent(

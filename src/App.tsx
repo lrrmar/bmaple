@@ -23,6 +23,7 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
+import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
@@ -106,6 +107,9 @@ const App = () => {
         <FoldOutItem id={'Flight'} icon={'paper plane outline'}>
           <FlightTrackMenu />
         </FoldOutItem>
+        {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
+          <WaypointsMenu />
+        </FoldOutItem>*/}
       </FoldOutMenu>
       <Themes>
         <GlassTabletTheme id={'glassTablet'} />
