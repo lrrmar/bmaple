@@ -1,0 +1,18 @@
+
++++ Simple view ---
+
+Separate continuous and discrete metadata
+
+Send lists of discreta metadata to populate discrete menus
+
+On a selection of discrete metadata, query ES for all Hash tables that this works for
+
+Generate store entries for displayTimes, displayLevels, etc etc
+
+
+
++++ problems ---
+
+How can we determine when a selection of discrete meta data can not be picked? i.e. a field and region is chosen together but they have no corresponding scrollable data i.e. there are no hashtables that contain that discrete selection? -> grey out in discrete menu based on a binary matrix of 1 if there exists a hash table that includes that selection and 0 if not. By clicking on a greyed out option, the currently selection box would become greyed out also.
+
+How can we determine when a selection of continuous data can not be picked? i.e. we have a seletion of continous data but then one is changed and there are no hashes tables for this. If we were to do a query for every change of meta data, especcially scrolling, this could slow down rednering due to massively complicated API calls and scroll bar changes -> Always give best estimate on continuous data OR have a dissapearing layer for those that are not there ... could this be an option at run time???

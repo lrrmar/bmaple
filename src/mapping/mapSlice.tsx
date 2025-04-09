@@ -16,7 +16,6 @@ interface InitialState {
   zoom: number | null;
   units: string | null;
   displayTime: string;
-  verticalLevel: string;
   clickEvent: { longitude: number; latitude: number } | null;
   featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
@@ -27,6 +26,9 @@ interface InitialState {
     [source: string]: number[];
   };
   outlineContours: boolean;
+  verticalLevel: string | null;
+  verticalLevels: string[];
+  verticalLevelUnits: string;
 }
 
 const initialState: InitialState = {
@@ -34,7 +36,6 @@ const initialState: InitialState = {
   zoom: 5,
   units: null,
   displayTime: '',
-  verticalLevel: '',
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
@@ -43,6 +44,9 @@ const initialState: InitialState = {
   themeId: 'Plain',
   displayTimes: {},
   outlineContours: false,
+  verticalLevel: null,
+  verticalLevels: [],
+  verticalLevelUnits: '',
 };
 
 export const mapSlice = createSlice({
@@ -63,9 +67,6 @@ export const mapSlice = createSlice({
       const iso = new Date(displayTime.payload).toISOString();
       const reducedIso = iso.substring(0, iso.length - 2);
       state.displayTime = reducedIso;
-    },
-    updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
-      state.verticalLevel = verticalLevel.payload;
     },
     updateClickEvent: (
       state,
@@ -100,6 +101,18 @@ export const mapSlice = createSlice({
     toggleOutlineContours: (state) => {
       state.outlineContours = !state.outlineContours;
     },
+    updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
+      state.verticalLevel = verticalLevel.payload;
+    },
+    updateVerticalLevels: (state, verticalLevels: PayloadAction<string[]>) => {
+      state.verticalLevels = verticalLevels.payload;
+    },
+    updateVerticalLevelUnits: (
+      state,
+      verticalLevelUnits: PayloadAction<string>,
+    ) => {
+      state.verticalLevelUnits = verticalLevelUnits.payload;
+    },
   },
 });
 
@@ -108,7 +121,6 @@ export const {
   //updateColourPalette,
   updateUnits,
   updateDisplayTime,
-  updateVerticalLevel,
   updateClickEvent,
   updateFeaturesAtClick,
   updateBaseMaps,
@@ -117,13 +129,14 @@ export const {
   updateThemeId,
   updateDisplayTimes,
   toggleOutlineContours,
+  updateVerticalLevel,
+  updateVerticalLevels,
+  updateVerticalLevelUnits,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;
 export const selectZoom = (state: RootState) => state.map.zoom;
 export const selectDisplayTime = (state: RootState) => state.map.displayTime;
-export const selectVerticalLevel = (state: RootState) =>
-  state.map.verticalLevel;
 export const selectUnits = (state: RootState) => state.map.units;
 //export const selectColourPalette = (state: RootState) => {
 //  return null;
@@ -140,4 +153,10 @@ export const selectMenuStyle = (state: RootState) =>
 export const selectDisplayTimes = (state: RootState) => state.map.displayTimes;
 export const selectOutlineContours = (state: RootState) =>
   state.map.outlineContours;
+export const selectVerticalLevel = (state: RootState) =>
+  state.map.verticalLevel;
+export const selectVerticalLevels = (state: RootState) =>
+  state.map.verticalLevels;
+export const selectVerticalLevelUnits = (state: RootState) =>
+  state.map.verticalLevelUnits;
 export default mapSlice.reducer;
