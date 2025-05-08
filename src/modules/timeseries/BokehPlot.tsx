@@ -47,6 +47,12 @@ const BokehPlot = () => {
   useEffect(() => {
     // Fetch new bokeh item if there is a change to
     // time series
+    if (!timeseries['flight']) {
+      return;
+    } else if (timeseries['flight'].times.length < 1) {
+      return;
+    }
+
     const fetchPlot = async () => {
       const response = await fetch('http://localhost:8282/plot', {
         method: 'post',

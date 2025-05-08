@@ -25,6 +25,8 @@ import WaypointsSource from './modules/waypoints/WaypointSource';
 import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
 import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
+import BokehPlot from './modules/timeseries/BokehPlot';
+import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -102,6 +104,8 @@ const App = () => {
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />
       </Themes>
+      <VisionToolkit />
+      <BokehPlot />
     </div>
   );
 };
