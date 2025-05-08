@@ -9,7 +9,7 @@ import {
   selectDisplayTimes,
   updateDisplayTime,
 } from '../mapping/mapSlice';
-import { Selector, Action } from '../App';
+import { Selector, ActionCreator } from '../App';
 
 interface Mark {
   value: number;
@@ -19,7 +19,7 @@ interface Mark {
 interface Props<T, U, V> {
   selectValues: Selector<number[]>;
   selectUnits: Selector<string | null>;
-  updateValue: Action<number>;
+  updateValue: ActionCreator<number>;
   orientation: 'horizontal' | 'vertical';
 }
 

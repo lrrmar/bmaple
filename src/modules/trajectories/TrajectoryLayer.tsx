@@ -31,27 +31,19 @@ import {
 import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from '../waypoints/waypointSlice';
-import { isEntryWaypoint } from '../waypoints/WaypointSourceLayer';
+import {
+  Waypoint,
+  isPendingWaypoint,
+  isEntryWaypoint,
+} from '../waypoints/WaypointSourceLayer';
 
-interface FlightTrack extends Pending {
-  longitude: number;
-  latitude: number;
-  time: string;
-  verticalLevel: string;
-  dataSource?: string;
-  dataType?: string;
-  dataValue?: string;
-  dataVariable?: string;
-  dataUnit?: string;
+interface Trajectory extends Pending {
+  waypoints: string[];
 }
 
-export const isFlightTrack = (element: any): element is FlightTrack => {
+export const isTrajectory = (element: any): element is Trajectory => {
   const keys: string[] = Object.keys(element);
-  return (
-    isPending(element) &&
-    keys.includes('startWaypoint') &&
-    keys.includes('endWaypoint')
-  );
+  return isPending(element) && keys.includes('waypoints');
 };
 
 interface Props {
@@ -59,14 +51,11 @@ interface Props {
   sourceIdentifier: string;
 }
 
-const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
+const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
   const [layerData, setLayerData] = useState<CacheElement | null>();
-  const [startCoordinates, setStartCoordinates] =
-    useState<LongitudeLatitude | null>();
-  const [endCoordinates, setEndCoordinates] =
-    useState<LongitudeLatitude | null>();
+  const [coordinates, setCoordinates] = useState<LongitudeLatitude[]>([]);
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
 
   useEffect(() => {
@@ -79,32 +68,22 @@ const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
-    if (isFlightTrack(layerData)) {
-      const startWaypointId = layerData.startWaypoint;
-      const endWaypointId = layerData.endWaypoint;
-      if (
-        startWaypointId &&
-        endWaypointId &&
-        typeof startWaypointId == 'string' &&
-        typeof endWaypointId == 'string' &&
-        cache[startWaypointId] &&
-        cache[endWaypointId]
-      ) {
-        const startWaypoint = cache[startWaypointId];
-        const endWaypoint = cache[endWaypointId];
-
-        if (isEntryWaypoint(startWaypoint) && isEntryWaypoint(endWaypoint)) {
-          setStartCoordinates({
-            latitude: startWaypoint.latitude,
-            longitude: startWaypoint.longitude,
-          });
-
-          setEndCoordinates({
-            latitude: endWaypoint.latitude,
-            longitude: endWaypoint.longitude,
+    if (isTrajectory(layerData)) {
+      const waypointIds = layerData.waypoints;
+      const waypointCoordinates: LongitudeLatitude[] = [];
+      waypointIds.forEach((id: string) => {
+        const waypoint = cache[id];
+        if (
+          waypoint &&
+          (isPendingWaypoint(waypoint) || isEntryWaypoint(waypoint))
+        ) {
+          waypointCoordinates.push({
+            latitude: waypoint.latitude,
+            longitude: waypoint.longitude,
           });
         }
-      }
+      });
+      setCoordinates(waypointCoordinates);
     }
   }, [layerData]);
 
@@ -112,11 +91,11 @@ const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!map) {
       return;
     }
-    if (!layerData || !startCoordinates || !endCoordinates) return;
-    const lineString = new LineString([
-      fromLonLat([startCoordinates.longitude, startCoordinates.latitude]),
-      fromLonLat([endCoordinates.longitude, endCoordinates.latitude]),
-    ]);
+    if (!layerData || coordinates.length < 1) return;
+    const lineStringCoords = coordinates.map((coordinate) =>
+      fromLonLat([coordinate.longitude, coordinate.latitude]),
+    );
+    const lineString = new LineString(lineStringCoords);
     const feature = new Feature({
       geometry: lineString,
     });
@@ -143,9 +122,9 @@ const FlightTrackSourceLayer = ({ id, sourceIdentifier }: Props) => {
     return () => {
       map.removeLayer(vectorLayer);
     };
-  }, [startCoordinates, endCoordinates]);
+  }, [coordinates]);
 
   return <div></div>;
 };
 
-export default FlightTrackSourceLayer;
+export default TrajectoryLayer;

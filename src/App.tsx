@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { configureStore, PayloadAction } from '@reduxjs/toolkit';
-
+import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import mapReducer from './mapping/mapSlice';
+import { Action } from 'redux';
 import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
@@ -22,14 +22,13 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
-import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
+import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
+import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
-import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
-import BokehPlot from './modules/timeseries/BokehPlot';
 import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import TimeScrollBar from './features/TimeScrollBar';
 import ScrollBar from './features/ScrollBar';
@@ -42,6 +41,7 @@ export const store = configureStore({
     geojsonField: geojsonFieldReducer,
     waypoint: waypointReducer,
     timeseries: timeseriesReducer,
+    trajectories: trajectoriesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -65,7 +65,7 @@ const App = () => {
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
-          <FlightTrackSource cache={{}} sourceIdentifier={'flight'} />
+          <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
@@ -90,9 +90,6 @@ const App = () => {
           orientation={'vertical'}
         />
       </FloatingBox>
-      <FloatingBox style={{ top: '20px', left: '20px', borderWidth: '0px' }}>
-        <BokehPlot />
-      </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         <FoldOutItem id={'Style'} icon={'paint brush'}>
           <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
@@ -105,14 +102,19 @@ const App = () => {
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />
       </Themes>
-      <VisionToolkit />
     </div>
   );
 };
 
 export default App;
+export type ActionCreator<T> = (payload: T) => PayloadAction<T>;
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore['getState']>;
 export type AppDispatch = AppStore['dispatch'];
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  Action<string>
+>;
 export type Selector<T> = (state: RootState) => T;
-export type Action<T> = (payload: T) => PayloadAction<T>;
