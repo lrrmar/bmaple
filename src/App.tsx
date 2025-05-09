@@ -74,15 +74,22 @@ const App = () => {
           <OSMBaseMap id={'Open Street Map'} />
         </BaseMaps>
       </Map>
-      <FloatingBox
-        minimise={''}
-        style={{ top: '10px', flexDirection: 'column-reverse', width: 'auto' }}
-      ></FloatingBox>
       <FloatingBox style={{ bottom: '130px', borderWidth: '0px' }}>
         <ContourColourBar />
       </FloatingBox>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
         <TimeScrollBar />
+      </FloatingBox>
+      <FloatingBox
+        style={{
+          top: '20px',
+          left: '20px',
+          width: '0.4vw',
+          height: '0.4vh',
+          borderWidth: '0px',
+        }}
+      >
+        <BokehPlot />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <ScrollBar
@@ -105,7 +112,6 @@ const App = () => {
         <PlainTheme id={'Plain'} />
       </Themes>
       <VisionToolkit />
-      <BokehPlot />
     </div>
   );
 };

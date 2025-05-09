@@ -37,7 +37,7 @@ const BokehPlot = () => {
         setTimeseries(updatedTimeseries);
         return;
       }
-      if (!areArraysEqual(current.values, updated.values)) {
+      if (!areArraysEqual(current.data, updated.data)) {
         setTimeseries(updatedTimeseries);
         return;
       }
@@ -91,7 +91,11 @@ const BokehPlot = () => {
     }
   }, [bokehItem]);
 
-  return <div id="bk-plot"></div>;
+  const style = {
+    width: '40vw',
+    height: '0.4vh',
+  };
+  return <div style={style} id="bk-plot"></div>;
 };
 
 export default BokehPlot;

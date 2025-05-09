@@ -8,7 +8,8 @@ import {
 
 export interface Timeseries {
   times: string[];
-  values: number[];
+  data: number[];
+  variable: string;
   units: string;
 }
 

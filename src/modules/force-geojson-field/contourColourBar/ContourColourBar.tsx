@@ -89,7 +89,6 @@ const ContourColourBar = () => {
     } else {
       const keys = Object.keys(contours);
       const index = Array.from({ length: keys.length }, (e, i) => i);
-      console.log(index.slice(1).reverse());
       const panels = index.slice(1).map((i: number) => {
         return (
           <ColourPanel

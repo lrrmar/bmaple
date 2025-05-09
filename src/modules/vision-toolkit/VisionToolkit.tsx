@@ -13,9 +13,15 @@ import {
   isPendingWaypoint,
 } from '../waypoints/WaypointSourceLayer';
 
+interface SegmentData {
+  standard_name: string;
+  units: string;
+  data: number[];
+}
+
 interface Segment {
-  time: number[];
-  [key: string]: number[];
+  time: SegmentData;
+  field: SegmentData;
 }
 
 interface RequestBody {
@@ -81,9 +87,11 @@ const VisionToolkit = () => {
       const data = await apiCall(requestBody);
       if (data) {
         const updatedSegments = { ...segments };
+        const field = data.field;
+        const coordinates = data.coordinates;
         updatedSegments[id] = {
-          time: [data.time0, data.time1],
-          data: [data.value0, data.value1],
+          time: coordinates.time,
+          field: field,
         };
         setSegments(updatedSegments);
       }
@@ -134,26 +142,38 @@ const VisionToolkit = () => {
     // whenever values change, dispatch new 'flight' timeseries
     // to timeseriesSlice
     const times: string[] = [];
-    const values: number[] = [];
+    const data: number[] = [];
+    const variables: string[] = [];
+    const units: string[] = [];
     Object.values(segments).forEach((segment) => {
-      if (segment.time && segment.value) {
-        const stringTimes = segment.times.map((time) =>
+      if (segment.time && segment.field) {
+        const stringTimes = segment.time.data.map((time) =>
           new Date(time).toISOString(),
         );
         times.push(...stringTimes);
-        values.push(...segment.value);
+        data.push(...segment.field.data);
+        variables.push(segment.field.standard_name);
+        units.push(segment.field.units);
       }
     });
-    dispatch(
-      updateTimeseries({
-        id: 'flight',
-        timeseries: {
-          times: times,
-          values: values,
-          units: 'none',
-        },
-      }),
-    );
+
+    // Check consistency  in variables and units
+    const uniqueVariables = Array.from(new Set(variables));
+    const uniqueUnits = Array.from(new Set(units));
+    console.log(uniqueVariables, uniqueUnits);
+    if (uniqueVariables.length == 1 && uniqueUnits.length == 1) {
+      dispatch(
+        updateTimeseries({
+          id: 'flight',
+          timeseries: {
+            times: times,
+            data: data,
+            units: uniqueUnits[0], // TODO
+            variable: uniqueVariables[0], //TODO
+          },
+        }),
+      );
+    }
   }, [segments]);
 
   return <div></div>;
