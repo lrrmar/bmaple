@@ -38,9 +38,9 @@ const initialState: InitialState = {
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
-  baseMapId: 'dark',
+  baseMapId: 'Open Street Map',
   themes: [],
-  themeId: 'glassTablet',
+  themeId: 'Plain',
   displayTimes: {},
   outlineContours: false,
 };

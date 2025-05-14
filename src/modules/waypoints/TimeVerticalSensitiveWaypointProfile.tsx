@@ -20,12 +20,14 @@ import {
 
 import { selectDisplayTime } from '../../mapping/mapSlice';
 import { selectVerticalLevel } from '../force-geojson-field/geojsonFieldSlice';
+import { selectHighlightedWaypoints } from './waypointSlice';
 
 interface Waypoint extends Entry {
   longitude: string;
   latitude: string;
   time: string;
   verticalLevel: string;
+  id: string;
   dataSource?: string;
   dataType?: string;
   dataValue?: string;
@@ -85,8 +87,8 @@ const tearDropStyle = (
 const OpenLayerPoint = ({ waypointData }: OpenLayerPointProps) => {
   const map = OpenLayersMap.map;
   const mapUtils = new OpenLayersMap();
-  const strokeColour = '#111111';
-  const pastFillColour = strokeColour;
+  const unhighlightedStrokeColour = '#111111';
+  const highlightedStrokeColour = '#ffffff';
   const nowFillColour = '#1976d2';
   const futureFillColour = '#ffffff00';
   const waypointTime = new Date(waypointData.time);
@@ -95,10 +97,19 @@ const OpenLayerPoint = ({ waypointData }: OpenLayerPointProps) => {
     : 0;
   const displayTime = new Date(useSelector(selectDisplayTime));
   const verticalLevel = useSelector(selectVerticalLevel);
+  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
   const displayLevel = verticalLevel ? verticalLevel : 0;
   //const displayLevel: number = verticalLevel ? new Number(verticalLevel.replace(/[^a-zA-Z]/g, '')) : 0 ;
 
+  // Find stroke colour depending on highlighting
+  let strokeColour: string;
+  if (highlightedWaypoints.includes(waypointData.id)) {
+    strokeColour = highlightedStrokeColour;
+  } else {
+    strokeColour = unhighlightedStrokeColour;
+  }
   // Find colours depending on time placement of waypoint
+  const pastFillColour = strokeColour;
   let fillColour: string;
   if (waypointTime.getTime() == displayTime.getTime()) {
     fillColour = nowFillColour;

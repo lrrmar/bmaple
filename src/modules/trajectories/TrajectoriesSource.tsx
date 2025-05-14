@@ -34,6 +34,39 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
   const currentTrajectory = useSelector(selectCurrentTrajectory);
   const currentTrajectoryId = useSelector(selectCurrentTrajectoryId);
 
+  async function getClosestSettlement(
+    lat: number,
+    lon: number,
+  ): Promise<string | undefined> {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (your@email.com)',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.address) {
+        // Prioritize known settlement types
+        return (
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          data.address.hamlet ||
+          data.address.county
+        );
+      }
+
+      return undefined;
+    } catch (error) {
+      console.error('Reverse geocoding failed:', error);
+      return undefined;
+    }
+  }
+
   useEffect(() => {
     // On inital load create 'init' trajectory array, this is a place holder. Normally this will be done
     // via a click on 'new trajectory' button.

@@ -21,9 +21,8 @@ export interface Entry extends Pending {
   ol_uid: string;
 }
 
-export type CacheElement =
-  | (Pending & Partial<Generic>)
-  | (Entry & Partial<Generic>);
+export type CacheElement = Action &
+  ((Pending & Partial<Generic>) | (Entry & Partial<Generic>));
 
 export interface Cache {
   [key: string]: CacheElement;
@@ -33,7 +32,7 @@ interface InitialState {
   [key: string]: CacheElement;
 }
 
-interface Action {
+export interface Action {
   id: string;
 }
 
@@ -95,7 +94,7 @@ export const cacheSlice = createSlice({
         const id: string = update.id;
         if (!isEntry(cache[id])) return;
         const updates: Generic = update;
-        delete updates.id;
+        //delete updates.id;
         cache[id] = { ...cache[id], ...updates };
       });
       state = cache;

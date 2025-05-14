@@ -9,11 +9,13 @@ import {
 interface InitialState {
   profileIds: string[];
   mode: string | undefined;
+  highlightedWaypoints: string[];
 }
 
 const initialState: InitialState = {
   profileIds: [],
   mode: 'default',
+  highlightedWaypoints: [],
 };
 
 export interface GenericLayerMixIn {
@@ -45,12 +47,24 @@ export const waypointSlice = createSlice({
       profileIds.concat(toAppend);
       state.profileIds = profileIds;
     },
+    updateHighlightedWaypoints: (
+      state,
+      ids: PayloadAction<string | string[]>,
+    ) => {
+      const toUpdate: string[] = Array.isArray(ids.payload)
+        ? ids.payload
+        : [ids.payload];
+      state.highlightedWaypoints = toUpdate;
+    },
   },
 });
 
-export const { appendProfileIds } = waypointSlice.actions;
+export const { appendProfileIds, updateHighlightedWaypoints } =
+  waypointSlice.actions;
 export const selectProfileIds = (state: RootState) => state.waypoint.profileIds;
 export const selectMode = (state: RootState) => state.waypoint.mode;
+export const selectHighlightedWaypoints = (state: RootState) =>
+  state.waypoint.highlightedWaypoints;
 export const selectWaypoints = (state: RootState) =>
   state.waypoint.profileIds.map((id) => state.cache[id]);
 export default waypointSlice.reducer;

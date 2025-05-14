@@ -22,6 +22,7 @@ import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfi
 import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
+import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
 import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
@@ -105,6 +106,9 @@ const App = () => {
         </FoldOutItem>
         <FoldOutItem id={'Overlays'} icon={'images outline'}>
           <LayerSelector />
+        </FoldOutItem>
+        <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
+          <WaypointsMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>

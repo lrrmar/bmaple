@@ -43,7 +43,7 @@ interface Trajectory extends Pending {
 
 export const isTrajectory = (element: any): element is Trajectory => {
   const keys: string[] = Object.keys(element);
-  return isPending(element) && keys.includes('waypoints');
+  return (isPending(element) || isEntry(element)) && keys.includes('waypoints');
 };
 
 interface Props {
@@ -63,8 +63,9 @@ const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
   }, [cache]);
 
   useEffect(() => {
+    const layerData: CacheElement | null = cache[id];
     if (!layerData) return;
-    if (isEntry(layerData)) return;
+    //if (isEntry(layerData)) return;
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
@@ -83,11 +84,29 @@ const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
           });
         }
       });
-      setCoordinates(waypointCoordinates);
+
+      if (waypointCoordinates.length < 2) return;
+      // Catch change to coordinates stored locally
+      if (coordinates.length !== waypointCoordinates.length) {
+        setCoordinates(waypointCoordinates);
+      } else {
+        for (let i = 0; i < waypointCoordinates.length; i++) {
+          const oldCoords = coordinates[i];
+          const newCoords = waypointCoordinates[i];
+
+          if (
+            oldCoords.latitude !== newCoords.latitude ||
+            oldCoords.longitude !== newCoords.longitude
+          ) {
+            setCoordinates(waypointCoordinates);
+          }
+        }
+      }
     }
-  }, [layerData]);
+  }, [cache]);
 
   useEffect(() => {
+    const layerData = cache[id];
     if (!map) {
       return;
     }
