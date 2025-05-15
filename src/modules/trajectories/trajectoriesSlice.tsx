@@ -9,11 +9,13 @@ import {
 interface InitialState {
   all: { [key: string]: string[] };
   current: string | null;
+  highlightedTrajectories: string[];
 }
 
 const initialState: InitialState = {
   current: 'init',
   all: {},
+  highlightedTrajectories: [],
 };
 
 export interface GenericLayerMixIn {
@@ -51,11 +53,23 @@ export const trajectoriesSlice = createSlice({
         state.all[state.current] = update.payload;
       }
     },
+    updateHighlightedTrajectories: (
+      state,
+      ids: PayloadAction<string | string[]>,
+    ) => {
+      const toUpdate: string[] = Array.isArray(ids.payload)
+        ? ids.payload
+        : [ids.payload];
+      state.highlightedTrajectories = toUpdate;
+    },
   },
 });
 
-export const { newTrajectory, updateCurrentTrajectory } =
-  trajectoriesSlice.actions;
+export const {
+  newTrajectory,
+  updateCurrentTrajectory,
+  updateHighlightedTrajectories,
+} = trajectoriesSlice.actions;
 
 export const appendWaypointToCurrentTrajectory =
   (id: string): AppThunk =>
@@ -108,5 +122,7 @@ export const selectCurrentTrajectory = (state: RootState) => {
     return null;
   }
 };
+export const selectHighlightedTrajectories = (state: RootState) =>
+  state.trajectories.highlightedTrajectories;
 
 export default trajectoriesSlice.reducer;

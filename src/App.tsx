@@ -25,6 +25,7 @@ import WaypointsSource from './modules/waypoints/WaypointSource';
 import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
 import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
+import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
 import BokehPlot from './modules/timeseries/BokehPlot';
 import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
@@ -109,6 +110,9 @@ const App = () => {
         </FoldOutItem>
         <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
           <WaypointsMenu />
+        </FoldOutItem>
+        <FoldOutItem id={'Trajectories'} icon={'share alternate'}>
+          <TrajectoriesMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>

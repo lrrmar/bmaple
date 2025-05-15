@@ -37,8 +37,9 @@ import {
   isEntryWaypoint,
 } from '../waypoints/WaypointSourceLayer';
 
-interface Trajectory extends Pending {
+export interface Trajectory extends Pending {
   waypoints: string[];
+  name: string;
 }
 
 export const isTrajectory = (element: any): element is Trajectory => {

@@ -5,7 +5,7 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 
-import { SemanticICONS, Input, Label, Button } from 'semantic-ui-react';
+import { SemanticICONS, Icon, Input, Label, Button } from 'semantic-ui-react';
 
 import {} from '../waypoints/waypointSlice';
 
@@ -13,6 +13,7 @@ import DropDownList from '../../features/DropDownList';
 import {
   request,
   update,
+  remove,
   selectCache,
   CacheElement,
 } from '../../mapping/cacheSlice';
@@ -39,7 +40,20 @@ const MenuItem = (
   const style: React.CSSProperties = {
     borderColor: 'white',
     backgroundColor: '#101010',
-    margin: '1px',
+    margin: '2px',
+    padding: '8px',
+    borderRadius: '4px',
+  };
+
+  const headerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    borderColor: 'white',
+    backgroundColor: '#101010',
+    padding: '4px',
+    fontWeight: 'bold',
   };
 
   const openStyle: React.CSSProperties = {
@@ -58,6 +72,7 @@ const MenuItem = (
         onMouseLeave={() => setHovered(null)}
       >
         <div
+          style={headerStyle}
           onClick={() => {
             if (id === open) {
               setOpen(null);
@@ -86,19 +101,31 @@ const WaypointForm = ({
   waypoint: Waypoint & CacheElement;
   setOpen: Dispatch<SetStateAction<string | null>>;
 }) => {
+  const inputLabelContainerStyle: React.CSSProperties = {
+    display: 'flex',
+    margin: '2px 0px',
+  };
+
+  const buttonContainerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  };
   const labelStyle: React.CSSProperties = {
     minWidth: '52px',
-    textAlign: 'center',
+    textAlign: 'left',
   };
   const inputStyle: React.CSSProperties = {
     minWidth: '48px',
   };
+
+  const buttonStyle: React.CSSProperties = {};
   const dispatch = useDispatch();
   const [wp, setWp] = useState<(Waypoint & CacheElement) | null>(waypoint);
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
+      <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="name input">
           Name
         </Label>
@@ -117,7 +144,7 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <div style={{ display: 'flex' }}>
+      <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="time input">
           Time
         </Label>
@@ -136,7 +163,7 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <div style={{ display: 'flex' }}>
+      <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="lat input">
           Lat
         </Label>
@@ -155,7 +182,7 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <div style={{ display: 'flex' }}>
+      <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="lon input">
           Lon
         </Label>
@@ -174,15 +201,67 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <div style={{ display: 'flex' }}>
-        <Button
-          id="submit"
+
+      <div style={inputLabelContainerStyle}>
+        <Label style={labelStyle} for="vert input">
+          Vert
+        </Label>
+        <Input
+          id="vert input"
+          type="text"
           style={inputStyle}
-          onClick={() => {
-            if (wp) dispatch(update(wp));
-            setOpen(null);
+          defaultValue={waypoint.verticalLevel}
+          placeholder={'Vertical'}
+          onChange={(e, data) => {
+            if (wp) {
+              const newWaypoint = { ...wp };
+              newWaypoint['verticalLevel'] = data.value;
+              setWp(newWaypoint);
+            }
           }}
         />
+      </div>
+
+      <div style={buttonContainerStyle}>
+        <Button
+          id="update"
+          style={buttonStyle}
+          onClick={() => {
+            if (wp) dispatch(update(wp));
+          }}
+          icon
+        >
+          <Icon name="pencil alternate" />
+        </Button>
+        <Button
+          id="duplicate"
+          style={buttonStyle}
+          onClick={() => {
+            if (wp) {
+              const newWp = { ...wp };
+              const uid = 'id' + new Date().getTime();
+              const name = newWp.name + ' duplicate';
+              newWp.id = uid;
+              newWp.name = name;
+              delete newWp.ol_uid;
+              dispatch(request(newWp));
+            }
+          }}
+          icon
+        >
+          <Icon name="copy outline" />
+        </Button>
+        <Button
+          id="remove"
+          style={buttonStyle}
+          onClick={() => {
+            if (wp) dispatch(remove(wp));
+            setOpen(null);
+          }}
+          icon
+        >
+          <Icon name="trash alternate" />
+        </Button>
       </div>
     </div>
   );
