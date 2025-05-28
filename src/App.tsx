@@ -90,6 +90,7 @@ const App = () => {
           height: '0.4vh',
           borderWidth: '0px',
         }}
+        minimise={'x'}
       >
         <BokehPlot />
       </FloatingBox>

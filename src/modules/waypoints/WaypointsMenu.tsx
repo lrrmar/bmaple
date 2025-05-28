@@ -38,25 +38,30 @@ const MenuItem = (
 ) => {
   const id = waypoint.id;
   const style: React.CSSProperties = {
-    borderColor: 'white',
     backgroundColor: '#101010',
+    borderWidth: '1px',
+    borderColor: '#ffffff',
     margin: '2px',
-    padding: '8px',
     borderRadius: '4px',
+    padding: '0px 4px',
+    width: '100%',
   };
 
   const headerStyle: React.CSSProperties = {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
     alignItems: 'flex-start',
-    borderColor: 'white',
     backgroundColor: '#101010',
-    padding: '4px',
+    borderColor: '#ffffff',
+    padding: '8px',
     fontWeight: 'bold',
+    borderRadius: '4px',
   };
 
   const openStyle: React.CSSProperties = {
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
@@ -85,7 +90,7 @@ const MenuItem = (
           {waypoint.name}
         </div>
         {id === open && (
-          <div>
+          <div style={openStyle}>
             <WaypointForm waypoint={waypoint} setOpen={setOpen} />
           </div>
         )}
@@ -103,20 +108,39 @@ const WaypointForm = ({
 }) => {
   const inputLabelContainerStyle: React.CSSProperties = {
     display: 'flex',
-    margin: '2px 0px',
+    margin: '2px',
+    width: '100%',
+  };
+
+  const formStyle: React.CSSProperties = {
+    width: '100%',
+  };
+
+  const inputStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    maxWidth: '100%',
+  };
+
+  const inputContainerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    width: '52px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
   };
 
   const buttonContainerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  };
-  const labelStyle: React.CSSProperties = {
-    minWidth: '52px',
-    textAlign: 'left',
-  };
-  const inputStyle: React.CSSProperties = {
-    minWidth: '48px',
+    margin: '2px 0px',
+    padding: '2px',
   };
 
   const buttonStyle: React.CSSProperties = {};
@@ -124,7 +148,7 @@ const WaypointForm = ({
   const [wp, setWp] = useState<(Waypoint & CacheElement) | null>(waypoint);
 
   return (
-    <div>
+    <div style={formStyle}>
       <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="name input">
           Name
@@ -163,25 +187,28 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <div style={inputLabelContainerStyle}>
-        <Label style={labelStyle} for="lat input">
+      <Input
+        id="lat input"
+        type="text"
+        style={inputStyle}
+        defaultValue={waypoint.latitude.toPrecision(4)}
+        placeholder={'Latitude'}
+        //label={{ basic: true, content: 'deg N' }}
+        labelPosition="right"
+        onChange={(e, data) => {
+          if (wp) {
+            const newWaypoint = { ...wp };
+            newWaypoint['latitude'] = parseFloat(data.value);
+            setWp(newWaypoint);
+          }
+        }}
+      >
+        <Label for="lat input" style={{ ...labelStyle, justifySelf: 'start' }}>
           Lat
         </Label>
-        <Input
-          id="lat input"
-          type="text"
-          style={inputStyle}
-          defaultValue={waypoint.latitude.toPrecision(4)}
-          placeholder={'Latitude'}
-          onChange={(e, data) => {
-            if (wp) {
-              const newWaypoint = { ...wp };
-              newWaypoint['latitude'] = parseFloat(data.value);
-              setWp(newWaypoint);
-            }
-          }}
-        />
-      </div>
+        <input style={{ maxWidth: '100%' }} />
+        <Label style={{ ...labelStyle, justifySelf: 'end' }}>°N</Label>
+      </Input>
       <div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="lon input">
           Lon
