@@ -63,7 +63,6 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          <GeojsonFieldProfile />
           <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
