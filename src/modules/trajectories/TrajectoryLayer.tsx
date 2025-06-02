@@ -86,7 +86,6 @@ const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
         }
       });
 
-      if (waypointCoordinates.length < 2) return;
       // Catch change to coordinates stored locally
       if (coordinates.length !== waypointCoordinates.length) {
         setCoordinates(waypointCoordinates);
@@ -111,18 +110,23 @@ const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
     if (!map) {
       return;
     }
-    if (!layerData || coordinates.length < 1) return;
+    if (!layerData) return;
     const lineStringCoords = coordinates.map((coordinate) =>
       fromLonLat([coordinate.longitude, coordinate.latitude]),
     );
-    const lineString = new LineString(lineStringCoords);
-    const feature = new Feature({
-      geometry: lineString,
-    });
-    // Create a vector source and layer to hold the features
-    const vectorSource = new VectorSource({
-      features: [feature],
-    });
+    let vectorSource: VectorSource<Feature<LineString> | never>;
+    if (coordinates.length > 1) {
+      const lineString = new LineString(lineStringCoords);
+      const feature = new Feature({
+        geometry: lineString,
+      });
+      // Create a vector source and layer to hold the features
+      vectorSource = new VectorSource({
+        features: [feature],
+      });
+    } else {
+      vectorSource = new VectorSource({});
+    }
     const style = new Style({
       stroke: new Stroke({
         color: '#000000',

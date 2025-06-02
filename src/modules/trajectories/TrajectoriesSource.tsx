@@ -15,6 +15,7 @@ import {
 
 import {
   appendWaypointToCurrentTrajectory,
+  removeWaypointFromAllTrajectories,
   newTrajectory,
   selectCurrentTrajectory,
   selectCurrentTrajectoryId,
@@ -30,6 +31,7 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
   const [allWaypoints, setAllWaypoints] = useState<string[]>([]);
   const [newWaypoints, setNewWaypoints] = useState<string[]>([]);
+  const [oldWaypoints, setOldWaypoints] = useState<string[]>([]);
   const allCache = useSelector(selectCache);
   const currentTrajectory = useSelector(selectCurrentTrajectory);
   const currentTrajectoryId = useSelector(selectCurrentTrajectoryId);
@@ -81,8 +83,15 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
     const newWaypointIds = cacheWaypointIds.filter(
       (id) => !allWaypoints.includes(id),
     );
+    const oldWaypointIds = allWaypoints.filter(
+      (id) => !cacheWaypointIds.includes(id),
+    );
     if (newWaypointIds.length > 0) {
       setNewWaypoints(newWaypointIds);
+      setAllWaypoints(cacheWaypointIds);
+    }
+    if (oldWaypointIds.length > 0) {
+      setOldWaypoints(oldWaypointIds);
       setAllWaypoints(cacheWaypointIds);
     }
   }, [allCache]);
@@ -95,6 +104,13 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
       );
     }
   }, [newWaypoints]);
+
+  useEffect(() => {
+    // Once waypoints remove from cache, remove from trajectories
+    oldWaypoints.forEach((waypoint) =>
+      dispatch(removeWaypointFromAllTrajectories(waypoint)),
+    );
+  }, [oldWaypoints]);
 
   useEffect(() => {
     if (currentTrajectory && currentTrajectoryId) {

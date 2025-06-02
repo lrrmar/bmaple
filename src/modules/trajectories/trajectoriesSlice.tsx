@@ -62,6 +62,18 @@ export const trajectoriesSlice = createSlice({
         : [ids.payload];
       state.highlightedTrajectories = toUpdate;
     },
+    removeWaypointFromAllTrajectories: (state, id: PayloadAction<string>) => {
+      const allTrajectories = state.all;
+      Object.keys(allTrajectories).forEach((trajectoryId) => {
+        const trajectory = allTrajectories[trajectoryId];
+        const index = trajectory.indexOf(id.payload);
+        trajectory.splice(index, 1);
+        allTrajectories[trajectoryId] = trajectory;
+      });
+      console.log(allTrajectories);
+      console.log(state.all);
+      state.all = allTrajectories;
+    },
   },
 });
 
@@ -69,6 +81,7 @@ export const {
   newTrajectory,
   updateCurrentTrajectory,
   updateHighlightedTrajectories,
+  removeWaypointFromAllTrajectories,
 } = trajectoriesSlice.actions;
 
 export const appendWaypointToCurrentTrajectory =
@@ -81,32 +94,39 @@ export const appendWaypointToCurrentTrajectory =
       const currentTrajectory = [
         ...state.trajectories.all[currentTrajectoryId],
       ];
+      console.log(currentTrajectory);
       currentTrajectory.push(id);
-      const sortedCurrentTrajectory = currentTrajectory.sort(
-        (a: string, b: string): -1 | 0 | 1 => {
-          // this sort function takes two waypoint IDs, gets their
-          // respective 'time' properties via the cache
-          // and orders them chronologically
-          const cacheEntryA: CacheElement = state.cache[a];
-          const cacheEntryB: CacheElement = state.cache[b];
-          if (
-            cacheEntryA.time &&
-            cacheEntryB.time &&
-            typeof cacheEntryA.time == 'string' &&
-            typeof cacheEntryB.time == 'string'
-          ) {
-            const aTime = new Date(cacheEntryA.time);
-            const bTime = new Date(cacheEntryB.time);
-            if (aTime < bTime) {
-              return -1;
+      console.log(currentTrajectory);
+      let sortedCurrentTrajectory: string[];
+      if (currentTrajectory.length > 1) {
+        sortedCurrentTrajectory = currentTrajectory.sort(
+          (a: string, b: string): -1 | 0 | 1 => {
+            // this sort function takes two waypoint IDs, gets their
+            // respective 'time' properties via the cache
+            // and orders them chronologically
+            const cacheEntryA: CacheElement = state.cache[a];
+            const cacheEntryB: CacheElement = state.cache[b];
+            if (
+              cacheEntryA.time &&
+              cacheEntryB.time &&
+              typeof cacheEntryA.time == 'string' &&
+              typeof cacheEntryB.time == 'string'
+            ) {
+              const aTime = new Date(cacheEntryA.time);
+              const bTime = new Date(cacheEntryB.time);
+              if (aTime < bTime) {
+                return -1;
+              }
+              if (aTime > bTime) {
+                return 1;
+              }
             }
-            if (aTime > bTime) {
-              return 1;
-            }
-          }
-          return 0;
-        },
-      );
+            return 0;
+          },
+        );
+      } else {
+        sortedCurrentTrajectory = currentTrajectory;
+      }
       dispatch(updateCurrentTrajectory(sortedCurrentTrajectory));
     }
   };
