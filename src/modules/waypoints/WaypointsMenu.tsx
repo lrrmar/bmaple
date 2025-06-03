@@ -29,6 +29,57 @@ import {
   selectHighlightedWaypoints,
 } from './waypointSlice';
 
+const CustomLabelledInput = ({
+  id,
+  value,
+  defaultValue,
+  placeholder,
+  onChange,
+  label,
+  unit,
+}: {
+  id: string;
+  value: string;
+  defaultValue: string;
+  placeholder: string;
+  onChange: (e: any, data: any) => void;
+  label: string;
+  unit?: string;
+}) => {
+  const inputStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'row',
+    maxWidth: '100%',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    width: '52px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  };
+  return (
+    <Input
+      id={id}
+      type="text"
+      style={inputStyle}
+      value={value}
+      defaultValue={defaultValue}
+      placeholder={placeholder}
+      labelPosition="left"
+      onChange={onChange}
+    >
+      <Label style={{ ...labelStyle, justifySelf: 'start' }}>{label}</Label>
+      <input style={{ width: '10px' }} />
+      {unit && (
+        <Label for="lat input" style={{ ...labelStyle, justifySelf: 'end' }}>
+          {unit}
+        </Label>
+      )}
+    </Input>
+  );
+};
+
 const MenuItem = (
   waypoint: Waypoint & CacheElement,
   open: string | null,
@@ -106,6 +157,7 @@ const WaypointForm = ({
   waypoint: Waypoint & CacheElement;
   setOpen: Dispatch<SetStateAction<string | null>>;
 }) => {
+  console.log('form rerender');
   const inputLabelContainerStyle: React.CSSProperties = {
     display: 'flex',
     margin: '2px',
@@ -114,11 +166,6 @@ const WaypointForm = ({
 
   const formStyle: React.CSSProperties = {
     width: '100%',
-  };
-
-  const inputStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'row',
     maxWidth: '100%',
   };
 
@@ -126,13 +173,6 @@ const WaypointForm = ({
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    width: '52px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
   };
 
   const buttonContainerStyle: React.CSSProperties = {
@@ -149,7 +189,7 @@ const WaypointForm = ({
 
   return (
     <div style={formStyle}>
-      <div style={inputLabelContainerStyle}>
+      {/*<div style={inputLabelContainerStyle}>
         <Label style={labelStyle} for="name input">
           Name
         </Label>
@@ -187,68 +227,84 @@ const WaypointForm = ({
           }}
         />
       </div>
-      <Input
-        id="lat input"
-        type="text"
-        style={inputStyle}
-        defaultValue={waypoint.latitude.toPrecision(4)}
-        placeholder={'Latitude'}
-        //label={{ basic: true, content: 'deg N' }}
-        labelPosition="right"
+        */}
+      <CustomLabelledInput
+        id={'name input'}
+        value={wp ? wp.name : ''}
+        defaultValue={'enter name'}
+        placeholder={'Name'}
         onChange={(e, data) => {
           if (wp) {
             const newWaypoint = { ...wp };
-            newWaypoint['latitude'] = parseFloat(data.value);
+            newWaypoint['name'] = data.value;
             setWp(newWaypoint);
           }
         }}
-      >
-        <Label for="lat input" style={{ ...labelStyle, justifySelf: 'start' }}>
-          Lat
-        </Label>
-        <input style={{ maxWidth: '100%' }} />
-        <Label style={{ ...labelStyle, justifySelf: 'end' }}>°N</Label>
-      </Input>
-      <div style={inputLabelContainerStyle}>
-        <Label style={labelStyle} for="lon input">
-          Lon
-        </Label>
-        <Input
-          id="lon input"
-          type="text"
-          style={inputStyle}
-          defaultValue={waypoint.longitude.toPrecision(4)}
-          placeholder={'Longitude'}
-          onChange={(e, data) => {
-            if (wp) {
-              const newWaypoint = { ...wp };
-              newWaypoint['longitude'] = parseFloat(data.value);
-              setWp(newWaypoint);
-            }
-          }}
-        />
-      </div>
-
-      <div style={inputLabelContainerStyle}>
-        <Label style={labelStyle} for="vert input">
-          Vert
-        </Label>
-        <Input
-          id="vert input"
-          type="text"
-          style={inputStyle}
-          defaultValue={waypoint.verticalLevel}
-          placeholder={'Vertical'}
-          onChange={(e, data) => {
-            if (wp) {
-              const newWaypoint = { ...wp };
-              newWaypoint['verticalLevel'] = data.value;
-              setWp(newWaypoint);
-            }
-          }}
-        />
-      </div>
-
+        label={'Name'}
+      />
+      <CustomLabelledInput
+        id={'time input'}
+        value={wp ? wp.time : ''}
+        defaultValue={'enter time'}
+        placeholder={'Time'}
+        onChange={(e, data) => {
+          if (wp) {
+            const newWaypoint = { ...wp };
+            newWaypoint['time'] = data.value;
+            setWp(newWaypoint);
+          }
+        }}
+        label={'Time'}
+      />
+      <CustomLabelledInput
+        id={'lat input'}
+        value={wp ? wp.latitude.toPrecision(4) : ''}
+        defaultValue={'enter latitude'}
+        placeholder={'Latitude'}
+        onChange={(e, data) => {
+          console.log(wp);
+          if (wp) {
+            console.log(wp);
+            const newWaypoint = { ...wp };
+            console.log(data);
+            newWaypoint['latitude'] = parseFloat(data.value);
+            console.log(newWaypoint);
+            setWp(newWaypoint);
+          }
+        }}
+        label={'Lat'}
+        unit={'°N'}
+      />
+      <CustomLabelledInput
+        id={'lon input'}
+        value={wp ? wp.longitude.toPrecision(4) : ''}
+        defaultValue={'eneter longitude'}
+        placeholder={'Longitude'}
+        onChange={(e, data) => {
+          if (wp) {
+            const newWaypoint = { ...wp };
+            newWaypoint['longitude'] = parseFloat(data.value);
+            setWp(newWaypoint);
+          }
+        }}
+        label={'Lon'}
+        unit={'°E'}
+      />
+      <CustomLabelledInput
+        id="vert input"
+        value={wp ? wp.verticalLevel : ''}
+        defaultValue={'enter vertical'}
+        placeholder={'Vertical'}
+        onChange={(e, data) => {
+          if (wp) {
+            const newWaypoint = { ...wp };
+            newWaypoint['verticalLevel'] = data.value;
+            setWp(newWaypoint);
+          }
+        }}
+        label={'Vert'}
+        unit={'hPa'}
+      />
       <div style={buttonContainerStyle}>
         <Button
           id="update"
@@ -336,6 +392,32 @@ const WaypointsMenu = () => {
     display: 'flex',
     flexDirection: 'column',
   };
-  return <div style={style}>{waypointComponents}</div>;
+  return (
+    <div style={{ ...style, maxHeight: '100%' }}>
+      <div style={style}>{waypointComponents}</div>
+      <Button
+        id="duplicate"
+        style={{
+          alignSelf: 'end',
+        }}
+        onClick={() => {
+          const uid = 'id' + new Date().getTime();
+          const waypoint = {
+            id: uid,
+            name: 'blank',
+            source: 'waypoints',
+            latitude: 0,
+            longitude: 0,
+            verticalLevel: 0,
+            time: new Date().toISOString(),
+          };
+          dispatch(request(waypoint));
+        }}
+        icon
+      >
+        <Icon name="plus" />
+      </Button>
+    </div>
+  );
 };
 export default WaypointsMenu;

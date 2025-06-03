@@ -123,6 +123,7 @@ function FoldOutMenu({
             theme={theme}
             currentFoldOutId={id}
           >
+            <div style={{ fontWeight: 'bold' }}>{id}</div>
             {f}
           </FoldOut>
         );

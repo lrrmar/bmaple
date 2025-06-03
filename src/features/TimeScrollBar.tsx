@@ -158,7 +158,10 @@ const ScrollingScale = () => {
             //borderRadius: '50%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#010101', // Change label color
+            color: '#f1f1f1', // Change label color
+          },
+          '& .MuiSlider-text': {
+            color: '#f1f1f1', // Change label color
           },
         }}
       />

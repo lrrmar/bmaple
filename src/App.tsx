@@ -7,7 +7,7 @@ import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import BaseMaps from './mapping/BaseMaps';
-import DarkBaseMap from './mapping/DarkBaseMap';
+import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
@@ -71,7 +71,7 @@ const App = () => {
           <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
         </Sources>
         <BaseMaps>
-          <DarkBaseMap id={'dark'} />
+          <LightBaseMap id={'light'} />
           <OSMBaseMap id={'Open Street Map'} />
         </BaseMaps>
       </Map>
@@ -115,10 +115,7 @@ const App = () => {
           <TrajectoriesMenu />
         </FoldOutItem>
       </FoldOutMenu>
-      <Themes>
-        <GlassTabletTheme id={'glassTablet'} />
-        <PlainTheme id={'Plain'} />
-      </Themes>
+      <Themes></Themes>
       <VisionToolkit />
     </div>
   );
