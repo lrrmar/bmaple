@@ -28,7 +28,7 @@ export interface Cache {
   [key: string]: CacheElement;
 }
 
-interface InitialState {
+export interface InitialState {
   [key: string]: CacheElement;
 }
 
@@ -113,6 +113,43 @@ export const cacheSlice = createSlice({
     },
   },
 });
+
+/// Utilities
+
+export const cacheSortByTime = (cache: Cache, ids: string[]): string[] => {
+  const sortableIds: string[] = [];
+  ids.forEach((id) => {
+    const entry = cache[id];
+    if (entry && entry.time) sortableIds.push(id);
+  });
+
+  const sortedIds = sortableIds.sort((a: string, b: string): -1 | 0 | 1 => {
+    // this sort function takes two waypoint IDs, gets their
+    // respective 'time' properties via the cache
+    // and orders them chronologically
+    const cacheEntryA: CacheElement = cache[a];
+    const cacheEntryB: CacheElement = cache[b];
+    if (
+      cacheEntryA.time &&
+      cacheEntryB.time &&
+      typeof cacheEntryA.time == 'string' &&
+      typeof cacheEntryB.time == 'string'
+    ) {
+      const aTime = new Date(cacheEntryA.time);
+      const bTime = new Date(cacheEntryB.time);
+      if (aTime < bTime) {
+        return -1;
+      }
+      if (aTime > bTime) {
+        return 1;
+      }
+    }
+    return 0;
+  });
+  return sortedIds;
+};
+
+///
 
 export const { request, ingest, update, remove } = cacheSlice.actions;
 export const selectCache = (state: RootState) => state.cache;

@@ -37,6 +37,7 @@ export interface Waypoint extends Pending {
   time: string;
   verticalLevel: string;
   name: string;
+  id: string;
   dataSource?: string;
   dataType?: string;
   dataValue?: string;

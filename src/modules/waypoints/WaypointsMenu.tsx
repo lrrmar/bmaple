@@ -29,7 +29,7 @@ import {
   selectHighlightedWaypoints,
 } from './waypointSlice';
 
-const CustomLabelledInput = ({
+export const CustomLabelledInput = ({
   id,
   value,
   defaultValue,
@@ -106,7 +106,7 @@ const MenuItem = (
     alignItems: 'flex-start',
     backgroundColor: '#101010',
     borderColor: '#ffffff',
-    padding: '8px',
+    padding: '8px 4px',
     fontWeight: 'bold',
     borderRadius: '4px',
   };
@@ -138,7 +138,11 @@ const MenuItem = (
             }
           }}
         >
-          {waypoint.name}
+          {id === open ? (
+            <Icon size="large" name={'caret square down'} />
+          ) : (
+            <p>{waypoint.name}</p>
+          )}
         </div>
         {id === open && (
           <div style={openStyle}>

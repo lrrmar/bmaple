@@ -19,6 +19,7 @@ import {
   newTrajectory,
   selectCurrentTrajectory,
   selectCurrentTrajectoryId,
+  selectTrajectories,
 } from './trajectoriesSlice';
 
 import TrajectoryLayer from './TrajectoryLayer';
@@ -35,6 +36,7 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
   const allCache = useSelector(selectCache);
   const currentTrajectory = useSelector(selectCurrentTrajectory);
   const currentTrajectoryId = useSelector(selectCurrentTrajectoryId);
+  const trajectories = useSelector(selectTrajectories);
 
   async function getClosestSettlement(
     lat: number,
@@ -68,12 +70,6 @@ const TrajectoriesSource = ({ sourceIdentifier, cache }: Props) => {
       return undefined;
     }
   }
-
-  useEffect(() => {
-    // On inital load create 'init' trajectory array, this is a place holder. Normally this will be done
-    // via a click on 'new trajectory' button.
-    dispatch(newTrajectory('init'));
-  }, []);
 
   useEffect(() => {
     // Get new waypoints that have been added to the cache

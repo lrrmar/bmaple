@@ -40,11 +40,18 @@ import {
 export interface Trajectory extends Pending {
   waypoints: string[];
   name: string;
+  id: string;
+  ol_uid: string;
 }
 
 export const isTrajectory = (element: any): element is Trajectory => {
   const keys: string[] = Object.keys(element);
   return (isPending(element) || isEntry(element)) && keys.includes('waypoints');
+};
+
+export const isEntryTrajectory = (element: any): element is Trajectory => {
+  const keys: string[] = Object.keys(element);
+  return isEntry(element) && keys.includes('waypoints');
 };
 
 interface Props {
@@ -127,18 +134,11 @@ const TrajectoryLayer = ({ id, sourceIdentifier }: Props) => {
     } else {
       vectorSource = new VectorSource({});
     }
-    const style = new Style({
-      stroke: new Stroke({
-        color: '#000000',
-        width: 1.5,
-      }),
-    });
 
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       zIndex: 29,
-      visible: true,
-      style: style,
+      visible: false,
     });
 
     map.addLayer(vectorLayer);

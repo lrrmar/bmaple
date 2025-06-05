@@ -30,6 +30,7 @@ import timeseriesReducer from './modules/timeseries/timeseriesSlice';
 import BokehPlot from './modules/timeseries/BokehPlot';
 import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
+import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TempBaseMapMenu from './features/TempBaseMapMenu';
@@ -64,6 +65,7 @@ const App = () => {
       <Map>
         <Profiles>
           <TimeVerticalSensitiveWaypointsProfile />
+          <TimeVerticalSensitiveTrajectoryProfile />
         </Profiles>
         <Sources>
           <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
