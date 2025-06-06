@@ -8,6 +8,7 @@ import {
   selectDisplayTime,
   selectDisplayTimes,
   updateDisplayTime,
+  updateDisplayTimes,
 } from '../mapping/mapSlice';
 
 const getUTCString = (timeInt: number) => {
@@ -24,7 +25,7 @@ const ScrollingScale = () => {
   const displayTimes = useSelector(selectDisplayTimes);
   const [upperLim, setUpperLim] = useState<number>(0);
   const [lowerLim, setLowerLim] = useState<number>(1);
-  const [dataIncrement, setDataIncrement] = useState<number>(60 * 60 * 1000);
+  const [dataIncrement, setDataIncrement] = useState<number>(15 * 60 * 1000);
   const [tickIncrement, setTickIncrement] = useState<number>(0);
   const [marks, setMarks] = useState<Mark[]>([]);
   // TODO: update based on size allocated to slider...
@@ -37,6 +38,31 @@ const ScrollingScale = () => {
   });
 
   useEffect(() => {
+    // On render, set automatic display times
+    const now = new Date(Date.now());
+    const minDate = new Date();
+    minDate.setFullYear(now.getFullYear());
+    minDate.setMonth(now.getMonth());
+    minDate.setDate(now.getDate());
+    minDate.setUTCHours(6);
+    minDate.setMinutes(0);
+    minDate.setSeconds(0);
+    minDate.setMilliseconds(0);
+    const maxDate = new Date(minDate);
+    maxDate.setUTCHours(18);
+    console.log(minDate, maxDate);
+    const dateArray = [minDate];
+    while (dateArray[dateArray.length - 1].getTime() < maxDate.getTime()) {
+      const newDate = new Date(
+        dateArray[dateArray.length - 1].getTime() + 15 * 60000,
+      );
+      dateArray.push(newDate);
+    }
+    const times = dateArray.map((date) => date.getTime());
+    dispatch(updateDisplayTimes({ source: 'timescroll', times: times }));
+  }, []);
+
+  useEffect(() => {
     // Get min time and floor it to nearest hour
     const minDateTime = new Date(Math.min(...allTimeInts));
     minDateTime.setMinutes(0);
@@ -46,7 +72,7 @@ const ScrollingScale = () => {
     // Get max time and ceil it to nearest hour
     const maxDateTime = new Date(Math.max(...allTimeInts));
     if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
-      maxDateTime.setHours(maxDateTime.getHours() + 1);
+      maxDateTime.setUTCHours(maxDateTime.getUTCHours() + 1);
     }
     maxDateTime.setMinutes(0);
     maxDateTime.setSeconds(0);
@@ -102,11 +128,10 @@ const ScrollingScale = () => {
     let currentTimeInt = minDateTime.getTime();
     while (currentTimeInt <= maxDateTime.getTime()) {
       const dt = new Date(currentTimeInt);
-      const hour = dt.getHours();
+      const hour = dt.getUTCHours();
       const minute = dt.getMinutes();
       const day = dt.getDate();
       const month = dt.getMonth() + 1;
-
       const zf = (num: number) => {
         // zero formatter
         return num < 10 ? `0${num}` : `${num}`;

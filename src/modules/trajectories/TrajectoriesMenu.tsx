@@ -175,6 +175,11 @@ const ButtonBar = ({
   setOpen: Dispatch<SetStateAction<string | null>>;
 }) => {
   const dispatch = useDispatch();
+  // Temp, for download
+  const cache = useSelector(selectCache);
+  const trajectoryWaypoints = trajectory.waypoints.map((id) => {
+    return cache[id];
+  });
   const buttonContainerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'row',
@@ -214,12 +219,32 @@ const ButtonBar = ({
         <Icon name="trash alternate" />
       </Button>
       <Button
-        id="remove"
+        id="download"
         onClick={() => {
-          const conf = confirm(`Remove trajectory: '${trajectory.name}'?`);
-          if (conf) {
-            dispatch(remove({ id: trajectory.id }));
-          }
+          const waypointsForJson = trajectoryWaypoints.map((waypoint) => {
+            return {
+              name: waypoint.name,
+              latitude: waypoint.latitude,
+              longitude: waypoint.longitude,
+              verticalLevel: waypoint.verticalLevel,
+              verticalUnits: waypoint.verticalUnits,
+              time: waypoint.time,
+            };
+          });
+          console.log(waypointsForJson);
+          const trajectoryForJson = {
+            name: trajectory.name,
+            waypoints: waypointsForJson,
+          };
+          const blob = new Blob([JSON.stringify(trajectoryForJson)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${trajectory.name}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
         }}
         icon
       >

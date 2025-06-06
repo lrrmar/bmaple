@@ -68,7 +68,6 @@ const App = () => {
           <TimeVerticalSensitiveTrajectoryProfile />
         </Profiles>
         <Sources>
-          <GeojsonFieldSource cache={{}} sourceIdentifier={'geojsonField'} />
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
           <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
         </Sources>
@@ -77,23 +76,8 @@ const App = () => {
           <OSMBaseMap id={'Open Street Map'} />
         </BaseMaps>
       </Map>
-      <FloatingBox style={{ bottom: '130px', borderWidth: '0px' }}>
-        <ContourColourBar />
-      </FloatingBox>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
         <TimeScrollBar />
-      </FloatingBox>
-      <FloatingBox
-        style={{
-          top: '20px',
-          left: '20px',
-          width: '0.4vw',
-          height: '0.4vh',
-          borderWidth: '0px',
-        }}
-        minimise={'x'}
-      >
-        <BokehPlot />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <ScrollBar
@@ -104,12 +88,6 @@ const App = () => {
         />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
-        <FoldOutItem id={'Style'} icon={'paint brush'}>
-          <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
-        </FoldOutItem>
-        <FoldOutItem id={'Overlays'} icon={'images outline'}>
-          <LayerSelector />
-        </FoldOutItem>
         <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
           <WaypointsMenu />
         </FoldOutItem>
@@ -118,7 +96,6 @@ const App = () => {
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>
-      <VisionToolkit />
     </div>
   );
 };

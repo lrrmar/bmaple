@@ -234,46 +234,39 @@ const WaypointForm = ({
         */}
       <CustomLabelledInput
         id={'name input'}
-        value={wp ? wp.name : ''}
+        value={waypoint ? waypoint.name : ''}
         defaultValue={'enter name'}
         placeholder={'Name'}
         onChange={(e, data) => {
-          if (wp) {
-            const newWaypoint = { ...wp };
-            newWaypoint['name'] = data.value;
-            setWp(newWaypoint);
+          if (waypoint) {
+            const name = data.value;
+            dispatch(update({ id: waypoint.id, name: name }));
           }
         }}
         label={'Name'}
       />
       <CustomLabelledInput
         id={'time input'}
-        value={wp ? wp.time : ''}
+        value={waypoint ? waypoint.time : ''}
         defaultValue={'enter time'}
         placeholder={'Time'}
         onChange={(e, data) => {
-          if (wp) {
-            const newWaypoint = { ...wp };
-            newWaypoint['time'] = data.value;
-            setWp(newWaypoint);
+          if (waypoint) {
+            const time = data.value;
+            dispatch(update({ id: waypoint.id, time: time }));
           }
         }}
         label={'Time'}
       />
       <CustomLabelledInput
         id={'lat input'}
-        value={wp ? wp.latitude.toPrecision(4) : ''}
+        value={waypoint ? waypoint.latitude.toPrecision(5) : ''}
         defaultValue={'enter latitude'}
         placeholder={'Latitude'}
         onChange={(e, data) => {
-          console.log(wp);
-          if (wp) {
-            console.log(wp);
-            const newWaypoint = { ...wp };
-            console.log(data);
-            newWaypoint['latitude'] = parseFloat(data.value);
-            console.log(newWaypoint);
-            setWp(newWaypoint);
+          if (waypoint) {
+            const latitude = parseFloat(data.value);
+            dispatch(update({ id: waypoint.id, latitude: latitude }));
           }
         }}
         label={'Lat'}
@@ -281,14 +274,13 @@ const WaypointForm = ({
       />
       <CustomLabelledInput
         id={'lon input'}
-        value={wp ? wp.longitude.toPrecision(4) : ''}
-        defaultValue={'eneter longitude'}
+        value={waypoint ? waypoint.longitude.toPrecision(5) : ''}
+        defaultValue={'enter longitude'}
         placeholder={'Longitude'}
         onChange={(e, data) => {
-          if (wp) {
-            const newWaypoint = { ...wp };
-            newWaypoint['longitude'] = parseFloat(data.value);
-            setWp(newWaypoint);
+          if (waypoint) {
+            const longitude = parseFloat(data.value);
+            dispatch(update({ id: waypoint.id, longitude: longitude }));
           }
         }}
         label={'Lon'}
@@ -296,14 +288,13 @@ const WaypointForm = ({
       />
       <CustomLabelledInput
         id="vert input"
-        value={wp ? wp.verticalLevel : ''}
+        value={waypoint ? waypoint.verticalLevel : ''}
         defaultValue={'enter vertical'}
         placeholder={'Vertical'}
         onChange={(e, data) => {
-          if (wp) {
-            const newWaypoint = { ...wp };
-            newWaypoint['verticalLevel'] = data.value;
-            setWp(newWaypoint);
+          if (waypoint) {
+            const verticalLevel = data.value;
+            dispatch(update({ id: waypoint.id, verticalLevel: verticalLevel }));
           }
         }}
         label={'Vert'}
@@ -311,21 +302,11 @@ const WaypointForm = ({
       />
       <div style={buttonContainerStyle}>
         <Button
-          id="update"
-          style={buttonStyle}
-          onClick={() => {
-            if (wp) dispatch(update(wp));
-          }}
-          icon
-        >
-          <Icon name="pencil alternate" />
-        </Button>
-        <Button
           id="duplicate"
           style={buttonStyle}
           onClick={() => {
-            if (wp) {
-              const newWp = { ...wp };
+            if (waypoint) {
+              const newWp = { ...waypoint };
               const uid = 'id' + new Date().getTime();
               const name = newWp.name + ' duplicate';
               newWp.id = uid;

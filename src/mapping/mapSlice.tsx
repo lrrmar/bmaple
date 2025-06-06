@@ -61,8 +61,10 @@ export const mapSlice = createSlice({
     },
     updateDisplayTime: (state, displayTime: PayloadAction<number>) => {
       const iso = new Date(displayTime.payload).toISOString();
+      console.log(iso);
       const reducedIso = iso.substring(0, iso.length - 2);
-      state.displayTime = reducedIso;
+      console.log(reducedIso);
+      state.displayTime = iso;
     },
     updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
       state.verticalLevel = verticalLevel.payload;
