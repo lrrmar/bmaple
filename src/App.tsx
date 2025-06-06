@@ -10,16 +10,11 @@ import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
-import GlassTabletTheme from './mapping/GlassTabletTheme';
-import PlainTheme from './mapping/PlainTheme';
 import geojsonFieldReducer, {
   selectVerticalLevels,
   selectVerticalLevelUnits,
   updateVerticalLevel,
 } from './modules/force-geojson-field/geojsonFieldSlice';
-import GeojsonFieldSource from './modules/force-geojson-field/GeojsonFieldSource';
-import GeojsonFieldProfile from './modules/force-geojson-field/GeojsonFieldProfile';
-import LayerSelector from './modules/force-geojson-field/LayerSelector';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
 import WaypointsMenu from './modules/waypoints/WaypointsMenu';
@@ -27,14 +22,11 @@ import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
 import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
 import timeseriesReducer from './modules/timeseries/timeseriesSlice';
-import BokehPlot from './modules/timeseries/BokehPlot';
-import VisionToolkit from './modules/vision-toolkit/VisionToolkit';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
+import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
-import TempBaseMapMenu from './features/TempBaseMapMenu';
-import ContourColourBar from './modules/force-geojson-field/contourColourBar/ContourColourBar';
 import TimeScrollBar from './features/TimeScrollBar';
 import ScrollBar from './features/ScrollBar';
 import './App.css';
@@ -88,6 +80,9 @@ const App = () => {
         />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
+        <FoldOutItem id={'Info'} icon={'info'}>
+          <Info />
+        </FoldOutItem>
         <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
           <WaypointsMenu />
         </FoldOutItem>

@@ -60,6 +60,7 @@ const ScrollingScale = () => {
     }
     const times = dateArray.map((date) => date.getTime());
     dispatch(updateDisplayTimes({ source: 'timescroll', times: times }));
+    dispatch(updateDisplayTime(times[0]));
   }, []);
 
   useEffect(() => {
