@@ -8,6 +8,7 @@ import {
 import { SemanticICONS, Icon, Input, Label, Button } from 'semantic-ui-react';
 
 import {} from '../waypoints/waypointSlice';
+import { ARAWaypoints, ARAWaypoint } from './ara-waypoints';
 
 import DropDownList from '../../features/DropDownList';
 import {
@@ -340,6 +341,7 @@ const WaypointsMenu = () => {
   const cache = useSelector(selectCache);
   const [hovered, setHovered] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
+  const [araIds, setAraIds] = useState<string[] | null>(null);
   const [waypointComponents, setWaypointComponents] = useState<
     React.ReactNode[]
   >([]);
@@ -380,28 +382,72 @@ const WaypointsMenu = () => {
   return (
     <div style={{ ...style, maxHeight: '100%' }}>
       <div style={style}>{waypointComponents}</div>
-      <Button
-        id="duplicate"
+      <div
         style={{
-          alignSelf: 'end',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
         }}
-        onClick={() => {
-          const uid = 'id' + new Date().getTime();
-          const waypoint = {
-            id: uid,
-            name: 'blank',
-            source: 'waypoints',
-            latitude: 0,
-            longitude: 0,
-            verticalLevel: 0,
-            time: new Date().toISOString(),
-          };
-          dispatch(request(waypoint));
-        }}
-        icon
       >
-        <Icon name="plus" />
-      </Button>
+        <Button
+          id="duplicate"
+          style={{
+            alignSelf: 'end',
+          }}
+          onClick={() => {
+            const uid = 'id' + new Date().getTime();
+            const waypoint = {
+              id: uid,
+              name: 'blank',
+              source: 'waypoints',
+              latitude: 0,
+              longitude: 0,
+              verticalLevel: 0,
+              time: new Date().toISOString(),
+            };
+            dispatch(request(waypoint));
+          }}
+          icon
+        >
+          <Icon name="plus" />
+        </Button>
+        <Button
+          id="add-ARA"
+          style={{
+            alignSelf: 'end',
+          }}
+          onClick={() => {
+            // On inital render, load ARA waypoints from json file
+            // and request to cache
+            //
+            if (araIds) {
+              const toRemove = araIds.map((id) => {
+                return { id: id };
+              });
+              dispatch(remove(toRemove));
+              setAraIds(null);
+            } else {
+              const uids: string[] = [];
+              ARAWaypoints.forEach((waypoint) => {
+                const uid = 'id' + new Date().getTime();
+                dispatch(
+                  request({
+                    source: 'waypoints',
+                    id: uid,
+                    ...waypoint,
+                    time: null,
+                    verticalLevel: null,
+                  }),
+                );
+                uids.push(uid);
+                setAraIds(uids);
+              });
+            }
+          }}
+        >
+          {`${araIds ? 'hide' : 'show'} ARA`}
+        </Button>
+      </div>
     </div>
   );
 };

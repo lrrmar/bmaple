@@ -72,6 +72,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
   const mode = useSelector(selectMode);
+  const [araLoaded, setAraLoaded] = useState<boolean>(false);
   const [count, setCount] = useState<number>(0);
   const [clickEvents, setClickEvents] = useState([]);
 

@@ -9,10 +9,9 @@ const Info = () => {
         justifyContent: 'flexStart',
       }}
     >
-      <br></br>
-      A demo version of the flight planning tool that FORCE is developing for
-      use during research campaigns. Feedback and bug reports are welcomed and
-      encouraged, please send them to laurents.marker@ncas.ac.uk.
+      <br></br>A demo version of the flight planning tool that FORCE is
+      developing for use during research campaigns. Feedback and bug reports are
+      welcomed and encouraged, please send them to laurents.marker@ncas.ac.uk.
       <br></br>
       <h5>Time and Vertical Level</h5>
       The scroll bars at the bottom and right hand side of the map define the
@@ -23,8 +22,8 @@ const Info = () => {
       <p>
         Waypoints can be added by either clicking the map or by manually adding
         using the plus button in the waypoints menu. A waypoint can be edited by
-        opening it's sub menu and changing it's metadata. It can be
-        duplicated or deleted here too.
+        opening it's sub menu and changing it's metadata. It can be duplicated
+        or deleted here too.
       </p>
       <p>
         The visual styling of waypoint is sensitive to both the current time and
