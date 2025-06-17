@@ -7,7 +7,6 @@ import Geometry from 'ol/geom/Geometry';
 import { toLonLat, fromLonLat } from 'ol/proj';
 import { getUid } from 'ol/util';
 
-
 import {
   selectCenter,
   selectZoom,
@@ -86,7 +85,7 @@ const Map = ({ children }: Props) => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
     if (mouseIsDragging) {
-      console.log('dragging');
+      const doing = 'nothing';
     } else {
       handleClick(event);
     }

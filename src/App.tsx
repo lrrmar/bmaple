@@ -9,15 +9,18 @@ import Sources from './mapping/Sources';
 import BaseMaps from './mapping/BaseMaps';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import './App.css';
-
+import FloatingBox from './features/FloatingBox';
 import waypointReducer from './modules/waypoints/waypointSlice';
-import WaypointSource from './modules/waypoints/WaypointSource';
-import WaypointProfile from './modules/waypoints/WaypointProfile';
+import bgsWmsReducer from './modules/bgs-wms/bgsWmsSlice';
+import BGSWMSSource from './modules/bgs-wms/bgsWmsSource';
+import BGSWMSProfile from './modules/bgs-wms/bgsWmsProfile';
+import BGSWMSMenu from './modules/bgs-wms/bgsWmsMenu';
 
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
+    bgsWms: bgsWmsReducer,
     waypoint: waypointReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -36,14 +39,17 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          <WaypointProfile />
+          <BGSWMSProfile />
         </Profiles>
         <Sources>
-          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+          <BGSWMSSource sourceIdentifier={'BGSWMS'} />
         </Sources>
         <BaseMaps>
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
+        <FloatingBox>
+          <BGSWMSMenu />
+        </FloatingBox>
       </Map>
     </div>
   );
