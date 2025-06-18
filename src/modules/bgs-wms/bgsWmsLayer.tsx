@@ -11,6 +11,7 @@ import {
   isPending,
 } from '../../mapping/cacheSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
+import Style from 'ol/style/Style';
 
 // import OpenLayers types
 import Map from 'ol/Map';
