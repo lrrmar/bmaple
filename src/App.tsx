@@ -10,7 +10,6 @@ import BaseMaps from './mapping/BaseMaps';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import './App.css';
 import FloatingBox from './features/FloatingBox';
-import waypointReducer from './modules/waypoints/waypointSlice';
 import bgsWmsReducer from './modules/bgs-wms/bgsWmsSlice';
 import BGSWMSSource from './modules/bgs-wms/bgsWmsSource';
 import BGSWMSProfile from './modules/bgs-wms/bgsWmsProfile';
@@ -21,7 +20,6 @@ export const store = configureStore({
     map: mapReducer,
     cache: cacheReducer,
     bgsWms: bgsWmsReducer,
-    waypoint: waypointReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
