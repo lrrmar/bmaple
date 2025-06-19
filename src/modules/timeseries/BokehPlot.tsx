@@ -86,7 +86,6 @@ const BokehPlot = () => {
       target &&
       target.children.length < 1
     ) {
-      console.log('rend');
       Bokeh.embed.embed_item(bokehItem, 'bk-plot');
     }
   }, [bokehItem]);
