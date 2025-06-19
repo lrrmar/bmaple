@@ -31,7 +31,6 @@ import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
 import TimeScrollBar from './features/TimeScrollBar';
-import Tester from './features/Tester';
 import MetaDataMenu from './features/MetaDataMenu';
 //import ScrollBar from './features/ScrollBar';
 import './App.css';
