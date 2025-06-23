@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import mapReducer, {
-  selectVerticalLevelUnits,
   selectVerticalLevels,
   updateVerticalLevel,
 } from './mapping/mapSlice';
@@ -18,7 +17,7 @@ import Themes from './mapping/Themes';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
 import PlainTheme from './mapping/PlainTheme';
 import teamxReducer from './modules/teamx/teamxSlice';
-import TeamxSource from './modules/teamx/TeamxSource';
+import TEAMxSource from './modules/teamx/TEAMxSource';
 import TeamxProfile from './modules/teamx/TeamxProfile';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
@@ -32,7 +31,7 @@ import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MetaDataMenu from './features/MetaDataMenu';
-//import ScrollBar from './features/ScrollBar';
+import MultiUnitScrollBar from './features/MultiUnitScrollBar';
 import './App.css';
 
 // Configure the reducers that will be used in the app
@@ -65,12 +64,12 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          {/*<TeamxProfile />*/}
+          <TeamxProfile />
           {/*<TimeVerticalSensitiveWaypointsProfile />*/}
         </Profiles>
         <Sources>
-          {/*<TeamxSource cache={{}} sourceIdentifier={'teamx'} />
-          <WaypointsSource sourceIdentifier={'waypoints'} />
+          <TEAMxSource sourceIdentifier={'teamx'} />
+          {/*<WaypointsSource sourceIdentifier={'waypoints'} />
           <FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
         <BaseMaps>
@@ -86,14 +85,13 @@ const App = () => {
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
         <TimeScrollBar />
       </FloatingBox>
-      {/*<FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
-        <ScrollBar
+      <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
+        <MultiUnitScrollBar
           selectValues={selectVerticalLevels}
-          selectUnits={selectVerticalLevelUnits}
           updateValue={updateVerticalLevel}
           orientation={'vertical'}
         />
-      </FloatingBox>*/}
+      </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         {/*<FoldOutItem id={'Style'} icon={'paint brush'}>
           <TempBaseMapMenu id={'Style'} icon={'paint brush'} />

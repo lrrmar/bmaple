@@ -3,9 +3,10 @@ import type { RootState } from '../../App';
 import { useHashTables, HashTable } from './teamxHashTables';
 
 export interface DiscreteMetaData {
-  run: number;
-  region: number;
-  field: number;
+  run: string | null;
+  region: string | null;
+  field: string | null;
+  start_time: string | null;
 }
 
 interface InitialState {
@@ -23,7 +24,6 @@ interface InitialState {
 
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
-console.log(window);
 const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8383';
 
 const initialState: InitialState = {
@@ -39,9 +39,10 @@ const initialState: InitialState = {
   levels: [],
   levelUnits: '',
   discreteMetaData: {
-    run: 0,
-    region: 0,
-    field: 0,
+    run: null,
+    region: null,
+    field: null,
+    start_time: null,
   },
 };
 
@@ -104,7 +105,7 @@ export const {
 
 export const selectHashTables = createSelector(
   (state: RootState): RootState => state,
-  (): HashTable[] => useHashTables(),
+  () => useHashTables(),
 );
 export const selectSelectedId = (state: RootState) => state.teamx.selectedId;
 export const selectProfileId = (state: RootState) => state.teamx.profileId;

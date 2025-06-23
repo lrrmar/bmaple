@@ -16,7 +16,7 @@ import {
   updateDiscreteMetaData,
 } from '../modules/teamx/teamxSlice';
 
-type Header = 'run' | 'region' | 'field';
+type Header = 'run' | 'region' | 'field' | 'start_time';
 interface MetaData {
   headers: Header[];
   values: { [key in Header]: string[] };
@@ -52,37 +52,61 @@ const MetaDataMenu = () => {
 
   useEffect(() => {
     // Generate drop down for each heading
-
     if (metaData) {
       const headers = metaData.headers;
       const values = metaData.values;
       const tables = metaData.tables;
-      const selects = headers.map((header: Header, i) => {
+      const allSelectionsNull = !Object.values(selection).reduce(
+        (acc, curr) => {
+          return !!acc || !!curr;
+        },
+        false,
+      );
+      if (allSelectionsNull) {
+        //Get initial selection
+        const newSelection = {
+          region: values['region'][0],
+          field: values['field'][0],
+          run: values['run'][0],
+          start_time: values['start_time'][0],
+        };
+        dispatch(updateDiscreteMetaData(newSelection));
+        return;
+      }
+      const selects = headers.map((thisHeader: Header, i) => {
         // First find out which value we have valid hash tables
         // for by checking against the metadata tables for each
         // other header
-        const headerValues = values[header];
-        const headerTables = tables[header];
+        const thisHeaderValues = values[thisHeader];
+        const thisHeaderTables = tables[thisHeader];
         const otherHeaders = [...headers];
         otherHeaders.splice(i, 1);
 
-        // Assum true i.e. 1 -> there exists a hash table that contains each of
+        // Assume true i.e. 1 -> there exists a hash table that contains each of
         // those values for each header
-        let hashAvailableBools: number[] = new Array(headerValues.length).fill(
-          1,
-        );
+        let hashAvailableBools: number[] = new Array(
+          thisHeaderValues.length,
+        ).fill(1);
         otherHeaders.forEach((otherHeader) => {
           // Other headers current selection
-          const otherSelection: number = selection[otherHeader];
-          const array = headerTables[otherHeader].map(
-            (row) => row[otherSelection],
-          );
-          hashAvailableBools = hashAvailableBools.map(
-            (val, i) => val & array[i],
-          );
+          const otherHeaderSelection = selection[otherHeader];
+          if (typeof otherHeaderSelection === 'string') {
+            const otherSelection: number =
+              values[otherHeader].indexOf(otherHeaderSelection);
+            // Get boolean array for header + otherHeader, i.e.
+            // check to see what matches in dicsrete metadata we have
+
+            const array = thisHeaderTables[otherHeader].map(
+              (row) => row[otherSelection],
+            );
+            hashAvailableBools = hashAvailableBools.map(
+              (val, i) => val & array[i],
+            );
+          } else {
+            hashAvailableBools = new Array(thisHeaderValues.length).fill(0);
+          }
         });
-        console.log(header, hashAvailableBools);
-        const menuItems = headerValues.map((val, i) => {
+        const menuItems = thisHeaderValues.map((val, i) => {
           const sx = {
             color: hashAvailableBools[i] ? '#000000' : '#888888',
           };
@@ -92,22 +116,22 @@ const MetaDataMenu = () => {
             </MenuItem>
           );
         });
-        console.log(selection);
         const select = (
           <div>
-            <InputLabel id={`${header} label`}>{header}</InputLabel>
+            <InputLabel id={`${thisHeader} label`}>{thisHeader}</InputLabel>
             <Select
-              labelId={header}
-              value={selection[header]}
+              labelId={thisHeader}
+              value={selection[thisHeader]}
               onChange={(e) => {
                 if (typeof e.target.value === 'number') {
-                  const newSelection = { ...selection };
-                  newSelection[header] = e.target.value;
-                  console.log(newSelection);
+                  const newSelection: DiscreteMetaData = {
+                    ...selection,
+                  };
+                  newSelection[thisHeader] = thisHeaderValues[e.target.value];
                   dispatch(updateDiscreteMetaData(newSelection));
                 }
               }}
-              input={<OutlinedInput />}
+              input={<OutlinedInput value={selection[thisHeader]} />}
             >
               {menuItems}
             </Select>

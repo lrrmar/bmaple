@@ -26,7 +26,6 @@ const Graphics = () => {
   const profileId = useSelector(selectProfileId);
   const opacity = useSelector(selectOpacity);
   const cache = useSelector(selectCacheEntries);
-  const outlineContours = useSelector(selectOutlineContours);
   const [currentLayer, setCurrentLayer] =
     useState<ImageLayer<ImageSource> | null>(null);
   const [oldLayer, setOldLayer] = useState<ImageLayer<ImageSource> | null>(
@@ -50,6 +49,8 @@ const Graphics = () => {
     if (cacheEntry)
       teamxCacheEntry = isTeamxEntry(cacheEntry) ? cacheEntry : undefined;
 
+    console.log(teamxCacheEntry);
+
     // Get new layer from open layers
     if (teamxCacheEntry)
       newLayer = mapUtils.getLayerByUid(teamxCacheEntry.ol_uid);
@@ -64,16 +65,17 @@ const Graphics = () => {
     }
     if (!teamxCacheEntry) return;
     setCurrentLayer(newLayer);
-  }, [profileId]);
+  }, [profileId, cache]);
 
   // Exchange layer visibility ASAP, dependant on styling bool
   useEffect(() => {
+    console.log(currentLayer);
     if (isStyling) return;
     if (oldLayer) {
-      oldLayer.setVisible(false);
+      oldLayer.setOpacity(0.0);
       setOldLayer(null);
     }
-    if (currentLayer) currentLayer.setVisible(true);
+    if (currentLayer) currentLayer.setOpacity(1.0);
   }, [currentLayer]);
 
   // Handle layer colouring change
