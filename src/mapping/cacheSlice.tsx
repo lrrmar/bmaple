@@ -19,22 +19,20 @@ export interface Pending {
 
 export interface Entry extends Pending {
   ol_uid: string;
-  id: string;
 }
 
-export type CacheElement =
-  | (Pending & Partial<Generic>)
-  | (Entry & Partial<Generic>);
+export type CacheElement = Action &
+  ((Pending & Partial<Generic>) | (Entry & Partial<Generic>));
 
 export interface Cache {
   [key: string]: CacheElement;
 }
 
-interface InitialState {
+export interface InitialState {
   [key: string]: CacheElement;
 }
 
-interface Action {
+export interface Action {
   id: string;
 }
 
@@ -96,7 +94,7 @@ export const cacheSlice = createSlice({
         const id: string = update.id;
         if (!isEntry(cache[id])) return;
         const updates: Generic = update;
-        delete updates.id;
+        //delete updates.id;
         cache[id] = { ...cache[id], ...updates };
       });
       state = cache;
@@ -115,6 +113,43 @@ export const cacheSlice = createSlice({
     },
   },
 });
+
+/// Utilities
+
+export const cacheSortByTime = (cache: Cache, ids: string[]): string[] => {
+  const sortableIds: string[] = [];
+  ids.forEach((id) => {
+    const entry = cache[id];
+    if (entry && entry.time) sortableIds.push(id);
+  });
+
+  const sortedIds = sortableIds.sort((a: string, b: string): -1 | 0 | 1 => {
+    // this sort function takes two waypoint IDs, gets their
+    // respective 'time' properties via the cache
+    // and orders them chronologically
+    const cacheEntryA: CacheElement = cache[a];
+    const cacheEntryB: CacheElement = cache[b];
+    if (
+      cacheEntryA.time &&
+      cacheEntryB.time &&
+      typeof cacheEntryA.time == 'string' &&
+      typeof cacheEntryB.time == 'string'
+    ) {
+      const aTime = new Date(cacheEntryA.time);
+      const bTime = new Date(cacheEntryB.time);
+      if (aTime < bTime) {
+        return -1;
+      }
+      if (aTime > bTime) {
+        return 1;
+      }
+    }
+    return 0;
+  });
+  return sortedIds;
+};
+
+///
 
 export const { request, ingest, update, remove } = cacheSlice.actions;
 export const selectCache = (state: RootState) => state.cache;
@@ -136,15 +171,4 @@ export const selectCachePending = (state: RootState) => {
   });
   return pending;
 };
-export const filteredCache =
-  <T,>(isType: (el: any) => el is T) =>
-  (state: RootState) => {
-    const cache: Cache = state.cache;
-    const filtered: { [key: string]: T } = {};
-    Object.keys(cache).forEach((key: string) => {
-      const element: CacheElement = cache[key];
-      if (isType(element)) filtered[key] = element;
-    });
-    return filtered;
-  };
 export default cacheSlice.reducer;

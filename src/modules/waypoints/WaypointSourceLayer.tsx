@@ -22,8 +22,9 @@ import {
   isPending,
   Entry,
   isEntry,
+  Action,
+  Generic,
   CacheElement,
-  filteredCache,
 } from '../../mapping/cacheSlice';
 
 import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
@@ -35,16 +36,32 @@ export interface Waypoint extends Pending {
   latitude: number;
   time: string;
   verticalLevel: string;
+  name: string;
+  id: string;
   dataSource?: string;
   dataType?: string;
   dataValue?: string;
   dataVariable?: string;
   dataUnit?: string;
 }
-
-export const isWaypoint = (element: any): element is Waypoint => {
+export interface EntryWaypoint extends Waypoint {
+  id: string;
+}
+export const isPendingWaypoint = (element: any): element is Waypoint => {
   const keys: string[] = Object.keys(element);
   return (
+    isPending(element) &&
+    keys.includes('latitude') &&
+    keys.includes('longitude') &&
+    keys.includes('time') &&
+    keys.includes('verticalLevel')
+  );
+};
+
+export const isEntryWaypoint = (element: any): element is Waypoint => {
+  const keys: string[] = Object.keys(element);
+  return (
+    isEntry(element) &&
     keys.includes('latitude') &&
     keys.includes('longitude') &&
     keys.includes('time') &&
@@ -59,61 +76,129 @@ interface Props {
 
 const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
-  const waypoints = useSelector(filteredCache(isWaypoint));
+  const cache = useSelector(selectCache);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
-  const [layerData, setLayerData] = useState<Waypoint | null>();
-  const [coordinates, setCoordinates] = useState<LongitudeLatitude | null>();
+  const [layerData, setLayerData] = useState<CacheElement | null>();
+  const [coordinates, setCoordinates] = useState<LongitudeLatitude | null>(
+    null,
+  );
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
 
-  useEffect(() => {
-    if (layerData) return;
-    setLayerData(waypoints[id]);
-  }, [waypoints]);
+  async function apiCall(
+    lat: number,
+    lon: number,
+  ): Promise<string | undefined> {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'YourAppName/1.0 (your@email.com)',
+        },
+      });
+      const data = await response.json();
+      if (data.address) {
+        // Prioritize known settlement types
+        return (
+          data.address.city ||
+          data.address.town ||
+          data.address.village ||
+          data.address.hamlet ||
+          data.address.county
+        );
+      }
+      return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+    } catch (error) {
+      return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+    }
+  }
+
+  async function getClosestSettlementAndIngest(
+    waypoint: Waypoint & Ingest,
+  ): Promise<void> {
+    const name = waypoint.name;
+    if (name && !(name === '')) {
+      // Name already defined
+      dispatch(ingest(waypoint));
+      return;
+    }
+    await apiCall(waypoint.latitude, waypoint.longitude).then((settlement) => {
+      if (settlement) {
+        waypoint.name = settlement;
+      } else {
+        waypoint.name = `${waypoint.latitude.toFixed(2)},${waypoint.longitude.toFixed(2)}`;
+      }
+      dispatch(ingest(waypoint));
+    });
+  }
 
   useEffect(() => {
+    setLayerData(cache[id]);
+  }, [cache]);
+
+  useEffect(() => {
+    // Assess what to do with incoming layer data
     if (!layerData) return;
+
+    // Wrong source
     if (layerData['source'] !== sourceIdentifier) {
       return;
     }
-    if (isEntry(layerData)) return;
-    setCoordinates({
-      longitude: layerData.longitude,
-      latitude: layerData.latitude,
-    });
+    // check for updates
+    if (isEntryWaypoint(layerData) && coordinates) {
+      const newLatitude = layerData.latitude;
+      const newLongitude = layerData.longitude;
+      if (
+        newLatitude !== coordinates.latitude ||
+        newLongitude !== coordinates.longitude
+      ) {
+        setCoordinates({
+          longitude: layerData.longitude,
+          latitude: layerData.latitude,
+        });
+      }
+    }
+
+    if (isPendingWaypoint(layerData)) {
+      setCoordinates({
+        longitude: layerData.longitude,
+        latitude: layerData.latitude,
+      });
+    }
   }, [layerData]);
 
   useEffect(() => {
-    // Return if map, layerData or coords not available return
-    if (!map) return;
+    if (!map) {
+      return;
+    }
     if (!layerData) return;
-    if (!coordinates) return;
-
-    // Generate an Openlayers Point geometry for coordinates
+    if (!coordinates) {
+      return;
+    }
     const point = new Point(
       fromLonLat([coordinates.longitude, coordinates.latitude]),
     );
-
-    // Generate OpenLayers Feature for Point
     const feature = new Feature({
       geometry: point,
     });
-
-    // Generate OpenLayers VectorSource
+    // Create a vector source and layer to hold the features
     const vectorSource = new VectorSource({
       features: [feature],
     });
 
-    // Generate OpenLayers VectorLayers
     const vectorLayer = new VectorLayer({
       source: vectorSource,
       zIndex: 30,
       visible: false,
     });
 
-    // Add layer to map
     map.addLayer(vectorLayer);
-    dispatch(ingest({ ...layerData, id: id, ol_uid: getUid(vectorLayer) }));
+    const waypoint: Generic & Entry & Action = {
+      ...layerData,
+      id: id,
+      ol_uid: getUid(vectorLayer),
+    };
+    if (isEntryWaypoint(waypoint)) getClosestSettlementAndIngest(waypoint);
     return () => {
       map.removeLayer(vectorLayer);
     };

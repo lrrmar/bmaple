@@ -37,13 +37,13 @@ const TeamxLayer = ({ id, sourceIdentifier }: Props) => {
       return;
     }
 
-      /*if (hasFetched.current) {
+    /*if (hasFetched.current) {
       dispatch(updateProfileId(id));
       return;
     }*/
     const source = new Static({
       url: `${apiUrl}?id=${id}`,
-      imageExtent: [15.0, 35.0, 35.0, 45.6],
+      imageExtent: [3.8, 40.49, 18.5, 48.69],
       projection: 'EPSG:4326',
     });
 
@@ -58,7 +58,6 @@ const TeamxLayer = ({ id, sourceIdentifier }: Props) => {
     const add = map.addLayer(layer);
 
     map.once('postrender', (event) => {
-      console.log('post render');
       // Once rendered, push properties to cache
       const ol_uid: string | null = getUid(layer);
       // Big error... how can we handle?

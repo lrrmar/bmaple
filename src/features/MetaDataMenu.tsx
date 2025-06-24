@@ -118,10 +118,13 @@ const MetaDataMenu = () => {
         });
         const select = (
           <div>
-            <InputLabel id={`${thisHeader} label`}>{thisHeader}</InputLabel>
+            <InputLabel id={`${thisHeader} label`} style={{ color: 'white' }}>
+              {thisHeader}
+            </InputLabel>
             <Select
               labelId={thisHeader}
               value={selection[thisHeader]}
+              style={{ color: 'white' }}
               onChange={(e) => {
                 if (typeof e.target.value === 'number') {
                   const newSelection: DiscreteMetaData = {

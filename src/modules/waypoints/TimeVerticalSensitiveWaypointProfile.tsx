@@ -20,12 +20,14 @@ import {
 
 import { selectDisplayTime } from '../../mapping/mapSlice';
 import { selectVerticalLevel } from '../force-geojson-field/geojsonFieldSlice';
+import { selectHighlightedWaypoints } from './waypointSlice';
 
 interface Waypoint extends Entry {
   longitude: string;
   latitude: string;
   time: string;
   verticalLevel: string;
+  id: string;
   dataSource?: string;
   dataType?: string;
   dataValue?: string;
@@ -47,10 +49,10 @@ export const isWaypoint = (element: any): element is Waypoint => {
 interface OpenLayerPointProps {
   waypointData: Waypoint;
 }
-const circleStyle = (fill: string, stroke: string): Style => {
+const circleStyle = (fill: string, stroke: string, radius: number): Style => {
   const st = new Style({
     image: new Circle({
-      radius: 6,
+      radius: radius,
       fill: new Fill({
         color: fill,
       }),
@@ -67,38 +69,52 @@ const tearDropStyle = (
   fill: string,
   stroke: string,
   rotation: number,
+  radius: number,
 ): Style[] => {
   const triangle: Style = new Style({
     image: new RegularShape({
       points: 3, // Triangle
-      radius: 3.5,
+      radius: radius / 2,
       rotation: rotation, // Flip the triangle downwards
-      displacement: [0, 7.8], // Adjust position so it sits on top of the circle
+      displacement: [0, radius * 1.3], // Adjust position so it sits on top of the circle
       fill: new Fill({ color: stroke }),
       stroke: new Stroke({ color: stroke, width: 0 }),
     }),
   });
   // Second shape: Circle
-  const circle: Style = circleStyle(fill, stroke);
+  const circle: Style = circleStyle(fill, stroke, radius);
   return [circle, triangle];
 };
 const OpenLayerPoint = ({ waypointData }: OpenLayerPointProps) => {
   const map = OpenLayersMap.map;
   const mapUtils = new OpenLayersMap();
-  const strokeColour = '#111111';
-  const pastFillColour = strokeColour;
+  const unhighlightedStrokeColour = '#111111';
+  const highlightedStrokeColour = '#ffffff';
+  const unhighlightedRadius = 6;
+  const highlightedRadius = 9;
   const nowFillColour = '#1976d2';
-  const futureFillColour = '#ffffff00';
+  const futureFillColour = '#ffffff';
   const waypointTime = new Date(waypointData.time);
   const waypointLevel = waypointData.verticalLevel
     ? waypointData.verticalLevel
     : 0;
   const displayTime = new Date(useSelector(selectDisplayTime));
   const verticalLevel = useSelector(selectVerticalLevel);
+  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
   const displayLevel = verticalLevel ? verticalLevel : 0;
   //const displayLevel: number = verticalLevel ? new Number(verticalLevel.replace(/[^a-zA-Z]/g, '')) : 0 ;
 
+  // Find radius (previously stroke colour) depending on highlighting
+  const strokeColour = unhighlightedStrokeColour;
+  let radius: number;
+  if (highlightedWaypoints.includes(waypointData.id)) {
+    radius = highlightedRadius;
+  } else {
+    radius = unhighlightedRadius;
+  }
   // Find colours depending on time placement of waypoint
+
+  const pastFillColour = strokeColour;
   let fillColour: string;
   if (waypointTime.getTime() == displayTime.getTime()) {
     fillColour = nowFillColour;
@@ -109,10 +125,10 @@ const OpenLayerPoint = ({ waypointData }: OpenLayerPointProps) => {
   // Find shape depending on vertical placement of waypoint
   let pointStyle: Style | Style[];
   if (waypointLevel == displayLevel) {
-    pointStyle = circleStyle(fillColour, strokeColour);
+    pointStyle = circleStyle(fillColour, strokeColour, radius);
   } else {
     const rotation = waypointLevel < displayLevel ? 0 : Math.PI;
-    pointStyle = tearDropStyle(fillColour, strokeColour, rotation);
+    pointStyle = tearDropStyle(fillColour, strokeColour, rotation, radius);
   }
   let olLayer: VectorLayer<Feature> | undefined;
   if (waypointData.ol_uid)

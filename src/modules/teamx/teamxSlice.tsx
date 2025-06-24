@@ -30,7 +30,7 @@ const initialState: InitialState = {
   selectedId: null,
   profileId: null,
   hashesFlag: 0,
-  opacity: 0.8,
+  opacity: 0.6,
   apiUrl: apiUrl,
   //  field: '',
   startTime: '',

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { configureStore, PayloadAction } from '@reduxjs/toolkit';
+import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 
 import mapReducer, {
   selectVerticalLevels,
@@ -21,11 +21,11 @@ import TEAMxSource from './modules/teamx/TEAMxSource';
 import TeamxProfile from './modules/teamx/TeamxProfile';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
-//import WaypointsSource from './modules/waypoints/WaypointSource';
-//import WaypointsMenu from './modules/waypoints/WaypointsMenu';
+import WaypointsSource from './modules/waypoints/WaypointSource';
+import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 //import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
-//import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
+import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
@@ -65,12 +65,12 @@ const App = () => {
       <Map>
         <Profiles>
           <TeamxProfile />
-          {/*<TimeVerticalSensitiveWaypointsProfile />*/}
+          <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
           <TEAMxSource sourceIdentifier={'teamx'} />
-          {/*<WaypointsSource sourceIdentifier={'waypoints'} />
-          <FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
+          <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
+          {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
@@ -95,14 +95,14 @@ const App = () => {
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         {/*<FoldOutItem id={'Style'} icon={'paint brush'}>
           <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
-        </FoldOutItem>
-        <FoldOutItem id={'Flight'} icon={'paper plane outline'}>
+        </FoldOutItem>*/}
+        {/*<FoldOutItem id={'Flight'} icon={'paper plane outline'}>
           <FlightTrackMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'Waypoints'} icon={'map pin'}>
+        </FoldOutItem>*/}
+        {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
           <WaypointsMenu />
         </FoldOutItem>*/}
-        <FoldOutItem id={'Style'} icon={'paint brush'}>
+        <FoldOutItem id={'Style'} icon={'data'}>
           <MetaDataMenu />
         </FoldOutItem>
       </FoldOutMenu>
@@ -119,4 +119,10 @@ export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore['getState']>;
 export type AppDispatch = AppStore['dispatch'];
 export type Selector<T> = (state: RootState) => T;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  PayloadAction<string>
+>;
 export type Action<T> = (payload: T) => PayloadAction<T>;

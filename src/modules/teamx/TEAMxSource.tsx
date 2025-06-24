@@ -126,8 +126,22 @@ const TEAMxSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       ];
       const levels = [...new Set(currentHashes.map((hash) => hash.level))];
       if (timeStrings && levels) {
-        const allLevels = ['none', 'r', 'surf', '1.5m', '300hPa', '500hPa', '600hPa', '700hPa', '850hPa', '950hPa', 'TOA' ]
-        const orderedLevels = allLevels.filter((level) => levels.includes(level));
+        const allLevels = [
+          'none',
+          'r',
+          'surf',
+          '1.5m',
+          '950hPa',
+          '850hPa',
+          '700hPa',
+          '600hPa',
+          '500hPa',
+          '300hPa',
+          'TOA',
+        ];
+        const orderedLevels = allLevels.filter((level) =>
+          levels.includes(level),
+        );
         const times = timeStrings
           .map((timeString) => new Date(timeString).getTime())
           .sort();
@@ -221,7 +235,7 @@ const TEAMxSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         dispatch(updateProfileId(null));
       }
     }
-  }, [discreteMetaData, displayTime, verticalLevel, cache]);
+  }, [discreteMetaData, displayTime, verticalLevel, currentHashes, cache]);
 
   useEffect(() => {
     const filteredCacheIds = Object.keys(cache).filter((id) => {

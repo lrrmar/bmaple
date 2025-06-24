@@ -54,6 +54,7 @@ const ScrollingScale = () => {
   }, [displayTimes]);
 
   useEffect(() => {
+    if (displayTimes) return;
     // Find increment based on different between lower and upper
     // lims of scroll bar
 
@@ -124,6 +125,35 @@ const ScrollingScale = () => {
     }
   }, [lowerLim, upperLim]);
 
+  useEffect(() => {
+    const times = displayTimes['teamx'];
+    if (times) {
+      setLowerLim(Math.min(...times));
+      setUpperLim(Math.max(...times));
+      const newMarks = times.map((timeInt) => {
+        const dt = new Date(timeInt);
+        const hour = dt.getHours();
+        const minute = dt.getMinutes();
+        const day = dt.getDate();
+        const month = dt.getMonth() + 1;
+
+        const zf = (num: number) => {
+          // zero formatter
+          return num < 10 ? `0${num}` : `${num}`;
+        };
+        const label =
+          hour === 0
+            ? `${zf(month)}-${zf(day)}\n${zf(hour)}:${zf(minute)}`
+            : `${zf(hour)}:${zf(minute)}`;
+        return {
+          value: timeInt,
+          label: label,
+        };
+      });
+      setMarks(newMarks);
+    }
+  }, [displayTimes]);
+
   if (Object.keys(displayTimes).length === 0) {
     return <div></div>;
   }
@@ -158,7 +188,7 @@ const ScrollingScale = () => {
             //borderRadius: '50%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#f1f1f1', // Change label color
+            color: '#000000', // Change label color
           },
         }}
       />
