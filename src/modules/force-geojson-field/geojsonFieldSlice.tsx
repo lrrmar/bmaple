@@ -41,8 +41,10 @@ const initialState: InitialState = {
   startTime: '',
   domain: '',
   verticalLevel: null,
-  verticalLevels: [],
-  verticalLevelUnits: '',
+  verticalLevels: [
+    0, 1000, 2000, 3000, 4000, 5000, 10000, 15000, 20000, 25000, 30000, 35000,
+  ],
+  verticalLevelUnits: 'ft',
 };
 
 export const geojsonFieldSlice = createSlice({
@@ -150,10 +152,8 @@ export const selectStartTime = (state: RootState) =>
 export const selectDomain = (state: RootState) => state.geojsonField.domain;
 export const selectVerticalLevel = (state: RootState) =>
   state.geojsonField.verticalLevel;
-export const selectVerticalLevels = (state: RootState) => [
-  925, 900, 850, 800, 750, 700, 600, 500, 400,
-];
-//state.geojsonField.verticalLevels;
+export const selectVerticalLevels = (state: RootState) =>
+  state.geojsonField.verticalLevels;
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.geojsonField.verticalLevelUnits;
 export default geojsonFieldSlice.reducer;

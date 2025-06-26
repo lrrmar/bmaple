@@ -22,15 +22,16 @@ const Info = () => {
       <p>
         Waypoints can be added by either clicking the map or by manually adding
         using the plus button in the waypoints menu. A waypoint can be edited by
-        opening it's sub menu and changing it's metadata. It can be duplicated
-        or deleted here too.
+        opening it&apos;s sub menu and changing it&apos;s metadata. It can be
+        duplicated or deleted here too.
       </p>
       <p>
         The visual styling of waypoint is sensitive to both the current time and
         vertical level of the map. They will be black, blue or white if they are
         prior to, contemporary with or following the current time. An arrow will
-        appear above or below the waypoint if it's vertical level with respect
-        to the ground is higher or lower than the current vertical level.
+        appear above or below the waypoint if it&apos;s vertical level with
+        respect to the ground is higher or lower than the current vertical
+        level.
       </p>
       <br></br>
       <h5>Trajectories</h5>
@@ -39,8 +40,8 @@ const Info = () => {
         trajectory sub menu, the name of the trajectory can be edited, waypoints
         can be added and removed and a list of waypoints currently associated
         with the trajectory is displayed. As with waypoints, a trajectory can be
-        duplicated or deleted. In addition, a .json file for a trajectory can be
-        downloaded.
+        duplicated or deleted. In addition, .csv files can be downloaded for the
+        waypoints and trajectory.
       </p>
     </div>
   );

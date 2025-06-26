@@ -37,7 +37,7 @@ const ScrollingScale = <T, U>({
 
   useEffect(() => {
     const newMarks: Mark[] = values.map((val) => {
-      return { value: val, label: `${val} hPa` }; //`${val}${units}` <- swap back to this eventually
+      return { value: val, label: `${val} ${units}` }; //`${val}${units}` <- swap back to this eventually
     });
     setMarks(newMarks);
   }, [values, units]);

@@ -107,9 +107,9 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
           data.address.county
         );
       }
-      return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+      return 'Above Sea'; //`${lat.toFixed(2)},${lon.toFixed(2)}`;
     } catch (error) {
-      return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+      return 'Above Sea'; //`${lat.toFixed(2)},${lon.toFixed(2)}`;
     }
   }
 
@@ -126,7 +126,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
       if (settlement) {
         waypoint.name = settlement;
       } else {
-        waypoint.name = `${waypoint.latitude.toFixed(2)},${waypoint.longitude.toFixed(2)}`;
+        waypoint.name = 'Above Sea'; //`${waypoint.latitude.toFixed(2)},${waypoint.longitude.toFixed(2)}`;
       }
       dispatch(ingest(waypoint));
     });

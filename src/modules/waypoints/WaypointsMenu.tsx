@@ -30,6 +30,8 @@ import {
   selectHighlightedWaypoints,
 } from './waypointSlice';
 
+import { selectVerticalLevelUnits } from '../force-geojson-field/geojsonFieldSlice';
+
 export const CustomLabelledInput = ({
   id,
   value,
@@ -190,6 +192,7 @@ const WaypointForm = ({
 
   const buttonStyle: React.CSSProperties = {};
   const dispatch = useDispatch();
+  const verticalLevelUnits = useSelector(selectVerticalLevelUnits);
   const [wp, setWp] = useState<(Waypoint & CacheElement) | null>(waypoint);
 
   return (
@@ -299,7 +302,7 @@ const WaypointForm = ({
           }
         }}
         label={'Vert'}
-        unit={'hPa'}
+        unit={verticalLevelUnits}
       />
       <div style={buttonContainerStyle}>
         <Button
@@ -411,7 +414,7 @@ const WaypointsMenu = () => {
         >
           <Icon name="plus" />
         </Button>
-        <Button
+        {/*<Button
           id="add-ARA"
           style={{
             alignSelf: 'end',
@@ -446,7 +449,7 @@ const WaypointsMenu = () => {
           }}
         >
           {`${araIds ? 'hide' : 'show'} ARA`}
-        </Button>
+        </Button>*/}
       </div>
     </div>
   );

@@ -4,6 +4,9 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 
+// OpenLayers helper for conversion from Lat Long to HDMS
+import { toStringHDMS } from 'ol/coordinate';
+
 import {
   SemanticICONS,
   Icon,
@@ -37,6 +40,17 @@ import {
 } from './trajectoriesSlice';
 
 import { updateHighlightedWaypoints } from '../waypoints/waypointSlice';
+
+interface WaypointJson {
+  name: string;
+  latitude: number;
+  longitude: number;
+  hdms: string;
+  verticalLevel: string | number;
+  duration: string;
+  total: string;
+  notes: string;
+}
 
 const WaypointList = ({
   trajectoryId,
@@ -177,8 +191,10 @@ const ButtonBar = ({
   const dispatch = useDispatch();
   // Temp, for download
   const cache = useSelector(selectCache);
-  const trajectoryWaypoints = trajectory.waypoints.map((id) => {
-    return cache[id];
+  const trajectoryWaypoints: Waypoint[] = [];
+  trajectory.waypoints.forEach((id) => {
+    const cacheElement = cache[id];
+    if (isEntryWaypoint(cacheElement)) trajectoryWaypoints.push(cacheElement);
   });
   const buttonContainerStyle: React.CSSProperties = {
     display: 'flex',
@@ -221,7 +237,72 @@ const ButtonBar = ({
       <Button
         id="download"
         onClick={() => {
-          const waypointsForJson = trajectoryWaypoints.map((waypoint) => {
+          const waypointsJson: WaypointJson[] = [];
+          const initTime = trajectoryWaypoints[0].time;
+          trajectoryWaypoints.forEach((waypoint, i) => {
+            let notes = `Land at ${waypoint.name}`;
+            let sinceStartMs =
+              new Date(waypoint.time).getTime() - new Date(initTime).getTime();
+            let durationMs = 0;
+            if (i < trajectoryWaypoints.length - 1) {
+              durationMs =
+                new Date(trajectoryWaypoints[i + 1].time).getTime() -
+                new Date(waypoint.time).getTime();
+              notes = `${waypoint.name} to ${trajectoryWaypoints[i + 1].name}`;
+            }
+            sinceStartMs += durationMs;
+            const sinceStartMins = sinceStartMs / (1000 * 60);
+            console.log(sinceStartMins);
+            const totalMinsInt = sinceStartMins % 60;
+            const totalMins =
+              totalMinsInt > 9 ? totalMinsInt.toString() : `0${totalMinsInt}`;
+            const totalHours = (sinceStartMins - totalMinsInt) / 60;
+            const json = {
+              name: waypoint.name,
+              latitude: waypoint.latitude,
+              longitude: waypoint.longitude,
+              hdms: toStringHDMS([waypoint.longitude, waypoint.latitude]),
+              verticalLevel: waypoint.verticalLevel,
+              duration: (durationMs / (1000 * 60)).toString(),
+              total: `${totalHours}:${totalMins}`,
+              notes: notes,
+            };
+            waypointsJson.push(json);
+          });
+
+          let waypointCsv = 'name, coordinate (d° m′ s″ H)\n';
+          let trajectoryCsv = 'No.,Notes,Time (mins),Time so far (h:mm)\n';
+          waypointsJson.forEach((waypoint, i) => {
+            waypointCsv = waypointCsv.concat(
+              `${waypoint.name},${waypoint.hdms}\n`,
+            );
+            trajectoryCsv = trajectoryCsv.concat(
+              `#${i},${waypoint.notes},${waypoint.duration},${waypoint.total}\n`,
+            );
+          });
+
+          const fileNames = ['waypoints', 'trajectory'];
+          [waypointCsv, trajectoryCsv].forEach((csv, i) => {
+            const blob = new Blob([csv], {
+              type: 'plain/text',
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${trajectory.name}-${fileNames[i]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          });
+        }}
+        icon
+      >
+        {'.csv'}
+        <Icon name="download" />
+      </Button>
+      {/*<Button
+        id="download"
+        onClick={() => {
+          const waypointsJson = trajectoryWaypoints.map((waypoint) => {
             return {
               name: waypoint.name,
               latitude: waypoint.latitude,
@@ -231,10 +312,10 @@ const ButtonBar = ({
               time: waypoint.time,
             };
           });
-          console.log(waypointsForJson);
+          console.log(waypointsJson);
           const trajectoryForJson = {
             name: trajectory.name,
-            waypoints: waypointsForJson,
+            waypoints: waypointsJson,
           };
           const blob = new Blob([JSON.stringify(trajectoryForJson)], {
             type: 'application/json',
@@ -248,8 +329,9 @@ const ButtonBar = ({
         }}
         icon
       >
+        {'.json'}
         <Icon name="download" />
-      </Button>
+      </Button>*/}
     </div>
   );
 };
