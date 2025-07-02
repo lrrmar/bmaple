@@ -49,7 +49,6 @@ const Graphics = () => {
     if (cacheEntry)
       teamxCacheEntry = isTeamxEntry(cacheEntry) ? cacheEntry : undefined;
 
-    console.log(teamxCacheEntry);
 
     // Get new layer from open layers
     if (teamxCacheEntry)
@@ -69,7 +68,6 @@ const Graphics = () => {
 
   // Exchange layer visibility ASAP, dependant on styling bool
   useEffect(() => {
-    console.log(currentLayer);
     if (isStyling) return;
     if (oldLayer) {
       oldLayer.setOpacity(0.0);

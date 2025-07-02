@@ -19,10 +19,10 @@ import PlainTheme from './mapping/PlainTheme';
 import teamxReducer from './modules/teamx/teamxSlice';
 import TEAMxSource from './modules/teamx/TEAMxSource';
 import TeamxProfile from './modules/teamx/TeamxProfile';
+import TEAMxMenu from './modules/teamx/TEAMxMenu';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
-import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 //import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
@@ -102,8 +102,11 @@ const App = () => {
         {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
           <WaypointsMenu />
         </FoldOutItem>*/}
-        <FoldOutItem id={'Style'} icon={'data'}>
+        <FoldOutItem id={'image outline'} icon={'data'}>
           <MetaDataMenu />
+        </FoldOutItem>
+        <FoldOutItem id={'style'} icon={'paint brush'}>
+          <TEAMxMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>
