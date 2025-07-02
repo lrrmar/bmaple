@@ -9,6 +9,7 @@ import { SemanticICONS, Icon, Input, Label, Button } from 'semantic-ui-react';
 
 import {} from '../waypoints/waypointSlice';
 import { ARAWaypoints, ARAWaypoint } from './ara-waypoints';
+import { v4 as uuidv4 } from 'uuid';
 
 import DropDownList from '../../features/DropDownList';
 import {
@@ -164,7 +165,6 @@ const WaypointForm = ({
   waypoint: Waypoint & CacheElement;
   setOpen: Dispatch<SetStateAction<string | null>>;
 }) => {
-  console.log('form rerender');
   const inputLabelContainerStyle: React.CSSProperties = {
     display: 'flex',
     margin: '2px',
@@ -414,7 +414,7 @@ const WaypointsMenu = () => {
         >
           <Icon name="plus" />
         </Button>
-        {/*<Button
+        <Button
           id="add-ARA"
           style={{
             alignSelf: 'end',
@@ -430,9 +430,10 @@ const WaypointsMenu = () => {
               dispatch(remove(toRemove));
               setAraIds(null);
             } else {
-              const uids: string[] = [];
+              const uids: string[] = araIds ? [...araIds] : [];
               ARAWaypoints.forEach((waypoint) => {
-                const uid = 'id' + new Date().getTime();
+                const uid = uuidv4();
+                uids.push(uid);
                 dispatch(
                   request({
                     source: 'waypoints',
@@ -442,14 +443,13 @@ const WaypointsMenu = () => {
                     verticalLevel: null,
                   }),
                 );
-                uids.push(uid);
                 setAraIds(uids);
               });
             }
           }}
         >
           {`${araIds ? 'hide' : 'show'} ARA`}
-        </Button>*/}
+        </Button>
       </div>
     </div>
   );

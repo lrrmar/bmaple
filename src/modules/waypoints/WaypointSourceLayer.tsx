@@ -85,6 +85,8 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   );
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
 
+  console.log(id)
+
   async function apiCall(
     lat: number,
     lon: number,
@@ -138,6 +140,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
   useEffect(() => {
     // Assess what to do with incoming layer data
+    if (!layerData) console.log(id);
     if (!layerData) return;
 
     // Wrong source
