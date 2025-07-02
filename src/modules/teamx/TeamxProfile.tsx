@@ -49,7 +49,6 @@ const Graphics = () => {
     if (cacheEntry)
       teamxCacheEntry = isTeamxEntry(cacheEntry) ? cacheEntry : undefined;
 
-
     // Get new layer from open layers
     if (teamxCacheEntry)
       newLayer = mapUtils.getLayerByUid(teamxCacheEntry.ol_uid);

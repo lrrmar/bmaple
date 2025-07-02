@@ -102,7 +102,7 @@ const App = () => {
         {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
           <WaypointsMenu />
         </FoldOutItem>*/}
-        <FoldOutItem id={'image outline'} icon={'data'}>
+        <FoldOutItem id={'data'} icon={'image outline'}>
           <MetaDataMenu />
         </FoldOutItem>
         <FoldOutItem id={'style'} icon={'paint brush'}>
