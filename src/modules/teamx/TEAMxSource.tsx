@@ -85,12 +85,18 @@ const TEAMxSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     const fetchMetaData = async () => {
       const apiUrl = 'http://localhost:8383';
       const response = await fetch(
-        `${apiUrl}/continuousQueryHashes/?region=${discreteMetaData.region}&field=${discreteMetaData.field}&run=${discreteMetaData.run}&start_time=${discreteMetaData.start_time}`,
+        `${apiUrl}/continuousQueryHashes/`,
         {
-          method: 'GET',
+          method: 'POST',
           headers: {
-            Accept: 'application/json',
+            'Content-type': 'application/json',
           },
+          body: JSON.stringify({
+            'region': discreteMetaData.region,
+            'field': discreteMetaData.field,
+            'run': discreteMetaData.run,
+            'start_time': discreteMetaData.start_time,
+          })
         },
       );
       const json = await response.json();
