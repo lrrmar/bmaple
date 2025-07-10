@@ -1,6 +1,6 @@
 import * as ol from 'ol';
 import BaseLayer from 'ol/layer/Base';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, transformExtent } from 'ol/proj';
 import { getUid } from 'ol/util';
 
 class OpenLayersMap {
@@ -13,11 +13,18 @@ class OpenLayersMap {
 
   public static get map(): ol.Map {
     if (!OpenLayersMap.#map) {
+      const tempExtent = [-20.0, 42, 10, 65];
+      const extentInLambert = transformExtent(
+        tempExtent,
+        'EPSG:4326',
+        'force_nwr_projection',
+      );
       const options = {
         view: new ol.View({
-          center: fromLonLat([-3.0, 54.0]),
+          //center: [-3.0, 54.0],
+          extent: extentInLambert,
           zoom: 5,
-          projection: 'EPSG:3857',
+          projection: 'force_nwr_projection',
         }),
         zIndex: 0,
         controls: [],

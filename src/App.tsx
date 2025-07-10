@@ -16,10 +16,10 @@ import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
 import PlainTheme from './mapping/PlainTheme';
-import teamxReducer from './modules/teamx/teamxSlice';
-import TEAMxSource from './modules/teamx/TEAMxSource';
-import TeamxProfile from './modules/teamx/TeamxProfile';
-import TEAMxMenu from './modules/teamx/TEAMxMenu';
+import forceNwrReducer from './modules/force-nwr/forceNwrSlice';
+import ForceNwrSource from './modules/force-nwr/ForceNwrSource';
+import ForceNwrProfile from './modules/force-nwr/ForceNwrProfile';
+import ForceNwrMenu from './modules/force-nwr/ForceNwrMenu';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
@@ -40,7 +40,7 @@ export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
-    teamx: teamxReducer,
+    forceNwr: forceNwrReducer,
     waypoint: waypointReducer,
     geojsonField: geojsonFieldReducer,
   },
@@ -64,18 +64,18 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          <TeamxProfile />
+          <ForceNwrProfile />
           <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
-          <TEAMxSource sourceIdentifier={'teamx'} />
+          <ForceNwrSource sourceIdentifier={'forceNwr'} />
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
           {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
         <BaseMaps>
-          <DarkBaseMap id={'dark'} />
+          {/*<DarkBaseMap id={'dark'} />
           <OSMBaseMap id={'Open Street Map'} />
-          <SwissTopoBaseMap id={'Swiss Topo'} />
+          <SwissTopoBaseMap id={'Swiss Topo'} />*/}
         </BaseMaps>
       </Map>
       <FloatingBox
@@ -106,7 +106,7 @@ const App = () => {
           <MetaDataMenu />
         </FoldOutItem>
         <FoldOutItem id={'style'} icon={'paint brush'}>
-          <TEAMxMenu />
+          <ForceNwrMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>

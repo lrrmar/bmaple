@@ -9,7 +9,7 @@ import { OSM } from 'ol/source';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import { Vector as VectorSource } from 'ol/source';
-import { get, fromLonLat } from 'ol/proj';
+import { get, fromLonLat, transform } from 'ol/proj';
 import { getUid } from 'ol/util';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,7 +27,7 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
+import { selectProjection, selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from './waypointSlice';
 
@@ -79,6 +79,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const cache = useSelector(selectCache);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const mapProjection = useSelector(selectProjection);
   const [layerData, setLayerData] = useState<CacheElement | null>();
   const [coordinates, setCoordinates] = useState<LongitudeLatitude | null>(
     null,
@@ -175,8 +176,9 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!coordinates) {
       return;
     }
+    const transformedCoordinates = transform([coordinates.longitude, coordinates.latitude], 'EPSG:4326', mapProjection)
     const point = new Point(
-      fromLonLat([coordinates.longitude, coordinates.latitude]),
+      transformedCoordinates,
     );
     const feature = new Feature({
       geometry: point,

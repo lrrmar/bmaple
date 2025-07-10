@@ -162,7 +162,6 @@ const WaypointForm = ({
   waypoint: Waypoint & CacheElement;
   setOpen: Dispatch<SetStateAction<string | null>>;
 }) => {
-  console.log('form rerender');
   const inputLabelContainerStyle: React.CSSProperties = {
     display: 'flex',
     margin: '2px',

@@ -29,7 +29,6 @@ const Sources = ({ children }: Props) => {
     [],
   );
   useEffect(() => {
-    console.log('Source rerender');
     // Provide each source with the cache, filtered by sourceIdentifier
     if (!cache) return;
     const childrenWithCacheToSet: React.ReactNode[] | null | undefined =

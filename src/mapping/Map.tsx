@@ -4,11 +4,12 @@ import './Map.css';
 import MapType from 'ol/Map';
 import Feature, { FeatureLike } from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';
-import { toLonLat, fromLonLat } from 'ol/proj';
+import { toLonLat, fromLonLat, transform } from 'ol/proj';
 
 import {
   selectCenter,
   selectZoom,
+  selectProjection,
   updateClickEvent,
   updateFeaturesAtClick,
   FeatureAtClick,
@@ -44,6 +45,7 @@ const Map = ({ children }: Props) => {
 
   const mapCenter: number[] | null = useSelector(selectCenter);
   const mapZoom: number | null = useSelector(selectZoom);
+  const mapProjection: string | null = useSelector(selectProjection);
 
   // on component mount
   useEffect(() => {
@@ -84,7 +86,6 @@ const Map = ({ children }: Props) => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
     if (mouseIsDragging) {
-      console.log('dragging');
     } else {
       handleClick(event);
     }
@@ -94,12 +95,11 @@ const Map = ({ children }: Props) => {
     if (map === null) {
       return;
     }
-    const lonLat: number[] = toLonLat(
-      map.getCoordinateFromPixel([e.clientX, e.clientY]),
-    );
+    const pixelCoord: number[] = map.getCoordinateFromPixel([e.clientX, e.clientY]);
+    const wgs84coord = transform(pixelCoord, mapProjection, 'EPSG:4326');
     const mapCoordinate = {
-      longitude: lonLat[0],
-      latitude: lonLat[1],
+      longitude: wgs84coord[0],
+      latitude: wgs84coord[1],
     };
     const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
       map.getFeaturesAtPixel([e.clientX, e.clientY]);
@@ -133,6 +133,7 @@ const Map = ({ children }: Props) => {
 
   return (
     <div
+      style={{ backgroundColor: 'black' }}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}

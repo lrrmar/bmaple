@@ -14,9 +14,9 @@ import {
   DiscreteMetaData,
   selectDiscreteMetaData,
   updateDiscreteMetaData,
-} from '../modules/teamx/teamxSlice';
+} from '../modules/force-nwr/forceNwrSlice';
 
-type Header = 'run' | 'region' | 'field' | 'start_time';
+type Header = 'domain' | 'field' | 'start_time';
 interface MetaData {
   headers: Header[];
   values: { [key in Header]: string[] };
@@ -65,9 +65,8 @@ const MetaDataMenu = () => {
       if (allSelectionsNull) {
         //Get initial selection
         const newSelection = {
-          region: values['region'][0],
           field: values['field'][0],
-          run: values['run'][0],
+          domain: values['domain'][0],
           start_time: values['start_time'][0],
         };
         dispatch(updateDiscreteMetaData(newSelection));
@@ -122,8 +121,11 @@ const MetaDataMenu = () => {
               {thisHeader}
             </InputLabel>
             <Select
-              labelId={thisHeader}
-              value={selection[thisHeader]}
+              labelId={`${thisHeader} label`}
+              //value={selection[thisHeader]}
+              renderValue={(val: string) => {
+                return val;
+              }}
               style={{ color: 'white' }}
               onChange={(e) => {
                 if (typeof e.target.value === 'number') {

@@ -1,5 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '../App';
+import View from 'ol/View';
+import { fromLonLat, transformExtent } from 'ol/proj';
+import OpenLayersMap from './OpenLayersMap';
 
 export interface FeatureAtClick {
   ol_uid: string;
@@ -14,6 +17,8 @@ export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
 interface InitialState {
   center: number[] | null;
   zoom: number | null;
+  extent: number[] | null;
+  projection: string;
   units: string | null;
   displayTime: string;
   clickEvent: { longitude: number; latitude: number } | null;
@@ -34,6 +39,8 @@ interface InitialState {
 const initialState: InitialState = {
   center: [-3, 54],
   zoom: 5,
+  extent: null,
+  projection: 'force_nwr_projection',
   units: null,
   displayTime: '',
   clickEvent: null,
@@ -114,7 +121,40 @@ export const mapSlice = createSlice({
       state.verticalLevelUnits = verticalLevelUnits.payload;
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(updateExtent.fulfilled, (state, action) => {
+      const extent = action.payload;
+      if (extent) state.extent = extent;
+    });
+  },
 });
+
+export const updateExtent = createAsyncThunk(
+  'map/updateExtent',
+  async (extent: number[], thunkAPI) => {
+    const state = thunkAPI.getState() as RootState;
+    const currentExtent: number[] | null = state.map.extent;
+    const changeExtent = (): boolean => {
+      if (!extent) return false;
+      if (extent.length != 4) return false;
+      if (!currentExtent) return true;
+      return currentExtent.every((val, i) => val === extent[i]);
+    };
+    if (changeExtent()) {
+      const view = new View({
+        zoom: 5,
+        extent: extent,
+        center: fromLonLat([
+          extent[0] + (extent[2] - extent[0]) / 2,
+          extent[1] + (extent[3] - extent[1]) / 2,
+        ]),
+      });
+      const map = OpenLayersMap.map;
+      map.setView(view);
+      return extent;
+    }
+  },
+);
 
 export const {
   //updateDataLevels,
@@ -136,6 +176,8 @@ export const {
 
 export const selectCenter = (state: RootState) => state.map.center;
 export const selectZoom = (state: RootState) => state.map.zoom;
+export const selectExtent = (state: RootState) => state.map.extent;
+export const selectProjection = (state: RootState) => state.map.projection;
 export const selectDisplayTime = (state: RootState) => state.map.displayTime;
 export const selectUnits = (state: RootState) => state.map.units;
 //export const selectColourPalette = (state: RootState) => {

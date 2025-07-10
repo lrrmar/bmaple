@@ -82,9 +82,7 @@ const GeojsonFieldSource = ({ sourceIdentifier, cache }: Props) => {
       {
         /*const units: string = levelStrings.reduce(
         (unit: string, current: string) => {
-          console.log(unit);
           const alpha: string = current.replace(/[^a-zA-Z]/g, '');
-          console.log(alpha);
           //if (!unit.includes(alpha)) unit + `, ${alpha}`;
           unit = alpha;
         },

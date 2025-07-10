@@ -126,7 +126,7 @@ const ScrollingScale = () => {
   }, [lowerLim, upperLim]);
 
   useEffect(() => {
-    const times = displayTimes['teamx'];
+    const times = displayTimes['forceNwr'];
     if (times) {
       setLowerLim(Math.min(...times));
       setUpperLim(Math.max(...times));
