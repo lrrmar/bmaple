@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
-import BGSWMSLayer, { BGSWMS, isBGSWMS } from './bgsWmsLayer';
+import BGSWMSLayer, { BGSWMS, isPendingBGSWMS } from './bgsWmsLayer';
 import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
 } from '../../hooks';
 import { selectCache, request } from '../../mapping/cacheSlice';
 import { selectLayerNames } from './bgsWmsSlice';
+import { v4 as uuidv4 } from 'uuid';
 
 const BGSWMSSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   /*
@@ -25,7 +26,7 @@ const BGSWMSSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     if (layerNames) {
       layerNames.forEach((name) => {
-        const uid = 'id' + new Date().getTime();
+        const uid = uuidv4();
         const toRequest = {
           id: uid, // Essential for type
           source: sourceIdentifier, // Essential for type
