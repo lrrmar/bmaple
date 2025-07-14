@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import type { RootState } from '../App';
+import type { RootState } from '../../App';
 import type { HashTable } from './FastaHashTables';
 
 interface InitialState {
@@ -26,21 +25,25 @@ export interface FastaProduct {
 
 const initialState: InitialState = {
   baseUrl: 'fastaweather.com',
+  token: '',
   selectedCrrId: null,
   selectedRdtId: null,
   profileCrrId: null,
   profileRdtId: null,
   hashTables: [],
   latestTimeslot: null,
-  fastaProducts: [ {
-    order: 0,
-    name: 'CRR',
-    visible: true,
-  }, {
-    order: 1,
-    name: 'RDT',
-    visible: false
-  }],
+  fastaProducts: [
+    {
+      order: 0,
+      name: 'CRR',
+      visible: true,
+    },
+    {
+      order: 1,
+      name: 'RDT',
+      visible: false,
+    },
+  ],
   zmFlag: false,
   mzFlag: false,
 };
@@ -67,7 +70,7 @@ export const fastaSlice = createSlice({
     updateLatestTimeslot: (state, timeslot: PayloadAction<number | null>) => {
       state.latestTimeslot = timeslot.payload;
     },
-    updateFastaProducts: (state, products : FastaProduct[]) => {
+    updateFastaProducts: (state, products: PayloadAction<FastaProduct[]>) => {
       state.fastaProducts = products.payload;
     },
     updateZmFlag: (state, flag: PayloadAction<boolean>) => {
@@ -75,7 +78,7 @@ export const fastaSlice = createSlice({
     },
     updateMzFlag: (state, flag: PayloadAction<boolean>) => {
       state.mzFlag = flag.payload;
-    }
+    },
   },
 });
 
@@ -101,21 +104,26 @@ export const selectProfileCrrId = (state: RootState) =>
 export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
-export const selectLatestTimeslot = (state: RootState) => state.fasta.latestTimeslot;
-export const selectFastaProducts = (state: RootState) => state.fasta.fastaProducts;
-export const selectCrrVisible = (state: RootState) => isProductVisible(state, "CRR");
-export const selectRdtVisible = (state: RootState) => isProductVisible(state, "RDT");
+export const selectLatestTimeslot = (state: RootState) =>
+  state.fasta.latestTimeslot;
+export const selectFastaProducts = (state: RootState) =>
+  state.fasta.fastaProducts;
+export const selectCrrVisible = (state: RootState) =>
+  isProductVisible(state, 'CRR');
+export const selectRdtVisible = (state: RootState) =>
+  isProductVisible(state, 'RDT');
 export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
 export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
 
-const isProductVisible = (state: RootState, productName : string) => {        
-  const idxProduct = state.fasta.fastaProducts.findIndex((pr) => pr.name === productName);
+const isProductVisible = (state: RootState, productName: string) => {
+  const idxProduct = state.fasta.fastaProducts.findIndex(
+    (pr) => pr.name === productName,
+  );
   if (idxProduct !== -1) {
-      return state.fasta.fastaProducts[idxProduct].visible;
+    return state.fasta.fastaProducts[idxProduct].visible;
+  } else {
+    return false;
   }
-  else {
-      return false;
-  }
-}
+};
 
 export default fastaSlice.reducer;

@@ -17,7 +17,13 @@ import {
   selectRdtVisible,
   FastaProduct,
 } from './fastaSlice';
-import { Entry, Ingest, request, Request, selectCache } from '../../mapping/cacheSlice';
+import {
+  Entry,
+  Ingest,
+  request,
+  Request,
+  selectCache,
+} from '../../mapping/cacheSlice';
 
 import openLayersMap from '../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
@@ -39,19 +45,18 @@ const Graphics = () => {
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
   const layerCache = useSelector(selectCache);
-  const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string|null>(null);
-  const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string|null>(null);
+  const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string | null>(null);
+  const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string | null>(null);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
-  const products : FastaProduct[] = useSelector(selectFastaProducts);
+  const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
 
-
   const getLayer = (
-    uid: string|null) : VectorTileLayer<Feature<Geometry>>|null => {
-    
-    var baseLayer: BaseLayer|undefined = undefined;
-    var vectorTileLayer : VectorTileLayer<Feature<Geometry>>|null = null;
+    uid: string | null,
+  ): VectorTileLayer<Feature<Geometry>> | null => {
+    let baseLayer: BaseLayer | undefined = undefined;
+    let vectorTileLayer: VectorTileLayer<Feature<Geometry>> | null = null;
 
     map
       .getLayers()
@@ -61,86 +66,112 @@ const Graphics = () => {
           baseLayer = l;
         }
       });
-    
+
     if (baseLayer) {
       vectorTileLayer = baseLayer as VectorTileLayer<Feature<Geometry>>;
     }
     return vectorTileLayer;
-  }
+  };
 
   function createCrrStyleFunction() {
-    
-    const style02_1 = new Style({fill: new Fill({color:'#2579d4'})});
-    const style1_2 = new Style({fill: new Fill({color:'#2a8cf0'})});
-    const style2_3 = new Style({fill: new Fill({color:'#1cd0f5'})});
-    const style3_5 = new Style({fill: new Fill({color:'#428730'})});
-    const style5_7 = new Style({fill: new Fill({color:'#31c749'})});
-    const style7_10 = new Style({fill: new Fill({color:'#63dd54'})})
-    const style10_15 = new Style({fill: new Fill({color:'#f9e063'})});
-    const style15_20 = new Style({fill: new Fill({color:'#fbc65b'})});
-    const style20_30 = new Style({fill: new Fill({color:'#fb8349'})});
-    const style30_50 = new Style({fill: new Fill({color:'#fd5740'})});
-    const style50_plus = new Style({fill: new Fill({color:'#b31b27'})});
-    const fallback = new Style({fill: new Fill({color:'#000'})});
-      
-    var cnv = document.createElement('canvas');
-    var ctx = cnv.getContext('2d');
-    var img = new Image();
+    const style02_1 = new Style({ fill: new Fill({ color: '#2579d4' }) });
+    const style1_2 = new Style({ fill: new Fill({ color: '#2a8cf0' }) });
+    const style2_3 = new Style({ fill: new Fill({ color: '#1cd0f5' }) });
+    const style3_5 = new Style({ fill: new Fill({ color: '#428730' }) });
+    const style5_7 = new Style({ fill: new Fill({ color: '#31c749' }) });
+    const style7_10 = new Style({ fill: new Fill({ color: '#63dd54' }) });
+    const style10_15 = new Style({ fill: new Fill({ color: '#f9e063' }) });
+    const style15_20 = new Style({ fill: new Fill({ color: '#fbc65b' }) });
+    const style20_30 = new Style({ fill: new Fill({ color: '#fb8349' }) });
+    const style30_50 = new Style({ fill: new Fill({ color: '#fd5740' }) });
+    const style50_plus = new Style({ fill: new Fill({ color: '#b31b27' }) });
+    const fallback = new Style({ fill: new Fill({ color: '#000' }) });
+
+    const cnv = document.createElement('canvas');
+    const ctx = cnv.getContext('2d');
+    const img = new Image();
     img.src = missingDataImage;
-    var pattern;
+    let pattern;
     if (ctx) {
-       pattern = ctx.createPattern(img, 'repeat');
+      pattern = ctx.createPattern(img, 'repeat');
     }
-    const missingDataStyle = new Style({fill: new Fill({color:pattern})});
+    const missingDataStyle = new Style({ fill: new Fill({ color: pattern }) });
 
     return (feature: FeatureLike) => {
-
       const objectType = feature.get('object_type');
       if (objectType === 'CRR-missing-data') {
         return missingDataStyle;
-      }
-      else {
+      } else {
         const rainRate = feature.get('rain_rate');
-        if (rainRate === 'CRR_02_1') { return style02_1; }
-        else if (rainRate === 'CRR_1_2') { return style1_2; }
-        else if (rainRate === 'CRR_2_3') { return style2_3 ; }
-        else if (rainRate === 'CRR_3_5') { return style3_5 ; }
-        else if (rainRate === 'CRR_5_7') { return style5_7 ; }
-        else if (rainRate === 'CRR_7_10') { return style7_10 ; }
-        else if (rainRate === 'CRR_10_15') { return style10_15 ; }
-        else if (rainRate === 'CRR_15_20') { return style15_20; }
-        else if (rainRate === 'CRR_20_30') { return style20_30; }
-        else if (rainRate === 'CRR_30_50') { return style30_50; }
-        else if (rainRate === 'CRR_50_plus') { return style50_plus; }
-        else { return fallback; }
+        if (rainRate === 'CRR_02_1') {
+          return style02_1;
+        } else if (rainRate === 'CRR_1_2') {
+          return style1_2;
+        } else if (rainRate === 'CRR_2_3') {
+          return style2_3;
+        } else if (rainRate === 'CRR_3_5') {
+          return style3_5;
+        } else if (rainRate === 'CRR_5_7') {
+          return style5_7;
+        } else if (rainRate === 'CRR_7_10') {
+          return style7_10;
+        } else if (rainRate === 'CRR_10_15') {
+          return style10_15;
+        } else if (rainRate === 'CRR_15_20') {
+          return style15_20;
+        } else if (rainRate === 'CRR_20_30') {
+          return style20_30;
+        } else if (rainRate === 'CRR_30_50') {
+          return style30_50;
+        } else if (rainRate === 'CRR_50_plus') {
+          return style50_plus;
+        } else {
+          return fallback;
+        }
       }
-    }
+    };
   }
 
   function createRdtStyleFunction() {
-    
-    const fillStyleCell000 = new Style({fill: new Fill({color:'rgb(254, 41, 59, 0.4)'})}); // red, semi-transparent
-    const fillFallback = new Style({fill: new Fill({color:'#ccc'})});
+    const fillStyleCell000 = new Style({
+      fill: new Fill({ color: 'rgb(254, 41, 59, 0.4)' }),
+    }); // red, semi-transparent
+    const fillFallback = new Style({ fill: new Fill({ color: '#ccc' }) });
 
-    const lineStyleCell000 = new Style({stroke: new Stroke({color:'rgb(254, 41, 59, 0.9)', width: 1})}); // red
-    const lineStyleForecast = new Style({stroke: new Stroke({color:'#000000', width: 2})});
-    const lineStylePast = new Style({stroke: new Stroke({color:'#666666', width: 2})});
-    const lineFallback = new Style({stroke: new Stroke({color:'#ccc', width: 0})});
+    const lineStyleCell000 = new Style({
+      stroke: new Stroke({ color: 'rgb(254, 41, 59, 0.9)', width: 1 }),
+    }); // red
+    const lineStyleForecast = new Style({
+      stroke: new Stroke({ color: '#000000', width: 2 }),
+    });
+    const lineStylePast = new Style({
+      stroke: new Stroke({ color: '#666666', width: 2 }),
+    });
+    const lineFallback = new Style({
+      stroke: new Stroke({ color: '#ccc', width: 0 }),
+    });
 
     const styleFunction = (feature: FeatureLike) => {
-
-      var fillStyle = null;
-      var lineStyle = null;
+      let fillStyle = null;
+      let lineStyle = null;
 
       const objectType = feature.get('object_type');
 
-      if (objectType === 'cell-000') { fillStyle = fillStyleCell000; }
-      else { fillStyle = fillFallback; }
+      if (objectType === 'cell-000') {
+        fillStyle = fillStyleCell000;
+      } else {
+        fillStyle = fillFallback;
+      }
 
-      if (objectType === 'cell-000') { lineStyle = lineStyleCell000; }
-      else if (objectType === 'FcstCGTraj') { lineStyle = lineStyleForecast; }
-      else if (objectType === 'PastCGTraj') { lineStyle = lineStylePast; }
-      else { lineStyle = lineFallback; }
+      if (objectType === 'cell-000') {
+        lineStyle = lineStyleCell000;
+      } else if (objectType === 'FcstCGTraj') {
+        lineStyle = lineStyleForecast;
+      } else if (objectType === 'PastCGTraj') {
+        lineStyle = lineStylePast;
+      } else {
+        lineStyle = lineFallback;
+      }
 
       return [fillStyle, lineStyle];
     };
@@ -148,22 +179,27 @@ const Graphics = () => {
     return styleFunction;
   }
 
-
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
      */
-    
+
     //console.log("FastaGraphic crrLayerId: " + crrLayerId);
-    
+
     const crrStyle = createCrrStyleFunction();
 
-    var newOlUidCrr: string|null = null;
-    var layer = layerCache[crrLayerId] as Entry;
+    let newOlUidCrr: string | null = null;
+
+    let layer: Entry | null = null;
+    if (crrLayerId) {
+      const layerId = crrLayerId;
+      layer = layerCache[crrLayerId] as Entry;
+    }
+
     if (layer) {
       newOlUidCrr = layer.ol_uid;
     }
-    
+
     //console.log("FastaGraphic newOlUidCrr: " + newOlUidCrr);
 
     const oldLayer = getLayer(currentOlUidCrr);
@@ -178,8 +214,7 @@ const Graphics = () => {
       if (crrIsVisible) {
         newLayer.setVisible(true);
         newLayer.setStyle(crrStyle);
-      }
-      else {
+      } else {
         newLayer.setVisible(false);
         newLayer.setStyle(invisibleStyle);
       }
@@ -197,12 +232,17 @@ const Graphics = () => {
 
     const rdtStyles = createRdtStyleFunction();
 
-    var newOlUidRdt: string|null = null;
-    var layer = layerCache[rdtLayerId] as Entry;
+    let newOlUidRdt: string | null = null;
+
+    let layer: Entry | null = null;
+    if (rdtLayerId) {
+      const layerId = rdtLayerId;
+      layer = layerCache[rdtLayerId] as Entry;
+    }
     if (layer) {
       newOlUidRdt = layer.ol_uid;
     }
-    
+
     const oldLayer = getLayer(currentOlUidRdt);
     const newLayer = getLayer(newOlUidRdt);
 
@@ -215,8 +255,7 @@ const Graphics = () => {
       if (rdtIsVisible) {
         newLayer.setVisible(true);
         newLayer.setStyle(rdtStyles);
-      }
-      else {
+      } else {
         newLayer.setVisible(false);
         newLayer.setStyle(invisibleStyle);
       }

@@ -23,23 +23,27 @@ interface Props {
 
 const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
-  const crrRequestId : string = useSelector(selectSelectedCrrId);
-  const rdtRequestId : string = useSelector(selectSelectedRdtId);
-  const hashTables : HashTable[] = useSelector(selectHashTables);
+  const crrRequestId: string | null = useSelector(selectSelectedCrrId);
+  const rdtRequestId: string | null = useSelector(selectSelectedRdtId);
+  const hashTables: HashTable[] = useSelector(selectHashTables);
 
   useEffect(() => {
     // converting "hashTables" into cache requests
-    const allCacheRequests: Request[] = hashTables.map((hashTable: HashTable) => {
-      //console.log(hashTableToUrl(hashTable));
-      const request = {
-        id: hashTableToUrl(hashTable),
-        source: 'fasta',
-      };
-      return request;
-    });
+    const allCacheRequests: Request[] = hashTables.map(
+      (hashTable: HashTable) => {
+        //console.log(hashTableToUrl(hashTable));
+        const request = {
+          id: hashTableToUrl(hashTable),
+          source: 'fasta',
+        };
+        return request;
+      },
+    );
 
     console.log('***all cache reqs: ', allCacheRequests);
-    const newCacheRequests = allCacheRequests.filter((req: Request) => !cache[req.id]);
+    const newCacheRequests = allCacheRequests.filter(
+      (req: Request) => !cache[req.id],
+    );
     //console.log(newCacheRequests);
     dispatch(request(newCacheRequests));
   }, [hashTables]);
@@ -61,7 +65,9 @@ const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   }, [rdtRequestId]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {
-    return <FastaSourceLayer sourceIdentifier={sourceIdentifier} key={id} id={id} />;
+    return (
+      <FastaSourceLayer sourceIdentifier={sourceIdentifier} key={id} id={id} />
+    );
   });
 
   const fastaHashTable = FastaHashTablesServer();

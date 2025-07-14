@@ -1,298 +1,335 @@
-import React, {
-    useEffect,
-    useState,
-} from 'react';
-import {
-    useDispatch,
-    useSelector
-} from 'react-redux';
-import ReactSlider from "react-slider";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import ReactSlider from 'react-slider';
 import './Slider.css';
 import {
-    selectHashTables,
-    selectLatestTimeslot,
-    updateSelectedCrrId,
-    updateSelectedRdtId,
-    selectCrrVisible,
-    selectRdtVisible,
+  selectHashTables,
+  selectLatestTimeslot,
+  updateSelectedCrrId,
+  updateSelectedRdtId,
+  selectCrrVisible,
+  selectRdtVisible,
 } from './fastaSlice';
 import type { HashTable } from './FastaHashTables';
 import {
-    dateDisplayString,
-    dateTimeDisplayString,
-    timeDisplayString,
-    timezoneDisplayString,
+  dateDisplayString,
+  dateTimeDisplayString,
+  timeDisplayString,
+  timezoneDisplayString,
 } from './dateFormatHelpers';
-import fastaHashTableToUrl from  './fastaHashTableToUrl';
+import fastaHashTableToUrl from './fastaHashTableToUrl';
 import { isMissingDeclaration } from 'typescript';
 
 const Slider = () => {
+  // We display a fixed number of slots
+  const nTimeslots = 19;
 
-    // We display a fixed number of slots
-    const nTimeslots = 19;
+  // We default to the the latest observation slot
+  const defaultSliderValue = 8;
 
-    // We default to the the latest observation slot
-    const defaultSliderValue = 8;
+  const slot_ms = 15 * 60 * 1000; // duration of 1 timeslot in msecs
 
-    const slot_ms = 15 * 60 * 1000;  // duration of 1 timeslot in msecs
-    
-    const dispatch = useDispatch();
-    const fastaHashes : HashTable[] = useSelector(selectHashTables);
-    const fastaLatestTimeslot : number = useSelector(selectLatestTimeslot);
+  const dispatch = useDispatch();
+  const fastaHashes: HashTable[] = useSelector(selectHashTables);
+  const fastaLatestTimeslot: number | null = useSelector(selectLatestTimeslot);
 
-    const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
-    const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
-    const [selectedTimeString , setSelectedTimeString] = useState('');
-    const [timeZoneString, setTimeZoneString] = useState('');
-    const [currentSliderValue, setCurrentSliderValue] = useState<number>(defaultSliderValue);
-    const [userMessageGeneral, setUserMessageGeneral] = useState<string|undefined>();
-    const [userMessageCrr, setUserMessageCrr] = useState<string|undefined>();
-    const [userMessageRdt, setUserMessageRdt] = useState<string|undefined>();
-  
-    const crrIsVisible = useSelector(selectCrrVisible);
-    const rdtIsVisible = useSelector(selectRdtVisible);
-  
-    const [animate, setAnimate] = useState(false);
-    const [pulse, setPulse] = useState(0);
-    const [pulseInterval, setPulseInterval] = useState(1000);
+  const [sliderTimeslots, setSliderTimeslots] = useState<number[]>([]);
+  const [selectedTimeslot, setSelectedTimeslot] = useState<number>();
+  const [selectedTimeString, setSelectedTimeString] = useState('');
+  const [timeZoneString, setTimeZoneString] = useState('');
+  const [currentSliderValue, setCurrentSliderValue] =
+    useState<number>(defaultSliderValue);
+  const [userMessageGeneral, setUserMessageGeneral] = useState<
+    string | undefined
+  >();
+  const [userMessageCrr, setUserMessageCrr] = useState<string | undefined>();
+  const [userMessageRdt, setUserMessageRdt] = useState<string | undefined>();
 
-    // Current date time in msecs, and first timeslot in msecs 
-    const [currentTimeMsecs, setCurrentTimeMsecs] = useState<number>(Date.now());
+  const crrIsVisible = useSelector(selectCrrVisible);
+  const rdtIsVisible = useSelector(selectRdtVisible);
 
-    const [ticksDiv1Width, setTicksDiv1Width] = useState('10%');
-    const [ticksDiv2Width, setTicksDiv2Width] = useState('10%');
-    const [ticksDiv3Width, setTicksDiv3Width] = useState('80%');
+  const [animate, setAnimate] = useState(false);
+  const [pulse, setPulse] = useState(0);
+  const [pulseInterval, setPulseInterval] = useState(1000);
 
-    const [lblStartSpacerWidth, setLblStartSpacerWidth] = useState('');
-    const [lblEndSpacerWidth, setLblEndSpacerWidth] = useState('');
-    const [lblDblWidth, setLblDblWidth] = useState('');
+  // Current date time in msecs, and first timeslot in msecs
+  const [currentTimeMsecs, setCurrentTimeMsecs] = useState<number>(Date.now());
 
-    useEffect(() => {
-        /* Initial selection / positioning
-        */
-        if (!fastaLatestTimeslot) {
-            return
-        };
+  const [ticksDiv1Width, setTicksDiv1Width] = useState('10%');
+  const [ticksDiv2Width, setTicksDiv2Width] = useState('10%');
+  const [ticksDiv3Width, setTicksDiv3Width] = useState('80%');
 
-        console.log("fastaLatestTimeslot:" + fastaLatestTimeslot);
+  const [lblStartSpacerWidth, setLblStartSpacerWidth] = useState('');
+  const [lblEndSpacerWidth, setLblEndSpacerWidth] = useState('');
+  const [lblDblWidth, setLblDblWidth] = useState('');
 
-        // Start the slider 2 hours (8 slots) previous of latest slot:
-        const firstMsecs = fastaLatestTimeslot - (8 * slot_ms);
-        const timeslots = Array(nTimeslots).fill(0).map((_, i) => firstMsecs + (i * slot_ms));
-        //console.log(timeslots);
-        setSliderTimeslots(timeslots);
-        setSelectedTimeslot(timeslots[defaultSliderValue]);
-    }, [fastaLatestTimeslot]);
+  useEffect(() => {
+    /* Initial selection / positioning
+     */
+    if (!fastaLatestTimeslot) {
+      return;
+    }
 
+    console.log('fastaLatestTimeslot:' + fastaLatestTimeslot);
 
-    // Handle changes to slider selection
-    useEffect(() => {
+    // Start the slider 2 hours (8 slots) previous of latest slot:
+    const firstMsecs = fastaLatestTimeslot - 8 * slot_ms;
+    const timeslots = Array(nTimeslots)
+      .fill(0)
+      .map((_, i) => firstMsecs + i * slot_ms);
+    //console.log(timeslots);
+    setSliderTimeslots(timeslots);
+    setSelectedTimeslot(timeslots[defaultSliderValue]);
+  }, [fastaLatestTimeslot]);
 
-        //console.log("Slider::useEffect(), [selectedTimeslot]");
-        console.log("selectedTimeslot:" + selectedTimeslot);
-            
-        if (selectedTimeslot) {
-    
-            const strSelected = dateTimeDisplayString(selectedTimeslot);
-            setSelectedTimeString(strSelected);
+  // Handle changes to slider selection
+  useEffect(() => {
+    //console.log("Slider::useEffect(), [selectedTimeslot]");
+    console.log('selectedTimeslot:' + selectedTimeslot);
 
-            if (Date.now() - fastaLatestTimeslot >= (60 * 1000 * 60)) {
-                setUserMessageGeneral("WARNING: latest data is from > 1 hour ago.");
-            }
+    if (!fastaLatestTimeslot) {
+      return;
+    }
 
-            //console.log("setSelectedTimeslot:" + strSelected);
+    if (selectedTimeslot) {
+      const strSelected = dateTimeDisplayString(selectedTimeslot);
+      setSelectedTimeString(strSelected);
 
-            setTimeZoneString(timezoneDisplayString(selectedTimeslot));
+      if (Date.now() - fastaLatestTimeslot >= 60 * 1000 * 60) {
+        setUserMessageGeneral('WARNING: latest data is from > 1 hour ago.');
+      }
 
-            // Find the CRR hash with matching effective_ts
-            const crrLayerHash = fastaHashes.find( (hash : HashTable) => {
-                return hash.name === "crr"
-                    && hash.effective_ts === selectedTimeslot;
-            });
-    
-            if (crrLayerHash) {
-                if (crrLayerHash.is_available) {
-                    var url = fastaHashTableToUrl(crrLayerHash);
-                    const newCrrLayerHash = {apiRequest: url};
-                    setUserMessageCrr(undefined);
-                    dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
-                }
-                else {
-                    setUserMessageCrr("CRR: data not available for "
-                        + timeDisplayString(crrLayerHash.effective_ts)
-                        + " slot");
-                    dispatch(updateSelectedCrrId(null));    
-                }
-            } else {
-                setUserMessageCrr("CRR: data not available");
-                dispatch(updateSelectedCrrId(null));
-            }
+      //console.log("setSelectedTimeslot:" + strSelected);
 
-            // Find the RDT hash with matching effective_ts
-            const rdtLayerHash = fastaHashes.find( (hash : HashTable) => {
-                return hash.name === "rdt"
-                        && hash.effective_ts === selectedTimeslot;
-            });
+      setTimeZoneString(timezoneDisplayString(selectedTimeslot));
 
-            if (rdtLayerHash) {
-                if (rdtLayerHash.is_available) {
-                    var url = fastaHashTableToUrl(rdtLayerHash);
-                    console.log(url);
-                    const newRdtLayerHash = {apiRequest: url};
-                    dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
+      // Find the CRR hash with matching effective_ts
+      const crrLayerHash = fastaHashes.find((hash: HashTable) => {
+        return hash.name === 'crr' && hash.effective_ts === selectedTimeslot;
+      });
 
-                    if (rdtLayerHash.completeness && rdtLayerHash.completeness < 92) {
-                        setUserMessageRdt("RDT: data incomplete "
-                            + rdtLayerHash.completeness + "% for "
-                            + timeDisplayString(rdtLayerHash.effective_ts)
-                            + " slot");
-                    } else {
-                        setUserMessageRdt(undefined);
-                    }
-                }
-                else {
-                    setUserMessageRdt("RDT: data not available for "
-                        + timeDisplayString(rdtLayerHash.effective_ts) + " slot");
-                    dispatch(updateSelectedRdtId(null));
-                }
-            } else {
-                // No forecasts for RDT
-                if (selectedTimeslot > fastaLatestTimeslot) {
-                    setUserMessageRdt("RDT: data not available");
-                }
-                else {
-                    setUserMessageRdt("RDT: forecasts are not displayed for RDT");
-                }
-                dispatch(updateSelectedRdtId(null));
-            }   
+      if (crrLayerHash) {
+        if (crrLayerHash.is_available) {
+          const url = fastaHashTableToUrl(crrLayerHash);
+          const newCrrLayerHash = { apiRequest: url };
+          setUserMessageCrr(undefined);
+          dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
+        } else {
+          setUserMessageCrr(
+            'CRR: data not available for ' +
+              timeDisplayString(crrLayerHash.effective_ts) +
+              ' slot',
+          );
+          dispatch(updateSelectedCrrId(null));
         }
-    }, [selectedTimeslot, fastaHashes]);
+      } else {
+        setUserMessageCrr('CRR: data not available');
+        dispatch(updateSelectedCrrId(null));
+      }
 
-    useEffect(() => {
-        const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
-        const interval = setInterval(doPulse, pulseInterval);
-        return () => clearInterval(interval);
-    }, []);
-    
-    useEffect(() => {
-        if (animate) {
-            var newValue : number = 0;
-            if (currentSliderValue >= 0 && currentSliderValue < (sliderTimeslots.length-1)) {
-                newValue = currentSliderValue + 1;
-            }
-            setCurrentSliderValue(newValue);
-            setSelectedTimeslot(sliderTimeslots[newValue]);
+      // Find the RDT hash with matching effective_ts
+      const rdtLayerHash = fastaHashes.find((hash: HashTable) => {
+        return hash.name === 'rdt' && hash.effective_ts === selectedTimeslot;
+      });
+
+      if (rdtLayerHash) {
+        if (rdtLayerHash.is_available) {
+          const url = fastaHashTableToUrl(rdtLayerHash);
+          console.log(url);
+          const newRdtLayerHash = { apiRequest: url };
+          dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
+
+          if (rdtLayerHash.completeness && rdtLayerHash.completeness < 92) {
+            setUserMessageRdt(
+              'RDT: data incomplete ' +
+                rdtLayerHash.completeness +
+                '% for ' +
+                timeDisplayString(rdtLayerHash.effective_ts) +
+                ' slot',
+            );
+          } else {
+            setUserMessageRdt(undefined);
+          }
+        } else {
+          setUserMessageRdt(
+            'RDT: data not available for ' +
+              timeDisplayString(rdtLayerHash.effective_ts) +
+              ' slot',
+          );
+          dispatch(updateSelectedRdtId(null));
         }
-
-        if (pulse % 60 === 0) {
-            setCurrentTimeMsecs(Date.now());
+      } else {
+        // No forecasts for RDT
+        if (selectedTimeslot > fastaLatestTimeslot) {
+          setUserMessageRdt('RDT: data not available');
+        } else {
+          setUserMessageRdt('RDT: forecasts are not displayed for RDT');
         }
-    }, [pulse]);
+        dispatch(updateSelectedRdtId(null));
+      }
+    }
+  }, [selectedTimeslot, fastaHashes]);
 
-    useEffect(() => {
+  useEffect(() => {
+    const doPulse = () => setPulse((currentPulse) => currentPulse + 1);
+    const interval = setInterval(doPulse, pulseInterval);
+    return () => clearInterval(interval);
+  }, []);
 
-        if (!sliderTimeslots) { return; }
+  useEffect(() => {
+    if (animate) {
+      let newValue = 0;
+      if (
+        currentSliderValue >= 0 &&
+        currentSliderValue < sliderTimeslots.length - 1
+      ) {
+        newValue = currentSliderValue + 1;
+      }
+      setCurrentSliderValue(newValue);
+      setSelectedTimeslot(sliderTimeslots[newValue]);
+    }
 
-        const firstTimeslotMsecs = sliderTimeslots[0];
-        const lastTimeslotMsecs = sliderTimeslots[nTimeslots-1];
+    if (pulse % 60 === 0) {
+      setCurrentTimeMsecs(Date.now());
+    }
+  }, [pulse]);
 
-        if (!firstTimeslotMsecs) { return; }
-        if (!lastTimeslotMsecs) { return; }
+  useEffect(() => {
+    if (!sliderTimeslots) {
+      return;
+    }
 
-        // We need to work out where to position the "now" label on the slider.
-        // We do this by using 3 divs: 1 for the "now" label and 1 either side.
+    const firstTimeslotMsecs = sliderTimeslots[0];
+    const lastTimeslotMsecs = sliderTimeslots[nTimeslots - 1];
 
-        const totalMsecs = lastTimeslotMsecs - firstTimeslotMsecs;
+    if (!firstTimeslotMsecs) {
+      return;
+    }
+    if (!lastTimeslotMsecs) {
+      return;
+    }
 
-        const msecsFirstToNow = (currentTimeMsecs - firstTimeslotMsecs);
-        const msecsNowToLast = (lastTimeslotMsecs - currentTimeMsecs);
+    // We need to work out where to position the "now" label on the slider.
+    // We do this by using 3 divs: 1 for the "now" label and 1 either side.
 
-        // div2 containing the "now" text will occupy width equivalent to 2 slots:
-        const div1Msecs = msecsFirstToNow - slot_ms;
-        const div3Msecs = msecsNowToLast - slot_ms;
+    const totalMsecs = lastTimeslotMsecs - firstTimeslotMsecs;
 
-        const div1Percent = Math.round((div1Msecs / totalMsecs) * 100);
-        const div3Percent = Math.round((div3Msecs / totalMsecs) * 100);
-        const div2Percent = 100 - div1Percent - div3Percent;
-        
-        setTicksDiv1Width(div1Percent + '%');
-        setTicksDiv2Width(div2Percent + '%');
-        setTicksDiv3Width(div3Percent + '%');        
-    }, [sliderTimeslots, currentTimeMsecs]);
+    const msecsFirstToNow = currentTimeMsecs - firstTimeslotMsecs;
+    const msecsNowToLast = lastTimeslotMsecs - currentTimeMsecs;
 
-    useEffect(() => {
+    // div2 containing the "now" text will occupy width equivalent to 2 slots:
+    const div1Msecs = msecsFirstToNow - slot_ms;
+    const div3Msecs = msecsNowToLast - slot_ms;
 
-        // We have 19 slots, each time label spans 2 slots, we work in percentages
-        const labelWidthPct = 1/19 * 100;
-        const lblDblWidthPctRounded = Math.round(((labelWidthPct) + Number.EPSILON) * 100) / 100;
-        setLblDblWidth(lblDblWidthPctRounded + '%');
-}, []);
+    const div1Percent = Math.round((div1Msecs / totalMsecs) * 100);
+    const div3Percent = Math.round((div3Msecs / totalMsecs) * 100);
+    const div2Percent = 100 - div1Percent - div3Percent;
 
-    //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
-    //const Thumb = (props, state) => <div {...props} key={state.key}></div>;;
-    //renderTrack={Track}
-    //renderThumb={Thumb}
+    setTicksDiv1Width(div1Percent + '%');
+    setTicksDiv2Width(div2Percent + '%');
+    setTicksDiv3Width(div3Percent + '%');
+  }, [sliderTimeslots, currentTimeMsecs]);
 
-    return (
+  useEffect(() => {
+    // We have 19 slots, each time label spans 2 slots, we work in percentages
+    const labelWidthPct = (1 / 19) * 100;
+    const lblDblWidthPctRounded =
+      Math.round((labelWidthPct + Number.EPSILON) * 100) / 100;
+    setLblDblWidth(lblDblWidthPctRounded + '%');
+  }, []);
+
+  //const Track = (props, state) => <div {...props} key={state.key} index={state.index}></div>;
+  //const Thumb = (props, state) => <div {...props} key={state.key}></div>;;
+  //renderTrack={Track}
+  //renderThumb={Thumb}
+
+  return (
     <div>
-        <div className="slider-message">
-            {userMessageGeneral && <div className="slider-message-label">{userMessageGeneral}</div>}
-            {crrIsVisible && userMessageCrr && <div className="slider-message-label">{userMessageCrr}</div>}
-            {rdtIsVisible && userMessageRdt && <div className="slider-message-label">{userMessageRdt}</div>}
-        </div>
-        <div className="slider">
-            <div className="slider-time-label">{selectedTimeString}</div>
-            <div className="slider-timezone-label">{timeZoneString}</div>
-            <div className="slider-controls">
-                <button className="slider-play" onClick={() => {setAnimate(!animate);}}>
-                        {animate ? '\u25A0' : '\u25B6'}</button>
+      <div className="slider-message">
+        {userMessageGeneral && (
+          <div className="slider-message-label">{userMessageGeneral}</div>
+        )}
+        {crrIsVisible && userMessageCrr && (
+          <div className="slider-message-label">{userMessageCrr}</div>
+        )}
+        {rdtIsVisible && userMessageRdt && (
+          <div className="slider-message-label">{userMessageRdt}</div>
+        )}
+      </div>
+      <div className="slider">
+        <div className="slider-time-label">{selectedTimeString}</div>
+        <div className="slider-timezone-label">{timeZoneString}</div>
+        <div className="slider-controls">
+          <button
+            className="slider-play"
+            onClick={() => {
+              setAnimate(!animate);
+            }}
+          >
+            {animate ? '\u25A0' : '\u25B6'}
+          </button>
 
-                <div className="slider-container">
-                    <div className='slider-ticks-above-labels'>
-                        {sliderTimeslots.map((object, i) =>
-                            <div className='slider-ticks-above-label-item'>
-                                {timeDisplayString(object)}
-                            </div>
-                        )}
-                    </div>
-
-                    <div className='slider-ticks-above-marks'>
-                    {sliderTimeslots.map((object, i) =>
-                            (new Date(object).getMinutes() === 0) ?
-                                <div className='slider-ticks-above-mark-item-bigger'>|</div>
-                            :
-                                <div className='slider-ticks-above-mark-item'>|</div>
-                        )}
-                    </div>
-
-                    <ReactSlider
-                        className="customSlider"
-                        thumbClassName="customSlider-thumb"
-                        trackClassName="customSlider-track"
-                        withTracks
-                        onChange={(value) => {
-                            console.log("onChange value=" + value);
-                            setCurrentSliderValue(value);
-                            if (value >= 0  && value <= (sliderTimeslots.length)) {
-                                setSelectedTimeslot(sliderTimeslots[value]);
-                            }
-                        }}
-                        value={currentSliderValue}
-                        //defaultValue={defaultSliderValue}
-                        markClassName="customSlider-mark"
-                        min={0}
-                        max={nTimeslots-1} />
-
-                    <div className="slider-ticks-below">
-                        <div className='slider-ticks-below-item' style={{width: ticksDiv1Width}}></div>
-                        <div className='slider-ticks-below-item' style={{width: ticksDiv2Width}}><div>now</div></div>
-                        <div className='slider-ticks-below-item' style={{width: ticksDiv3Width}}></div>
-                    </div>
-
+          <div className="slider-container">
+            <div className="slider-ticks-above-labels">
+              {sliderTimeslots.map((object, i) => (
+                <div className="slider-ticks-above-label-item" key={i}>
+                  {timeDisplayString(object)}
                 </div>
+              ))}
             </div>
-        </div>
 
+            <div className="slider-ticks-above-marks">
+              {sliderTimeslots.map((object, i) =>
+                new Date(object).getMinutes() === 0 ? (
+                  <div className="slider-ticks-above-mark-item-bigger" key={i}>
+                    |
+                  </div>
+                ) : (
+                  <div className="slider-ticks-above-mark-item" key={i}>
+                    |
+                  </div>
+                ),
+              )}
+            </div>
+
+            <ReactSlider
+              className="customSlider"
+              thumbClassName="customSlider-thumb"
+              trackClassName="customSlider-track"
+              withTracks
+              onChange={(value) => {
+                console.log('onChange value=' + value);
+                setCurrentSliderValue(value);
+                if (value >= 0 && value <= sliderTimeslots.length) {
+                  setSelectedTimeslot(sliderTimeslots[value]);
+                }
+              }}
+              value={currentSliderValue}
+              //defaultValue={defaultSliderValue}
+              markClassName="customSlider-mark"
+              min={0}
+              max={nTimeslots - 1}
+            />
+
+            <div className="slider-ticks-below">
+              <div
+                className="slider-ticks-below-item"
+                style={{ width: ticksDiv1Width }}
+              ></div>
+              <div
+                className="slider-ticks-below-item"
+                style={{ width: ticksDiv2Width }}
+              >
+                <div>now</div>
+              </div>
+              <div
+                className="slider-ticks-below-item"
+                style={{ width: ticksDiv3Width }}
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

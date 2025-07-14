@@ -47,10 +47,15 @@ interface SourceProps {
   cache?: number;
 }
 
-const floatingBoxStyle = { top: '20px', right: '20px',
-  borderColor: 'black', borderWidth: '2px',
-  borderStyle: 'solid', backgroundColor: 'rgba(255,255,255,0.8)'};
-  
+const floatingBoxStyle = {
+  top: '20px',
+  right: '20px',
+  borderColor: 'black',
+  borderWidth: '2px',
+  borderStyle: 'solid',
+  backgroundColor: 'rgba(255,255,255,0.8)',
+};
+
 const App = () => {
   useEffect(() => {
     sessionStorage.clear();
@@ -60,8 +65,8 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          <FastaProfile/>
-          <WaypointProfile/>
+          <FastaProfile />
+          <WaypointProfile />
         </Profiles>
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />

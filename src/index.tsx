@@ -10,14 +10,13 @@ import AppTimelinesZm from './AppTimelinesZm';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from 'react-router';
 
-
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter basename='/app'>
+      <BrowserRouter basename="/app">
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="timelines/mz" element={<AppTimelinesMz />} />
@@ -28,7 +27,6 @@ root.render(
     </Provider>
   </React.StrictMode>,
 );
-
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

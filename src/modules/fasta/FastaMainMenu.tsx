@@ -1,12 +1,8 @@
-import React from 'react'; 
+import React from 'react';
 import './FastaMainMenu.css';
 
-const FastaMainMenu = (props : any) => {
-    return (
-        <div className='FastaMainMenu'>
-            {props.children}
-        </div>
-    )
-}
+const FastaMainMenu = (props: any) => {
+  return <div className="FastaMainMenu">{props.children}</div>;
+};
 
 export default FastaMainMenu;

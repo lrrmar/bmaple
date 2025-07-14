@@ -57,7 +57,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
       ObjectType: 'contour',
     };
 
-    console.log("geojsonFilter " + sourceIdentifier);
+    console.log('geojsonFilter ' + sourceIdentifier);
 
     const geojsonFeatures = featuresAtClick.filter((feature) =>
       Object.keys(geojsonFilter)
@@ -65,7 +65,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
         .every(Boolean),
     );
 
-    console.log("geojsonFeatures:" + geojsonFeatures.length);
+    console.log('geojsonFeatures:' + geojsonFeatures.length);
 
     const geojsonFeature = geojsonFeatures[0];
 
@@ -81,7 +81,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
     }
     const uid = 'id' + new Date().getTime();
 
-    if (mode === "edit") {
+    if (mode === 'edit') {
       dispatch(
         request({
           source: sourceIdentifier,
@@ -96,8 +96,7 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
         }),
       );
 
-      console.log("Added request ... id:" + uid);
-      
+      console.log('Added request ... id:' + uid);
     }
   }, [clickEvent]);
 

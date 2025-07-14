@@ -2,19 +2,18 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
-import {getUid} from 'ol/util';
-import { useAppDispatch as useDispatch, useAppSelector as useSelector } from '../../hooks';
+import { getUid } from 'ol/util';
 import {
-  selectCache,
-  ingest,
-  Ingest
-} from '../../mapping/cacheSlice';
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector,
+} from '../../hooks';
+import { selectCache, ingest, Ingest } from '../../mapping/cacheSlice';
 import {
   selectBaseUrl,
   updateProfileCrrId,
   updateProfileRdtId,
   selectSelectedCrrId,
-  selectSelectedRdtId
+  selectSelectedRdtId,
 } from './fastaSlice';
 import openLayersMap from '../../mapping/OpenLayersMap';
 import FastaHashTablesServer from './FastaHashTables';
@@ -25,11 +24,10 @@ interface Props {
 }
 
 const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
- 
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const layerCache = useSelector(selectCache);
- 
+
   const urlParams = id.split('?');
   let forecastQs = '';
   if (urlParams[1]) {
@@ -56,11 +54,11 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
     console.log('FASTASourceLayer creating VectorTileLayer id:' + id);
 
-    var maxZoom = 4;
-    if (id.startsWith("rdt")) {
+    let maxZoom = 4;
+    if (id.startsWith('rdt')) {
       maxZoom = 3;
     }
-    
+
     const vtLayer = new VectorTileLayer({
       source: new VectorTileSource({
         maxZoom: maxZoom,
@@ -81,23 +79,22 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     // Could do with a way to flag that we've finished adding layers.
     //map.once('postrender', (event) => {
 
-      const toCache : Ingest = {
-        id: id,
-        source: "fasta",
-        ol_uid: getUid(vtLayer),
-      };
+    const toCache: Ingest = {
+      id: id,
+      source: 'fasta',
+      ol_uid: getUid(vtLayer),
+    };
 
-      //dispatch(cacheLayer(toCache));
-      dispatch(ingest(toCache));
+    //dispatch(cacheLayer(toCache));
+    dispatch(ingest(toCache));
 
-      //console.log("Added Ingest to cache: " + id + " : " + toCache.ol_uid);
+    //console.log("Added Ingest to cache: " + id + " : " + toCache.ol_uid);
 
-      setTimeout(() => {
-        vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
-      }, 3000);
-    
+    setTimeout(() => {
+      vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
+    }, 3000);
+
     //}); // once
-
   }, []);
 
   return null;

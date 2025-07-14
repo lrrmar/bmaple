@@ -1,8 +1,4 @@
-import {
-  useRef,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectBaseUrl,
@@ -20,19 +16,18 @@ export interface HashTable {
   completeness: number;
 }
 
-
 const FastaHashTablesServer = () => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
   const [hashTablesToKeep, setHashTablesToKeep] = useState<HashTable[]>([]);
-  const [latestTimeslot, setLatestTimeslot] = useState<number|null>(null);
+  const [latestTimeslot, setLatestTimeslot] = useState<number | null>(null);
 
   // timer to refresh hashtables every minute
   const [pulse, setPulse] = useState(0);
   const [pulseInterval, setPulseInterval] = useState(1000 * 60);
 
   const getFastaHashTables = () => {
-    var fastaHashes = sessionStorage.getItem('fastaHashes');
+    const fastaHashes = sessionStorage.getItem('fastaHashes');
     if (fastaHashes == null) {
       sessionStorage.setItem('fastaHashes', JSON.stringify([]));
       return JSON.parse(JSON.stringify([]));
@@ -43,7 +38,7 @@ const FastaHashTablesServer = () => {
 
   const [fastaHashes, setFastaHashes] = useState(getFastaHashTables);
 
-  const appendFastaHash = (val : HashTable) => {
+  const appendFastaHash = (val: HashTable) => {
     const fastaHashes = getFastaHashTables();
     fastaHashes.push(val);
     sessionStorage.setItem('fastaHashes', JSON.stringify(fastaHashes));
@@ -53,19 +48,19 @@ const FastaHashTablesServer = () => {
     setFastaHashes(updatedFastaHashes);
   };
 
-  const appendFastaHashes = (vals : HashTable[]) => {
+  const appendFastaHashes = (vals: HashTable[]) => {
     const fastaHashes = getFastaHashTables();
     const concatFastaHashes = fastaHashes.concat(vals);
     const uniqueFastaHashes = fastaHashes.filter(
-      (item:HashTable, index:number, self:HashTable[]) =>
-        index === self.findIndex((t:HashTable) => t.id === item.id),
+      (item: HashTable, index: number, self: HashTable[]) =>
+        index === self.findIndex((t: HashTable) => t.id === item.id),
     );
     sessionStorage.setItem('fastaHashes', JSON.stringify(concatFastaHashes));
     const updatedFastaHashes = sessionStorage.getItem('fastaHashes');
     setFastaHashes(updatedFastaHashes);
   };
 
-  const filterFastaHashes = (hashes : HashTable[], product : string) => {
+  const filterFastaHashes = (hashes: HashTable[], product: string) => {
     // Filter out forecast hashes leaving just observations,
     // and sort so that latest observation is first
     const observationHashes = hashes
@@ -84,7 +79,8 @@ const FastaHashTablesServer = () => {
       .filter((hash) => {
         return (
           hash.timeslot === latest.timeslot &&
-          hash.name === product && product === 'crr' &&
+          hash.name === product &&
+          product === 'crr' &&
           hash.forecast_slot !== ''
         );
       })
@@ -110,10 +106,8 @@ const FastaHashTablesServer = () => {
     dispatch(updateLatestTimeslot(latestTimeslot));
   }, [latestTimeslot]);
 
-
   const fetchFastaHashes = async () => {
-
-    const productCodes : { [index: string] : string } = {
+    const productCodes: { [index: string]: string } = {
       'Convective Rainfall Rate': 'crr',
       'Rapidly Developing Thunderstorms': 'rdt',
     };
@@ -123,11 +117,10 @@ const FastaHashTablesServer = () => {
     );
     const json = await response.json();
 
-    var latestTs : number|null = null;
-    var hashes : HashTable[] = [];
+    let latestTs: number | null = null;
+    const hashes: HashTable[] = [];
 
     json.tilesets.forEach((product: any) => {
-
       const name = productCodes[product.name];
       if (name === 'crr') {
         // The UI will need to know latest available timeslot to calibrate selector controls.
@@ -138,8 +131,8 @@ const FastaHashTablesServer = () => {
       product.timeslots.forEach((timeslot: any) => {
         const timestamp = new Date(timeslot.timeslot).getTime();
         const isLatest = timestamp === latestTs;
-        const isAvailable = (timeslot.available === "Yes");
-        const hash : HashTable = {
+        const isAvailable = timeslot.available === 'Yes';
+        const hash: HashTable = {
           name: name,
           timeslot: timestamp, // new Date(timestamp).toISOString(), //timeslot.timeslot,
           forecast_slot: '',
@@ -150,7 +143,7 @@ const FastaHashTablesServer = () => {
         //console.log("Adding hash:" + timestamp);
         hashes.push(hash);
 
-        timeslot.forecast_slots.forEach((forecast_slot : number) => {
+        timeslot.forecast_slots.forEach((forecast_slot: number) => {
           //console.log("Adding forecast hash:" + timestamp + ": " + forecast_slot.toString());
           const forecast_hash = { ...hash };
           forecast_hash.forecast_slot = forecast_slot.toString();
@@ -183,11 +176,11 @@ const FastaHashTablesServer = () => {
   }, []);
 
   useEffect(() => {
-    console.log("AUTO REFRESH");
+    console.log('AUTO REFRESH');
     fetchFastaHashes();
   }, [pulse]);
 
-  return <div className='FastaHashTables'></div>;
+  return <div className="FastaHashTables"></div>;
 };
 
 export default FastaHashTablesServer;
