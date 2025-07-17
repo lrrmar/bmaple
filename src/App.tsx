@@ -77,8 +77,9 @@ const App = () => {
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox style={floatingBoxStyle}>
-          <ProductSelector></ProductSelector>
+        <FloatingBox style={floatingBoxStyle} >
+          <ColourSchemeMenu />
+          {/* <ProductSelector /> */}
         </FloatingBox>
       </Map>
       <FastaMainMenu>
@@ -88,9 +89,7 @@ const App = () => {
   );
 };
 
-//<FoldOutMenu align={'left'}>
-//<ColourSchemeMenu id={'style'} />
-//</FoldOutMenu>
+
 
 export default App;
 export type AppStore = typeof store;

@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../App';
 import type { HashTable } from './FastaHashTables';
+import { Root } from 'react-dom/client';
 
 interface InitialState {
   baseUrl: string;
@@ -15,6 +16,9 @@ interface InitialState {
   fastaProducts: FastaProduct[];
   zmFlag: boolean;
   mzFlag: boolean;
+  opacityCRR: number;
+  opacityRDT: number;
+  crrChosenStyle: string;
 }
 
 export interface FastaProduct {
@@ -41,11 +45,14 @@ const initialState: InitialState = {
     {
       order: 1,
       name: 'RDT',
-      visible: false,
+      visible: true,
     },
   ],
   zmFlag: false,
   mzFlag: false,
+  opacityCRR: 1,
+  opacityRDT: 1,
+  crrChosenStyle: 'rainbow'
 };
 
 export const fastaSlice = createSlice({
@@ -79,10 +86,21 @@ export const fastaSlice = createSlice({
     updateMzFlag: (state, flag: PayloadAction<boolean>) => {
       state.mzFlag = flag.payload;
     },
+    updateOpacityCRR:(state, opacityLevel: PayloadAction<number>) => {
+      state.opacityCRR = opacityLevel.payload;
+    },
+    updateOpacityRDT:(state, opacityLevel: PayloadAction<number>) => {
+      state.opacityRDT = opacityLevel.payload;
+    },
+    updateCrrChosenStyle:(state, newStyle: PayloadAction<string>) => {
+      state.crrChosenStyle = newStyle.payload;
+    }
   },
 });
 
 export const {
+  updateOpacityRDT,
+  updateOpacityCRR,
   updateSelectedCrrId,
   updateSelectedRdtId,
   updateProfileCrrId,
@@ -92,6 +110,7 @@ export const {
   updateFastaProducts,
   updateZmFlag,
   updateMzFlag,
+  updateCrrChosenStyle,
 } = fastaSlice.actions;
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
@@ -114,6 +133,9 @@ export const selectRdtVisible = (state: RootState) =>
   isProductVisible(state, 'RDT');
 export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
 export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
+export const selectOpacityCRR = (state: RootState) => state.fasta.opacityCRR;
+export const selectCrrChosenStyle = (state: RootState) => state.fasta.crrChosenStyle;
+export const selectOpacityRDT = (state: RootState) => state.fasta.opacityRDT
 
 const isProductVisible = (state: RootState, productName: string) => {
   const idxProduct = state.fasta.fastaProducts.findIndex(
