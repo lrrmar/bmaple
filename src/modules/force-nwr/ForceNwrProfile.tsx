@@ -50,7 +50,6 @@ const Graphics = () => {
 
     // Get layer info from cache
     if (profileId) cacheEntry = cache[profileId];
-    console.log(cacheEntry);
 
     // Verifying type
     if (cacheEntry)
@@ -59,7 +58,6 @@ const Graphics = () => {
     // Get new layer from open layers
     if (forceNwrCacheEntry)
       newLayer = mapUtils.getLayerByUid(forceNwrCacheEntry.ol_uid);
-    console.log(forceNwrCacheEntry);
 
     // current layer ---> old layer
     // new layer ---> current layer
@@ -75,15 +73,12 @@ const Graphics = () => {
 
   // Exchange layer visibility ASAP, dependant on styling bool
   useEffect(() => {
-    console.log(!!oldLayer, !!currentLayer);
     if (isStyling) return;
     if (oldLayer) {
-      console.log('yes old layer', oldLayer.ol_uid);
       oldLayer.setOpacity(0.0);
       setOldLayer(null);
     }
     if (currentLayer) {
-      console.log('yes current layer', currentLayer.ol_uid);
       currentLayer.setOpacity(opacity);
       const source = currentLayer.getSource();
       if (source) {
