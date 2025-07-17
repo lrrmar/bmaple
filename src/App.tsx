@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
 import cacheReducer from './mapping/cacheSlice';
@@ -95,4 +95,6 @@ const App = () => {
 export default App;
 export type AppStore = typeof store;
 export type RootState = ReturnType<AppStore['getState']>;
+export type Selector<T> = (state: RootState) => T;
+export type Action<T> = (payload: T) => PayloadAction<T>;
 export type AppDispatch = AppStore['dispatch'];
