@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
-import cacheReducer from './mapping/cacheSlice';
+import cacheReducer, { update } from './mapping/cacheSlice';
 import capReducer from './modules/fasta/fastaCAP/capSlice'
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
@@ -20,6 +20,7 @@ import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import FloatingBox from './features/FloatingBox';
 import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
+import TimeScrollBar from './features/TimeScrollBar'
 import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
 import CapWarningSource from './modules/fasta/fastaCAP/capWarningSource';
@@ -72,9 +73,11 @@ const App = () => {
           <WaypointProfile />
         </Profiles>
         <Sources>
-          <FastaSource cache={{}} sourceIdentifier={'fasta'} />
+          <FastaSource cache={{}} sourceIdentifier={'fasta'} /> 
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-          <CapWarningSource cache={{}} sourceIdentifier={'cap'} /> 
+          <FloatingBox style={floatingBoxStyle} >
+            <CapWarningSource cache={{}} sourceIdentifier={'cap'}/>
+          </FloatingBox>
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />

@@ -67,7 +67,7 @@ const ScrollingScale = ({
         valueLabelDisplay={'auto'}
         valueLabelFormat={getUTCString}
         onChange={(e: Event, value: number | number[]) => {
-          if (typeof value === 'number') dispatch(updateDisplayTime(value));
+          if (typeof value === 'number') dispatch(updateDisplayTime(String(value)));
         }}
         color={'info'}
         sx={{
