@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
 import cacheReducer from './mapping/cacheSlice';
+import capReducer from './modules/fasta/fastaCAP/capSlice'
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
@@ -21,6 +22,7 @@ import FloatingBox from './features/FloatingBox';
 import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
 import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
+import CapWarningSource from './modules/fasta/fastaCAP/capWarningSource';
 
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
@@ -33,6 +35,7 @@ export const store = configureStore({
     cache: cacheReducer,
     fasta: fastaReducer,
     waypoint: waypointReducer,
+    cap: capReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -71,6 +74,7 @@ const App = () => {
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+          <CapWarningSource cache={{}} sourceIdentifier={'cap'} /> 
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
