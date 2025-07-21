@@ -27,7 +27,11 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-import { selectProjection, selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
+import {
+  selectProjection,
+  selectDisplayTime,
+  selectVerticalLevel,
+} from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from './waypointSlice';
 
@@ -176,10 +180,12 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!coordinates) {
       return;
     }
-    const transformedCoordinates = transform([coordinates.longitude, coordinates.latitude], 'EPSG:4326', mapProjection)
-    const point = new Point(
-      transformedCoordinates,
+    const transformedCoordinates = transform(
+      [coordinates.longitude, coordinates.latitude],
+      'EPSG:4326',
+      mapProjection,
     );
+    const point = new Point(transformedCoordinates);
     const feature = new Feature({
       geometry: point,
     });

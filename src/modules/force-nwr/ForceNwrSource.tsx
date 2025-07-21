@@ -204,7 +204,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [discreteMetaData, displayTime, verticalLevel, currentHashes, cache]);
 
   useEffect(() => {
-    console.log(window.navigator.connection.downlink)
     const filteredCacheIds = Object.keys(cache).filter((id) => {
       return cache[id].source === sourceIdentifier;
     });

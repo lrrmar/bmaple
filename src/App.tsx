@@ -73,9 +73,9 @@ const App = () => {
           {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
         <BaseMaps>
-          {/*<DarkBaseMap id={'dark'} />
+          <DarkBaseMap id={'dark'} />
           <OSMBaseMap id={'Open Street Map'} />
-          <SwissTopoBaseMap id={'Swiss Topo'} />*/}
+          <SwissTopoBaseMap id={'Swiss Topo'} />
         </BaseMaps>
       </Map>
       <FloatingBox

@@ -7,7 +7,12 @@ import Map from 'ol/Map';
 import ImageSource from 'ol/source/Image';
 import ImageLayer from 'ol/layer/Image';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
-import { selectCacheEntries, selectCache, Entry, isEntry } from '../../mapping/cacheSlice';
+import {
+  selectCacheEntries,
+  selectCache,
+  Entry,
+  isEntry,
+} from '../../mapping/cacheSlice';
 import {
   selectProfileId,
   selectOpacity,
@@ -23,7 +28,9 @@ interface ForceNwrEntry {
 
 const isForceNwrEntry = (a: any): a is ForceNwrEntry => {
   const keys = Object.keys(a);
-  return keys.includes('ol_uid') && keys.includes('id')&& keys.includes('source');
+  return (
+    keys.includes('ol_uid') && keys.includes('id') && keys.includes('source')
+  );
 };
 
 const Graphics = () => {

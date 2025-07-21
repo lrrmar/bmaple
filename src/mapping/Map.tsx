@@ -92,43 +92,44 @@ const Map = ({ children }: Props) => {
   };
 
   function handleClick(e: React.MouseEvent<HTMLElement>) {
-    if (map === null) {
-      return;
-    }
-    const pixelCoord: number[] = map.getCoordinateFromPixel([e.clientX, e.clientY]);
-    const wgs84coord = transform(pixelCoord, mapProjection, 'EPSG:4326');
-    const mapCoordinate = {
-      longitude: wgs84coord[0],
-      latitude: wgs84coord[1],
-    };
-    const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
-      map.getFeaturesAtPixel([e.clientX, e.clientY]);
-    if (!featuresAtPixel) return;
-    const featuresAtClick: (FeatureAtClick | undefined)[] = featuresAtPixel.map(
-      (feature: Feature<Geometry> | FeatureLike) => {
-        if (!feature) return;
-        const geometry = feature.getGeometry();
-        if (!geometry) return;
-        const geometryType: string = geometry.getType();
-        const ol_uid: string = feature.getProperties()['ol_uid'];
-        if (!ol_uid) return;
+    if (map && mapProjection) {
+      const pixelCoord: number[] = map.getCoordinateFromPixel([
+        e.clientX,
+        e.clientY,
+      ]);
+      const wgs84coord = transform(pixelCoord, mapProjection, 'EPSG:4326');
+      const mapCoordinate = {
+        longitude: wgs84coord[0],
+        latitude: wgs84coord[1],
+      };
+      const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
+        map.getFeaturesAtPixel([e.clientX, e.clientY]);
+      if (!featuresAtPixel) return;
+      const featuresAtClick: (FeatureAtClick | undefined)[] =
+        featuresAtPixel.map((feature: Feature<Geometry> | FeatureLike) => {
+          if (!feature) return;
+          const geometry = feature.getGeometry();
+          if (!geometry) return;
+          const geometryType: string = geometry.getType();
+          const ol_uid: string = feature.getProperties()['ol_uid'];
+          if (!ol_uid) return;
 
-        const values: { [key: string]: string | number } = {
-          ...feature.getProperties(),
-        }; // get type
-        delete values.geometry;
-        const info: FeatureAtClick = {
-          ol_uid: ol_uid,
-          geometry: geometryType,
-          ...values,
-        };
-        return info;
-      },
-    );
-    const filteredFeaturesAtClick: FeatureAtClick[] =
-      featuresAtClick.filter(isFeatureAtClick);
-    dispatch(updateClickEvent(mapCoordinate));
-    dispatch(updateFeaturesAtClick(filteredFeaturesAtClick));
+          const values: { [key: string]: string | number } = {
+            ...feature.getProperties(),
+          }; // get type
+          delete values.geometry;
+          const info: FeatureAtClick = {
+            ol_uid: ol_uid,
+            geometry: geometryType,
+            ...values,
+          };
+          return info;
+        });
+      const filteredFeaturesAtClick: FeatureAtClick[] =
+        featuresAtClick.filter(isFeatureAtClick);
+      dispatch(updateClickEvent(mapCoordinate));
+      dispatch(updateFeaturesAtClick(filteredFeaturesAtClick));
+    }
   }
 
   return (
