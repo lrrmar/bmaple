@@ -14,6 +14,7 @@ import FastaProfile from './modules/fasta/FastaGraphic';
 import FastaSource from './modules/fasta/FastaSource';
 import FastaMainMenu from './modules/fasta/FastaMainMenu';
 import FastaSourceLayer from './modules/fasta/FastaSourceLayer';
+import CapLayer from './modules/fasta/fastaCAP/capLayer';
 import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import DarkBaseMap from './mapping/DarkBaseMap';
