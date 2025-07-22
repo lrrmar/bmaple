@@ -16,6 +16,7 @@ import { Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { wait } from '@testing-library/user-event/dist/utils';
 import CapLayer  from './capLayer';
+import { JsxElement } from 'typescript';
 
 
 interface Props {
@@ -38,6 +39,7 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
     const allCache = useSelector(selectCache);
     const [currentCapArray, setCurrentCapArray] = useState<localCap[]>([]);
     const [currentPolyArray, setCurrentPolyArray] = useState<string[]>([]);
+    const [layers, setLayers] = useState<JSX.Element[]>([]);
 
     // fetch the cap warnings and store in cap list 
     useEffect(() => {
@@ -106,15 +108,14 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
 
         const components = filteredIds.map((id) => {
             console.log("filteredIDs");
-            <CapLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
+            return <CapLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
         });
 
-        console.log(components, "pls");
-        //setLayers(components);
+        setLayers(components);
     }, [allCache]);
 
 
-    return <div className="capSource"> </div>
+    return <div className="capSource">{layers}</div>
 }
 
 export default capWarningSource;
