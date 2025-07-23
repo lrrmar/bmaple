@@ -4,19 +4,20 @@ import type { RootState } from '../../../App';
 import type { HashTable } from './../FastaHashTables';
 import { Root } from 'react-dom/client';
 import { StringLiteral } from 'typescript';
+import { defaultFillStyle } from 'ol/render/canvas';
 
 interface InitialState{
     severity: string;
     country: string;
     opacity: number;
-    style: string[];
+    style: string;
 }
 
 const initialState: InitialState = {   
     severity: 'All',  
     country: 'All',
     opacity: 0.5,
-    style: ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd']
+    style: 'default'
 }
 
 export const capSlice = createSlice({
@@ -32,7 +33,7 @@ export const capSlice = createSlice({
         updateSeverity(state, severity:PayloadAction<string>){
             state.severity = severity.payload;
         },
-        updateStyle(state, style:PayloadAction<string[]>){
+        updateStyle(state, style:PayloadAction<string>){
             state.style = style.payload;
         }
     },

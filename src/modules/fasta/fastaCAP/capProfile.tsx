@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import OLVectorLayer from 'ol/layer/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
@@ -27,6 +27,8 @@ import {
     request,
     Request,
     selectCache,
+    remove,
+    Remove,
 } from '../../../mapping/cacheSlice';
 import {
     selectCountry,
@@ -56,60 +58,64 @@ TODO:
 */
 
 const CapProfile = () => {
+    const dispatch = useDispatch();
     const map = openLayersMap.map;
     const currentStyle = useSelector(selectStyle);
     const currentSeverity = useSelector(selectSeverity);
-    const currentCoutry = useSelector(selectCountry);
+    const currentCountry = useSelector(selectCountry);
     const currentOpacity = useSelector(selectOpacity);
     const allCache = useSelector(selectCache);
+    const styleList = {'default': ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd'],
+        'rainbow' : ['#2579d4', '#2a8cf0', '#1cd0f5', '#428730', '#31c749'],
+        'tol': ['#332288','#117733', '#44AA99', '#88CCEE', '#DDCC77'],
+        'viridis': ['#fde725', '#c2df23', '#86d549', '#52c569', '#2ab07f'],
+    };
+
     const [idList, setIdList] = useState<string[]>([]);
     const [sevList, setSevList] = useState<string[]>([]);
     const getLayer = (
-    uid: string | null,
-  ): VectorLayer<Feature<Geometry>> | null => {
-    let baseLayer: BaseLayer | undefined = undefined;
-    let vectorTileLayer: VectorLayer<Feature<Geometry>> | null = null;
-    map
-      .getLayers()
-      .getArray()
-      .forEach((l) => {
-        if (getUid(l) === uid) {
-          baseLayer = l;
+        uid: string | null,
+    ): VectorLayer<Feature<Geometry>> | null => {
+        let baseLayer: BaseLayer | undefined = undefined;
+        let vectorTileLayer: VectorLayer<Feature<Geometry>> | null = null;
+        map
+            .getLayers()
+            .getArray()
+            .forEach((l) => {
+                if (getUid(l) === uid) {
+                    baseLayer = l;
+                }
+            });
+
+        if (baseLayer) {
+            vectorTileLayer = baseLayer as VectorLayer<Feature<Geometry>>;
         }
-      });
+        return vectorTileLayer;
+    };
 
-    if (baseLayer) {
-      vectorTileLayer = baseLayer as VectorLayer<Feature<Geometry>>;
-    }
-    return vectorTileLayer;
-  };
-
+    // get list of all ids from cap source
     useEffect(() => {
 
         const filteredIds = Object.keys(allCache).filter((id) => {
             const element = allCache[id];
             return element?.source === 'cap' && element?.ol_uid;
         });
-        console.log(allCache);
-        //console.log(idList);
 
         setIdList(filteredIds);
-        console.log(idList, "FILTER");
     }, [allCache])
 
+    // set colour based on parameters from severity check
     const setColour = ((index: number, id: string) => {
         let newOlUid: string | null = null;
 
         let layerID: Entry | null = null;
 
-
-
-        if(id){
+        if (id) {
             const layerID = allCache[id] as Entry;
             newOlUid = layerID.ol_uid;
-            if (newOlUid){
+            if (newOlUid) {
                 const layer = getLayer(newOlUid);
-                const hexVal = currentStyle[index];
+                const hexVal = styleList[currentStyle][index];
                 const style = new Style({
                     stroke: new Stroke({
                         color: 'black',
@@ -123,19 +129,6 @@ const CapProfile = () => {
                 layer?.setStyle(style);
             }
         }
-
-   // const hexColour = currentStyle[index];
-        // const ol_uid = allCache[id]['ol_uid'];
-        // const style = new Style({ fill: new Fill({ color: hexColour }) })
-
-        // const layers = map.getLayers().getArray();
-        // let currLayer: BaseLayer | undefined;
-        // layers.forEach((layer) => {
-        //     if (layer.get('ol_uid') == ol_uid) {
-        //         currLayer = layer;
-        //         return;
-        //     }
-        // })
     })
 
     // Change Colour based on severity
@@ -143,9 +136,7 @@ const CapProfile = () => {
         // get the severity 
         idList.forEach((id) => {
             const cap = allCache[id];
-            console.log(cap, "CAP");
             const sev = cap.severity;
-            console.log(sev, "SEV");
             const comp = String(sev).toLowerCase();
             if (comp === 'minor') {
                 setColour(0, id);
@@ -159,8 +150,101 @@ const CapProfile = () => {
                 setColour(4, id);
             }
         })
-    }, [idList])
+    }, [idList, currentStyle])
 
+
+    // set opacity based on input i havent made yet
+    useEffect(() => {
+        idList.forEach((id) => {
+            let newOlUid: string | null = null;
+            let layerID: Entry | null = null;
+
+            if (id) {
+                layerID = allCache[id] as Entry;
+                newOlUid = layerID.ol_uid;
+                const newLayer = getLayer(newOlUid);
+                newLayer?.setOpacity(currentOpacity);
+            }
+        })
+
+    }, [idList, currentOpacity])
+
+    // filter by country, set countries that arent the correct one invisible and vice versa
+    useEffect(() => {
+        idList.forEach((id) => {
+            if (id) {
+                const oldLayer = allCache[id];
+                const newOlUid = oldLayer.ol_uid;
+                const layerCountry = String(oldLayer.country).toLowerCase();
+                const compCountry = currentCountry.toLowerCase();
+                const newLayer = getLayer(String(newOlUid));
+                if (compCountry === 'all') {
+                    newLayer?.setVisible(true);
+                } else if (layerCountry === compCountry) {
+                    newLayer?.setVisible(true);
+                } else {
+                    newLayer?.setVisible(false);
+                }
+            }
+        })
+
+    }, [idList, currentCountry])
+
+    // filter by severity
+    useEffect(() => {
+        idList.forEach((id) => {
+            if (id) {
+                const oldLayer = allCache[id];
+                const newOlUid = oldLayer.ol_uid;
+                const layerSev = String(oldLayer.severity).toLowerCase();
+                const compSev = currentSeverity.toLowerCase();
+                const newLayer = getLayer(String(newOlUid));
+                if (compSev === 'all') {
+                    newLayer?.setVisible(true);
+                } else if (layerSev === compSev) {
+                    newLayer?.setVisible(true);
+                } else {
+                    newLayer?.setVisible(false);
+                }
+            }
+        })
+
+    }, [idList, currentSeverity])
+
+    // Ensure that the alert is in the right time frame 
+    useEffect(() => {
+        idList.forEach((id) => {
+            if (id) {
+                const currentTime = Date.now();
+                const oldLayerID = allCache[id];
+                const oluid = oldLayerID.ol_uid;
+                const newLayer = getLayer(String(oluid));
+                const start = oldLayerID.start;
+                const end = oldLayerID.end;
+
+
+                if (start) {
+                    const startTime = new Date(String(start));
+                    if (startTime.getTime() < currentTime) {
+                        newLayer?.setVisible(true);
+                    } else {
+                        newLayer?.setVisible(false);
+                    }
+                } else {
+                    newLayer?.setVisible(true);
+                }
+                if (end) {
+                    const endTime = new Date(String(end));
+                    if (endTime.getTime() < currentTime) {
+                        const rem: Remove = {
+                            id: id,
+                        }
+                        dispatch(remove(rem));
+                    }
+                }
+            }
+        })
+    }, [idList, allCache])
     return <div></div>
 }
 

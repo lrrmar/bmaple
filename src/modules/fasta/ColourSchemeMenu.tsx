@@ -8,6 +8,8 @@ import {
 
 import { updateCrrChosenStyle, updateOpacityCRR, updateOpacityRDT } from "./fastaSlice";
 
+import { updateCountry, updateSeverity, updateOpacity, updateStyle } from './fastaCAP/capSlice'
+
 /*
 import {
   updateBaseMapId,
@@ -40,29 +42,20 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
 
   return (
     <div style={style}>
+      <h3> Weather Filters: </h3>
       <div>
-        <label htmlFor="style">Style:  </label>
-        <select id="style"  >
-
-          <option key="1"
-            value="0"
-            onClick={(element) =>
-              dispatch(updateCrrChosenStyle("rainbow"))}
-          > Rainbow </option>
-          <option key="1"
-            value="1"
-            onClick={(element) =>
-              dispatch(updateCrrChosenStyle("tol"))}
-          > Tol </option>
-          <option key="3"
-            value="2"
-            onClick={(element) =>
-              dispatch(updateCrrChosenStyle("viridis"))}
-          > Viridis </option>
+        <label htmlFor="style">Style: </label>
+        <select
+          id="style"
+          onChange={(event) => dispatch(updateCrrChosenStyle(event.target.value))}
+        >
+          <option value="rainbow">Rainbow</option>
+          <option value="tol">Tol</option>
+          <option value="viridis">Viridis</option>
         </select>
       </div>
       <div>
-        <label htmlFor="opacity">CRR Opacity:  </label>
+        <label htmlFor="opacityCRR">CRR Opacity:  </label>
         <input
           type="range"
           id="opacity"
@@ -75,7 +68,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         />
       </div>
       <div>
-        <label htmlFor="opacity">RDT Opacity:  </label>
+        <label htmlFor="opacityRDT">RDT Opacity:  </label>
         <input
           type="range"
           id="opacity"
@@ -87,6 +80,63 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           }
         />
       </div>
+      <h3> CAP Filters </h3>
+      <div>
+        <label htmlFor="style">Style: </label>
+        <select
+          id="style"
+          onChange={(event) => dispatch(updateStyle(event.target.value))}
+        >
+          <option value = "default"> Default</option>
+          <option value="rainbow">Rainbow</option>
+          <option value="tol">Tol</option>
+          <option value="viridis">Viridis</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="opacityCAP">CAP Opacity:  </label>
+        <input
+          type="range"
+          id="opacity"
+          min="0"
+          max="1"
+          step="0.1"
+          defaultValue="0.5"
+          onChange={(element) =>
+            dispatch(updateOpacity(parseFloat(element.target.value)))
+          }
+        />
+      </div>
+      <div>
+        <label htmlFor="country">Cap Country </label>
+        <select
+          id="country"
+          onChange={(event) => dispatch(updateCountry(event.target.value))}
+        >
+          <option value="All">All</option>
+          <option value="ML">ML</option>
+          <option value="TZ">TZ</option>
+          <option value="GN">GN</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="Severity">Cap Severity </label>
+        <select
+          id="Severity"
+          onChange={(event) => dispatch(updateSeverity(event.target.value))}
+        >
+          <option value="All">All</option>
+          <option value="Minor">Minor</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Severe">Severe</option>
+          <option value="Extreme">Extreme</option>
+        </select>
+      </div>
+
+
+
+
+
     </div>
   );
 };
