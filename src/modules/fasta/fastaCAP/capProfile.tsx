@@ -34,7 +34,9 @@ import {
     selectCountry,
     selectOpacity,
     selectSeverity,
-    selectStyle
+    selectStyle,
+    updateCountryList,
+    selectCountryList,
 } from './capSlice'
 import openLayersMap from '../../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
@@ -48,15 +50,6 @@ import OpenLayersMap from '../../../mapping/OpenLayersMap';
 import { hexToRgb } from '@mui/material';
 
 
-
-/*
-/*
-TODO:
-    ~ Change colour of the fill based on the severity of the CAP 
-    ~ Visibility based on severity
-    ~ Visibility based on country
-*/
-
 const CapProfile = () => {
     const dispatch = useDispatch();
     const map = openLayersMap.map;
@@ -65,14 +58,15 @@ const CapProfile = () => {
     const currentCountry = useSelector(selectCountry);
     const currentOpacity = useSelector(selectOpacity);
     const allCache = useSelector(selectCache);
-    const styleList = {'default': ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd'],
-        'rainbow' : ['#2579d4', '#2a8cf0', '#1cd0f5', '#428730', '#31c749'],
-        'tol': ['#332288','#117733', '#44AA99', '#88CCEE', '#DDCC77'],
+    const currentCountryList = useSelector(selectCountryList);
+    const styleList: { [key: string]: string[] } = {
+        'default': ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd'],
+        'rainbow': ['#2579d4', '#2a8cf0', '#1cd0f5', '#428730', '#31c749'],
+        'tol': ['#332288', '#117733', '#44AA99', '#88CCEE', '#DDCC77'],
         'viridis': ['#fde725', '#c2df23', '#86d549', '#52c569', '#2ab07f'],
     };
 
     const [idList, setIdList] = useState<string[]>([]);
-    const [sevList, setSevList] = useState<string[]>([]);
     const getLayer = (
         uid: string | null,
     ): VectorLayer<Feature<Geometry>> | null => {
@@ -104,6 +98,24 @@ const CapProfile = () => {
         setIdList(filteredIds);
     }, [allCache])
 
+    // keep track of the countries that have active CAP alerts 
+    useEffect(() => {
+        let countryList: string[] = [];
+
+        idList.forEach((id) => {
+            const cacheCap = allCache[id];
+            if (cacheCap) {
+                const cCountry = cacheCap.country;
+                const cCountry2 = String(cCountry);
+                if (countryList.indexOf(cCountry2) < 0) {
+                    countryList.push(cCountry2);
+                }
+            }
+        })
+        dispatch(updateCountryList(countryList));
+        console.log("CCL", currentCountryList);
+    }, [idList])
+
     // set colour based on parameters from severity check
     const setColour = ((index: number, id: string) => {
         let newOlUid: string | null = null;
@@ -111,11 +123,14 @@ const CapProfile = () => {
         let layerID: Entry | null = null;
 
         if (id) {
-            const layerID = allCache[id] as Entry;
+            const layerID = allCache[id] as Entry;0
+            let hexVal: string;
+
             newOlUid = layerID.ol_uid;
             if (newOlUid) {
                 const layer = getLayer(newOlUid);
-                const hexVal = styleList[currentStyle][index];
+                const styleArr = styleList[currentStyle]
+                hexVal = styleArr[index];
                 const style = new Style({
                     stroke: new Stroke({
                         color: 'black',
@@ -242,6 +257,8 @@ const CapProfile = () => {
                         dispatch(remove(rem));
                     }
                 }
+
+                newLayer?.setVisible(true);
             }
         })
     }, [idList, allCache])

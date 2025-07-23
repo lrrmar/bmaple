@@ -10,6 +10,8 @@ import { updateCrrChosenStyle, updateOpacityCRR, updateOpacityRDT } from "./fast
 
 import { updateCountry, updateSeverity, updateOpacity, updateStyle } from './fastaCAP/capSlice'
 
+import { selectCountryList } from './fastaCAP/capSlice';
+
 /*
 import {
   updateBaseMapId,
@@ -34,11 +36,12 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
   //const colourPalettes: string[] = useSelector(selectColourPalettes);
   //const colourPaletteId: string = useSelector(selectColourPaletteId);
   //const opacity: number = useSelector(selectOpacity);
-
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
   };
+  const countryList = useSelector(selectCountryList);
+
 
   return (
     <div style={style}>
@@ -87,7 +90,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           id="style"
           onChange={(event) => dispatch(updateStyle(event.target.value))}
         >
-          <option value = "default"> Default</option>
+          <option value="default"> Default</option>
           <option value="rainbow">Rainbow</option>
           <option value="tol">Tol</option>
           <option value="viridis">Viridis</option>
@@ -108,15 +111,12 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         />
       </div>
       <div>
-        <label htmlFor="country">Cap Country </label>
-        <select
-          id="country"
-          onChange={(event) => dispatch(updateCountry(event.target.value))}
-        >
-          <option value="All">All</option>
-          <option value="ML">ML</option>
-          <option value="TZ">TZ</option>
-          <option value="GN">GN</option>
+        <label htmlFor="country">CAP Country: </label>
+        <select name="country" onChange={(event) => dispatch(updateCountry(event.target.value))}>
+          <option value='All'>All</option>
+          {countryList.map((country, i) => {
+            return <option key={i} value={country} onChange={(event) => dispatch(updateCountry(country))}>{country}</option>
+          })}
         </select>
       </div>
       <div>

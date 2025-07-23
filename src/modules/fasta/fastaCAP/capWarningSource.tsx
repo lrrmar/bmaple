@@ -32,6 +32,7 @@ interface localCap {
     start: string | null;
     end: string | null;
     country: string | null;
+    [key: string]: string | number | null;
 }
 
 const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
@@ -52,25 +53,25 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                 const alertDL = capJson.alerts;
                 
 
-                const subsetAlertDL = alertDL.map((ale) => {
+                const subsetAlertDL = alertDL.map((ale: localCap) => {
                     const capObj: localCap = {
                         link: ale.link,
-                        fastaId: ale.id,
+                        fastaId: ale.fastaId,
                         event: ale.event,
                         severity: ale.severity,
-                        start: ale.onset,
-                        end: ale.expires,
+                        start: ale.start,
+                        end: ale.end,
                         country: ale.country,
                     }
                     return capObj;
                 })
+                console.log(subsetAlertDL, "CAPS");
                 setCurrentCapArray(subsetAlertDL);
             } catch (error) {
             }
 
         }
         fetchCaps();
-
     }, []);
 
     // update request list for when the capList changes

@@ -74,7 +74,6 @@ const App = () => {
           <FastaProfile />
           <WaypointProfile />
           <CapProfile />
-          <FoldOutMenu align='left'/> 
         </Profiles>
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} /> 
