@@ -6,70 +6,48 @@ import { Root } from 'react-dom/client';
 import { StringLiteral } from 'typescript';
 
 interface InitialState{
-    url: string| null;
-    capID: number | null;
-    event: string | null;
-    severity: string | null;
-    startTime: string | null;
-    endTime: string | null;
-    country: string | null;
+    severity: string;
+    country: string;
+    opacity: number;
+    style: string[];
 }
 
-const initialState: InitialState = {
-    url: null,
-    capID: null,
-    event: null,
-    severity: null,  
-    startTime: null,
-    endTime: null, 
-    country: null
+const initialState: InitialState = {   
+    severity: 'All',  
+    country: 'All',
+    opacity: 0.5,
+    style: ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd']
 }
 
 export const capSlice = createSlice({
     name: 'cap',
     initialState, 
     reducers: {
-        updateUrl(state, newUrl:PayloadAction<string>){
-            state.url = newUrl.payload;
-        },
-        updateCapID(state, newID:PayloadAction<number>){
-            state.capID = newID.payload;
-        },
-        updateEvent(state, event: PayloadAction<string>){
-            state.event = event.payload;
-        },
-        updateSeverity(state, severity: PayloadAction<string>){
-            state.severity = severity.payload;
-        },
-        updateEndTime(state, endTime: PayloadAction<string>){
-            state.endTime = endTime.payload;
-        },
-        updateStartTime(state, startTime: PayloadAction<string>){
-            state.startTime = startTime.payload;
+        updateOpacity(state, opacity:PayloadAction<number>){
+            state.opacity = opacity.payload;
         },
         updateCountry(state, country:PayloadAction<string>){
             state.country = country.payload;
+        },
+        updateSeverity(state, severity:PayloadAction<string>){
+            state.severity = severity.payload;
+        },
+        updateStyle(state, style:PayloadAction<string[]>){
+            state.style = style.payload;
         }
     },
 });
 
 export const {
-    updateUrl,
-    updateCapID,
+    updateOpacity,
     updateCountry,
-    updateEvent,
     updateSeverity, 
-    updateEndTime,
-    updateStartTime
-
+    updateStyle,
 } = capSlice.actions
 
-export const selectUrl = (state: RootState) => state.cap.url;
-export const selectCapID = (state: RootState) => state.cap.capID;
+export const selectOpacity = (state:RootState) => state.cap.opacity;
 export const selectCountry = (state: RootState) => state.cap.country;
-export const selectEvent = (state: RootState) => state.cap.event;
 export const selectSeverity = (state: RootState) => state.cap.severity;
-export const selectEndTime = (state: RootState) => state.cap.endTime;
-export const selectStartTime = (state: RootState) => state.cap.startTime;
+export const selectStyle = (state: RootState) => state.cap.style;
 
 export default capSlice.reducer;

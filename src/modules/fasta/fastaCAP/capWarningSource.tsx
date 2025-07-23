@@ -50,6 +50,7 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
 
                 const capJson = await response.json();
                 const alertDL = capJson.alerts;
+                
 
                 const subsetAlertDL = alertDL.map((ale) => {
                     const capObj: localCap = {
@@ -107,7 +108,6 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
         });
 
         const components = filteredIds.map((id) => {
-            console.log("filteredIDs");
             return <CapLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
         });
 

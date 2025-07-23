@@ -30,6 +30,7 @@ import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 import LocationsList from './modules/fasta/LocationsList';
+import CapProfile from './modules/fasta/fastaCAP/capProfile';
 
 export const store = configureStore({
   reducer: {
@@ -72,6 +73,7 @@ const App = () => {
         <Profiles>
           <FastaProfile />
           <WaypointProfile />
+          <CapProfile />
         </Profiles>
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} /> 
