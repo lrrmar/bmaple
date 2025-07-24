@@ -113,7 +113,6 @@ const CapProfile = () => {
             }
         })
         dispatch(updateCountryList(countryList));
-        console.log("CCL", currentCountryList);
     }, [idList])
 
     // set colour based on parameters from severity check

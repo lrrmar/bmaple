@@ -33,7 +33,7 @@ const CapLayer = ({
     const layerCache = useSelector(selectCache);
 
     const fetchPolygonData = async (id:string) => {
-        let polyStr: string;// get rid
+        let polyStr: string;
         try {
             if (layerCache[id]) {
                 const cacheElem = layerCache[id];

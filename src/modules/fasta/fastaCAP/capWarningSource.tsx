@@ -52,15 +52,14 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                 const capJson = await response.json();
                 const alertDL = capJson.alerts;
                 
-
                 const subsetAlertDL = alertDL.map((ale: localCap) => {
                     const capObj: localCap = {
                         link: ale.link,
                         fastaId: ale.fastaId,
                         event: ale.event,
                         severity: ale.severity,
-                        start: ale.start,
-                        end: ale.end,
+                        start: String(ale.onset),
+                        end: String(ale.expires),
                         country: ale.country,
                     }
                     return capObj;

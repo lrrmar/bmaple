@@ -31,6 +31,7 @@ import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 import LocationsList from './modules/fasta/LocationsList';
 import CapProfile from './modules/fasta/fastaCAP/capProfile';
+import CapPanel from './modules/fasta/fastaCAP/capPanel';
 
 export const store = configureStore({
   reducer: {
@@ -76,11 +77,10 @@ const App = () => {
           <CapProfile />
         </Profiles>
         <Sources>
-          <FastaSource cache={{}} sourceIdentifier={'fasta'} /> 
+          <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-          <FloatingBox style={floatingBoxStyle} >
-            <CapWarningSource cache={{}} sourceIdentifier={'cap'}/>
-          </FloatingBox>
+
+          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
@@ -91,9 +91,13 @@ const App = () => {
           <ColourSchemeMenu />
           {/* <ProductSelector /> */}
         </FloatingBox>
+        <FoldOutMenu align='left'>
+          <CapPanel id="Cap"/>
+        </FoldOutMenu>
       </Map>
       <FastaMainMenu>
         <Slider />
+        
       </FastaMainMenu>
     </div>
   );
