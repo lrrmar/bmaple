@@ -18,7 +18,7 @@ import {
 } from './forceNwrSlice';
 import { selectCache, request } from '../../mapping/cacheSlice';
 
-import ForceNwrLayer from './ForceNwrLayer';
+import ForceNwrImage from './ForceNwrImage';
 
 interface ContinuousMetaData {
   valid_time: string[];
@@ -208,7 +208,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       return cache[id].source === sourceIdentifier;
     });
     const components = filteredCacheIds.map((id) => (
-      <ForceNwrLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
+      <ForceNwrImage key={id} id={id} sourceIdentifier={sourceIdentifier} />
     ));
     setLayers(components);
   }, [cache]);
@@ -226,7 +226,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     }
   }, [profileId]);
 
-  return <div>{layers}</div>;
+  return <div style={{ left: '-100000px' }}>{layers}</div>;
 };
 
 export default ForceNwrSource;

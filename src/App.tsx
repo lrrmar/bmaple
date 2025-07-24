@@ -14,6 +14,7 @@ import DarkBaseMap from './mapping/DarkBaseMap';
 import SwissTopoBaseMap from './mapping/SwissTopoBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
+import ResizableDiv from './features/ResizableDiv';
 import GlassTabletTheme from './mapping/GlassTabletTheme';
 import PlainTheme from './mapping/PlainTheme';
 import forceNwrReducer from './modules/force-nwr/forceNwrSlice';
@@ -27,6 +28,7 @@ import WaypointsSource from './modules/waypoints/WaypointSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
+import ImgViewPort from './features/ImgViewPort';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
 import TimeScrollBar from './features/TimeScrollBar';
@@ -73,9 +75,9 @@ const App = () => {
           {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
         <BaseMaps>
-          <DarkBaseMap id={'dark'} />
+          {/*<DarkBaseMap id={'dark'} />
           <OSMBaseMap id={'Open Street Map'} />
-          <SwissTopoBaseMap id={'Swiss Topo'} />
+          <SwissTopoBaseMap id={'Swiss Topo'} />*/}
         </BaseMaps>
       </Map>
       <FloatingBox
@@ -92,6 +94,9 @@ const App = () => {
           orientation={'vertical'}
         />
       </FloatingBox>
+      <ResizableDiv minWidth={100}>
+        <ImgViewPort id={'nwr-img'} />
+      </ResizableDiv>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         {/*<FoldOutItem id={'Style'} icon={'paint brush'}>
           <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
@@ -107,6 +112,9 @@ const App = () => {
         </FoldOutItem>
         <FoldOutItem id={'style'} icon={'paint brush'}>
           <ForceNwrMenu />
+        </FoldOutItem>
+        <FoldOutItem id={'example'} icon={'question mark'}>
+          <div>{'I am an example'}</div>
         </FoldOutItem>
       </FoldOutMenu>
       <Themes>
