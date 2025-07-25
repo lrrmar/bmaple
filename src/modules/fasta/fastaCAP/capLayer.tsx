@@ -7,6 +7,7 @@ import { selectCache, ingest, Ingest } from '../../../mapping/cacheSlice';
 import { current } from '@reduxjs/toolkit';
 import Feature from 'ol/Feature.js';
 import Polygon from 'ol/geom/Polygon.js';
+import { Text } from 'ol/style';
 import { Coordinate } from 'ol/coordinate';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
@@ -30,9 +31,10 @@ const CapLayer = ({
 }) => {
     const dispatch = useDispatch();
     const [currentPoly, setCurrentPoly] = useState<string>();
+    const [currentText, setCurrentText] = useState<string>();
     const layerCache = useSelector(selectCache);
 
-    const fetchPolygonData = async (id:string) => {
+    const fetchPolygonData = async (id: string) => {
         let polyStr: string;
         try {
             if (layerCache[id]) {
@@ -46,7 +48,9 @@ const CapLayer = ({
                 const polygonData = xmlDoc.querySelector("polygon")?.innerHTML;
                 if (polygonData) {
                     polyStr = polygonData
+                    const descriptionStr = String(cacheElem?.event) + " \n" + String(cacheElem?.severity);
                     setCurrentPoly(polyStr);
+                    setCurrentText(descriptionStr);
                 }
             }
         } catch (error) {
@@ -65,11 +69,11 @@ const CapLayer = ({
         Object.keys(element).forEach((key: string) => {
             if (key === 'ol_uid') flag = false;
         })
-        if (flag){
+        if (flag) {
             fetchPolygonData(id);
         }
 
-        
+
     }, []);
 
     // create vector layers using the polygon data 
@@ -87,21 +91,33 @@ const CapLayer = ({
                 latlonArr.push(coords);
             });
             try {
-                const styles = new Style({
-                    stroke: new Stroke({
-                        color: 'black',
-                        width: 2,
-                    }), 
-                    fill: new Fill({
-                        color: 'orange',
+                    const styles = new Style({
+                        stroke: new Stroke({
+                            color: 'black',
+                            width: 2,
+                        }),
+                        fill: new Fill({
+                            color: 'orange',
+                        }),
+                        text: new Text({
+                            textAlign: 'center', 
+                            font: '12px bold Arial', 
+                            fill: new Fill({ color: '#000' }),
+                            stroke: new Stroke({ color: '#fff', width: 4 }),
+                            text: "WORKING",
+                            offsetX: 10,
+                            offsetY: 10,
+                        }),
                     })
-                })
+             
+                    
 
 
                 const feature = new Feature({
                     geometry: new Polygon([latlonArr]),
                 })
 
+            
                 const source = new VectorSource({
                     features: [feature],
                 })
@@ -113,27 +129,28 @@ const CapLayer = ({
                     visible: true,
                     zIndex: 100,
                 })
+                
                 const map = openLayersMap.map;
                 layer.setOpacity(0.5);
                 map.addLayer(layer);
                 const oldLayer = layerCache[id];
                 const toCache: Ingest = {
-                      id: id,
-                      country: oldLayer.country,
-                      source: 'cap',
-                      ol_uid: getUid(layer),
-                      end: oldLayer.end,
-                      event: oldLayer.event, 
-                      severity: oldLayer.severity,
-                      start: oldLayer.start, 
-                      link: oldLayer.link,
-                      fastaId: oldLayer.fastaId,
-                    };  
+                    id: id,
+                    country: oldLayer.country,
+                    source: 'cap',
+                    ol_uid: getUid(layer),
+                    end: oldLayer.end,
+                    event: oldLayer.event,
+                    severity: oldLayer.severity,
+                    start: oldLayer.start,
+                    link: oldLayer.link,
+                    fastaId: oldLayer.fastaId,
+                };
                 dispatch(ingest(toCache));
             } catch (error) {
                 console.log("ERROR", error);
             }
-            
+
 
         }
     }, [currentPoly])

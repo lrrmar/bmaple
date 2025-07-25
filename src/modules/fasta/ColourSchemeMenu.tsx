@@ -42,7 +42,6 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
   };
   const countryList = useSelector(selectCountryList);
 
-
   return (
     <div style={style}>
       <h3> Weather Filters: </h3>
@@ -80,8 +79,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           step="0.1"
           onChange={(element) =>
             dispatch(updateOpacityRDT(parseFloat(element.target.value)))
-          }
-        />
+          } />
       </div>
       <h3> CAP Filters </h3>
       <div>
@@ -109,6 +107,28 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
             dispatch(updateOpacity(parseFloat(element.target.value)))
           }
         />
+      </div>
+      <div>
+        <label htmlFor="miniCapTime">CAP TimeScroll  </label>
+        <input
+          type="range"
+          id="miniCapTime"
+          min="0"
+          max="1"
+          step="0.25"
+          defaultValue="0.5"
+          list='optionList'
+          onChange={(element) =>
+            dispatch(updateOpacity(parseFloat(element.target.value)))
+          }
+        />
+          <datalist id = 'optionList'>
+            <option value="0" label='-24hrs'></option>
+            <option value="0.25" label='-2hrs'></option>
+            <option value="0.5" label='now'></option>
+            <option value="0.75" label='+2hrs'></option>
+            <option value="1" label='+24hrs'></option>
+          </datalist>
       </div>
       <div>
         <label htmlFor="country">CAP Country: </label>

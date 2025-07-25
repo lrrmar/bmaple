@@ -48,6 +48,7 @@ import Stroke from 'ol/style/Stroke';
 import VectorLayer from 'ol/layer/Vector';
 import OpenLayersMap from '../../../mapping/OpenLayersMap';
 import { hexToRgb } from '@mui/material';
+import { Text } from 'ol/style';
 
 
 const CapProfile = () => {
@@ -130,6 +131,7 @@ const CapProfile = () => {
                 const layer = getLayer(newOlUid);
                 const styleArr = styleList[currentStyle]
                 hexVal = styleArr[index];
+                const currentText = String(allCache[id]?.event + " \n" + allCache[id]?.severity)
                 const style = new Style({
                     stroke: new Stroke({
                         color: 'black',
@@ -137,7 +139,16 @@ const CapProfile = () => {
                     }),
                     fill: new Fill({
                         color: hexVal,
-                    })
+                    }),
+                    text: new Text({
+                            textAlign: 'center', 
+                            font: '12px bold Arial', 
+                            fill: new Fill({ color: '#000' }),
+                            stroke: new Stroke({ color: '#fff', width: 4 }),
+                            text: currentText,
+                            offsetX: 0,
+                            offsetY: 0,
+                        }),
                 });
 
                 layer?.setStyle(style);
@@ -183,39 +194,24 @@ const CapProfile = () => {
 
     }, [idList, currentOpacity])
 
-    // filter by country, set countries that arent the correct one invisible and vice versa
-    useEffect(() => {
-        idList.forEach((id) => {
-            if (id) {
-                const oldLayer = allCache[id];
-                const newOlUid = oldLayer.ol_uid;
-                const layerCountry = String(oldLayer.country).toLowerCase();
-                const compCountry = currentCountry.toLowerCase();
-                const newLayer = getLayer(String(newOlUid));
-                if (compCountry === 'all') {
-                    newLayer?.setVisible(true);
-                } else if (layerCountry === compCountry) {
-                    newLayer?.setVisible(true);
-                } else {
-                    newLayer?.setVisible(false);
-                }
-            }
-        })
-
-    }, [idList, currentCountry])
-
-    // filter by severity
+    // filter by severity and country
     useEffect(() => {
         idList.forEach((id) => {
             if (id) {
                 const oldLayer = allCache[id];
                 const newOlUid = oldLayer.ol_uid;
                 const layerSev = String(oldLayer.severity).toLowerCase();
+                const layerCountry = String(oldLayer.country).toLowerCase();
                 const compSev = currentSeverity.toLowerCase();
+                const compCountry = currentCountry.toLowerCase();
                 const newLayer = getLayer(String(newOlUid));
-                if (compSev === 'all') {
+                if (compSev === 'all' && compCountry =='all') {
                     newLayer?.setVisible(true);
-                } else if (layerSev === compSev) {
+                } else if (layerSev === compSev && layerCountry === compCountry) {
+                    newLayer?.setVisible(true);
+                } else if (compSev === 'all' && layerCountry == compCountry){
+                    newLayer?.setVisible(true);
+                } else if ( layerSev === compSev && compCountry === 'all'){
                     newLayer?.setVisible(true);
                 } else {
                     newLayer?.setVisible(false);
@@ -223,7 +219,7 @@ const CapProfile = () => {
             }
         })
 
-    }, [idList, currentSeverity])
+    }, [idList, currentSeverity, currentCountry])
 
     // Ensure that the alert is in the right time frame 
     useEffect(() => {

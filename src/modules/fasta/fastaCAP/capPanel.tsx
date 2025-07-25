@@ -33,35 +33,26 @@ const CapPanel = (({ id }: { id: string }) => {
     })
 
     const getEventByID = ((id: string) => {
-        console.log(currentSeverity, currentCountry, "HERE");
         return String(allCache[id].event)
     })
 
     const getCountryByID = ((id: string) => {
-        console.log(currentSeverity, currentCountry, "HERE");
         return String(allCache[id].country)
     })
-
-    // get list of wanted ids based on the filters. 
-    useEffect(() => {
-        return;
-
-
-
-
-    }, [currentCountry, currentSeverity, capList])
-
 
     // get updated cap list every time the cache is changed 
     useEffect(() => {
         const filteredIds = Object.keys(allCache).filter((id) => {
             const element = allCache[id];
-            return element?.source === 'cap' && element?.ol_uid;
+            const matchesSource = element?.source === 'cap';
+            const hasUID = !!element?.ol_uid;
+            const matchesCountry = element?.country === currentCountry || currentCountry === 'All';
+            const matchesSeverity = element?.severity === currentSeverity || currentSeverity === 'All';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+            return matchesSource && hasUID && matchesCountry && matchesSeverity;
         });
 
-
         setCapList(filteredIds);
-    }, [allCache])
+    }, [allCache, currentCountry, currentSeverity])
 
     return (
         <div className="scrollable" id={id}>
@@ -71,33 +62,10 @@ const CapPanel = (({ id }: { id: string }) => {
                     <>
                         {
                             capList.map((id, i) => {
-                                if (currentSeverity === 'All' && currentCountry === 'All') {
-                                    return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
-                                        <h2>{getEventByID(id)}</h2>
-                                        <h3> {getCountryByID(id)}</h3>
-                                    </button>
-                                } else if (currentSeverity === 'All' && currentCountry != 'All') {
-                                    if (currentCountry.toLowerCase() == String(allCache[id].country).toLowerCase()) {
-                                        return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
-                                            <h2>{getEventByID(id)}</h2>
-                                            <h3> {getCountryByID(id)}</h3>
-                                        </button>
-                                    }
-                                } else if (currentSeverity != 'All' && currentCountry != 'All') {
-                                    if (currentCountry.toLowerCase() == String(allCache[id].country).toLowerCase() && currentSeverity.toLowerCase() == String(allCache[id].severity)) {
-                                        return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
-                                            <h2>{getEventByID(id)}</h2>
-                                            <h3> {getCountryByID(id)}</h3>
-                                        </button>
-                                    }
-                                } else if (currentSeverity != 'All' && currentCountry === 'All') {
-                                    if (currentSeverity.toLowerCase() == String(allCache[id].severity).toLowerCase()) {
-                                        return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
-                                            <h2>{getEventByID(id)}</h2>
-                                            <h3> {getCountryByID(id)}</h3>
-                                        </button>
-                                    }
-                                }
+                                return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
+                                    <h2>{getEventByID(id)}</h2>
+                                    <h3> {getCountryByID(id)}</h3>
+                                </button>
                             })
                         }
                     </>

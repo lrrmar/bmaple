@@ -32,6 +32,7 @@ import WaypointProfile from './modules/waypoints/WaypointProfile';
 import LocationsList from './modules/fasta/LocationsList';
 import CapProfile from './modules/fasta/fastaCAP/capProfile';
 import CapPanel from './modules/fasta/fastaCAP/capPanel';
+import CapKeyPanel from './modules/fasta/fastaCAP/capKeyPanel';
 
 export const store = configureStore({
   reducer: {
@@ -92,7 +93,9 @@ const App = () => {
           {/* <ProductSelector /> */}
         </FloatingBox>
         <FoldOutMenu align='left'>
-          <CapPanel id="Cap"/>
+          {/* <CapKeyPanel id="Caps Key"/> */}
+          <CapPanel id="Caps"/>
+          
         </FoldOutMenu>
       </Map>
       <FastaMainMenu>
