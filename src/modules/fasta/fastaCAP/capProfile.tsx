@@ -37,6 +37,7 @@ import {
     selectStyle,
     updateCountryList,
     selectCountryList,
+    selectDesiredTime,
 } from './capSlice'
 import openLayersMap from '../../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
@@ -49,6 +50,7 @@ import VectorLayer from 'ol/layer/Vector';
 import OpenLayersMap from '../../../mapping/OpenLayersMap';
 import { hexToRgb } from '@mui/material';
 import { Text } from 'ol/style';
+import { isTypeOnlyImportOrExportDeclaration } from 'typescript';
 
 
 const CapProfile = () => {
@@ -59,6 +61,7 @@ const CapProfile = () => {
     const currentCountry = useSelector(selectCountry);
     const currentOpacity = useSelector(selectOpacity);
     const allCache = useSelector(selectCache);
+    const desTime = useSelector(selectDesiredTime);
     const currentCountryList = useSelector(selectCountryList);
     const styleList: { [key: string]: string[] } = {
         'default': ['#ff0000', '#ec8100', '#ffe909', '#baff04', '#a0fffd'],
@@ -123,7 +126,7 @@ const CapProfile = () => {
         let layerID: Entry | null = null;
 
         if (id) {
-            const layerID = allCache[id] as Entry;0
+            const layerID = allCache[id] as Entry; 0
             let hexVal: string;
 
             newOlUid = layerID.ol_uid;
@@ -141,14 +144,14 @@ const CapProfile = () => {
                         color: hexVal,
                     }),
                     text: new Text({
-                            textAlign: 'center', 
-                            font: '12px bold Arial', 
-                            fill: new Fill({ color: '#000' }),
-                            stroke: new Stroke({ color: '#fff', width: 4 }),
-                            text: currentText,
-                            offsetX: 0,
-                            offsetY: 0,
-                        }),
+                        textAlign: 'center',
+                        font: '12px bold Arial',
+                        fill: new Fill({ color: '#000' }),
+                        stroke: new Stroke({ color: '#fff', width: 4 }),
+                        text: currentText,
+                        offsetX: 0,
+                        offsetY: 0,
+                    }),
                 });
 
                 layer?.setStyle(style);
@@ -205,13 +208,13 @@ const CapProfile = () => {
                 const compSev = currentSeverity.toLowerCase();
                 const compCountry = currentCountry.toLowerCase();
                 const newLayer = getLayer(String(newOlUid));
-                if (compSev === 'all' && compCountry =='all') {
+                if (compSev === 'all' && compCountry == 'all') {
                     newLayer?.setVisible(true);
                 } else if (layerSev === compSev && layerCountry === compCountry) {
                     newLayer?.setVisible(true);
-                } else if (compSev === 'all' && layerCountry == compCountry){
+                } else if (compSev === 'all' && layerCountry == compCountry) {
                     newLayer?.setVisible(true);
-                } else if ( layerSev === compSev && compCountry === 'all'){
+                } else if (layerSev === compSev && compCountry === 'all') {
                     newLayer?.setVisible(true);
                 } else {
                     newLayer?.setVisible(false);
@@ -225,17 +228,30 @@ const CapProfile = () => {
     useEffect(() => {
         idList.forEach((id) => {
             if (id) {
-                const currentTime = Date.now();
+                let currentTime = Date.now();
                 const oldLayerID = allCache[id];
                 const oluid = oldLayerID.ol_uid;
                 const newLayer = getLayer(String(oluid));
                 const start = oldLayerID.start;
                 const end = oldLayerID.end;
+                const twoHoursMS = 1000 * 60 * 60 * 2;
+                const aDayInMs = 1000 * 60 * 60 * 24;
 
+                if (desTime === 0) {
+                    currentTime -= aDayInMs;
+                } else if (desTime === 0.25) {
+                    currentTime -= twoHoursMS;
+                } else if (desTime === 0.75) {
+                    currentTime += twoHoursMS;
+                } else if (desTime === 1) {
+                    currentTime += aDayInMs;
+                }
+                //console.log(start, end, "FALSE TIME");
 
-                if (start) {
+                if (start && end) {
                     const startTime = new Date(String(start));
-                    if (startTime.getTime() < currentTime) {
+                    const endTime = new Date(String(end));
+                    if (startTime.getTime() < currentTime && endTime.getTime() > currentTime) {
                         newLayer?.setVisible(true);
                     } else {
                         newLayer?.setVisible(false);
@@ -243,20 +259,10 @@ const CapProfile = () => {
                 } else {
                     newLayer?.setVisible(true);
                 }
-                if (end) {
-                    const endTime = new Date(String(end));
-                    if (endTime.getTime() < currentTime) {
-                        const rem: Remove = {
-                            id: id,
-                        }
-                        dispatch(remove(rem));
-                    }
-                }
-
-                newLayer?.setVisible(true);
             }
+
         })
-    }, [idList, allCache])
+    }, [idList, allCache, desTime])
     return <div></div>
 }
 

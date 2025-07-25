@@ -8,7 +8,7 @@ import {
 
 import { updateCrrChosenStyle, updateOpacityCRR, updateOpacityRDT } from "./fastaSlice";
 
-import { updateCountry, updateSeverity, updateOpacity, updateStyle } from './fastaCAP/capSlice'
+import { updateCountry, updateSeverity, updateOpacity, updateStyle, updateDesiredTime} from './fastaCAP/capSlice'
 
 import { selectCountryList } from './fastaCAP/capSlice';
 
@@ -119,7 +119,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           defaultValue="0.5"
           list='optionList'
           onChange={(element) =>
-            dispatch(updateOpacity(parseFloat(element.target.value)))
+            dispatch(updateDesiredTime(parseFloat(element.target.value)))
           }
         />
           <datalist id = 'optionList'>
@@ -130,6 +130,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
             <option value="1" label='+24hrs'></option>
           </datalist>
       </div>
+      <br/>
       <div>
         <label htmlFor="country">CAP Country: </label>
         <select name="country" onChange={(event) => dispatch(updateCountry(event.target.value))}>

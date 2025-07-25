@@ -104,9 +104,9 @@ const CapLayer = ({
                             font: '12px bold Arial', 
                             fill: new Fill({ color: '#000' }),
                             stroke: new Stroke({ color: '#fff', width: 4 }),
-                            text: "WORKING",
-                            offsetX: 10,
-                            offsetY: 10,
+                            text: currentText,
+                            offsetX: 0,
+                            offsetY: 0,
                         }),
                     })
              

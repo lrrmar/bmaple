@@ -11,6 +11,7 @@ interface InitialState{
     country: string;
     opacity: number;
     style: string;
+    desiredTime: number;
     countryList: string[];
 }
 
@@ -19,6 +20,7 @@ const initialState: InitialState = {
     country: 'All',
     opacity: 0.5,
     style: 'default',
+    desiredTime: 0.5,
     countryList: []
 }
 
@@ -38,6 +40,9 @@ export const capSlice = createSlice({
         updateStyle(state, style:PayloadAction<string>){
             state.style = style.payload;
         },
+        updateDesiredTime( state, desTime:PayloadAction<number>){
+            state.desiredTime = desTime.payload;
+        },
         updateCountryList(state, country:PayloadAction<string[]>){
             state.countryList = country.payload;
         }
@@ -49,9 +54,11 @@ export const {
     updateCountry,
     updateSeverity, 
     updateStyle,
+    updateDesiredTime,
     updateCountryList
 } = capSlice.actions
 
+export const selectDesiredTime = (state: RootState) => state.cap.desiredTime;
 export const selectOpacity = (state:RootState) => state.cap.opacity;
 export const selectCountry = (state: RootState) => state.cap.country;
 export const selectSeverity = (state: RootState) => state.cap.severity;
