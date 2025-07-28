@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { CacheElement, cacheSlice, selectCache } from "../../../mapping/cacheSlice";
 import './capPanel.css';
 import PopUp from "../../../features/PopUp";
-import { selectCountry, selectSeverity } from "./capSlice";
+import { selectCountry, selectOluid, selectSeverity } from "./capSlice";
 import { current } from "@reduxjs/toolkit";
 
 
@@ -26,6 +26,7 @@ const CapPanel = (({ id }: { id: string }) => {
 
     const currentCountry = useSelector(selectCountry);
     const currentSeverity = useSelector(selectSeverity);
+    const currentOluid = useSelector(selectOluid);
     const allCache = useSelector(selectCache);
 
     const getURL = (() => {
@@ -40,19 +41,24 @@ const CapPanel = (({ id }: { id: string }) => {
         return String(allCache[id].country)
     })
 
+    const getFastaIdByID = ((id:string) => {
+        return String(allCache[id]?.fastaId)
+    })
+
     // get updated cap list every time the cache is changed 
     useEffect(() => {
         const filteredIds = Object.keys(allCache).filter((id) => {
             const element = allCache[id];
             const matchesSource = element?.source === 'cap';
             const hasUID = !!element?.ol_uid;
+            const matchesOLUID = element?.ol_uid === currentOluid || currentOluid === 'All';
             const matchesCountry = element?.country === currentCountry || currentCountry === 'All';
             const matchesSeverity = element?.severity === currentSeverity || currentSeverity === 'All';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-            return matchesSource && hasUID && matchesCountry && matchesSeverity;
+            return matchesSource && hasUID && matchesCountry && matchesSeverity && matchesOLUID;
         });
 
         setCapList(filteredIds);
-    }, [allCache, currentCountry, currentSeverity])
+    }, [allCache, currentCountry, currentSeverity, currentOluid])
 
     return (
         <div className="scrollable" id={id}>
@@ -63,6 +69,7 @@ const CapPanel = (({ id }: { id: string }) => {
                         {
                             capList.map((id, i) => {
                                 return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
+                                    <p> {getFastaIdByID(id)} <br/> </p>
                                     <h2>{getEventByID(id)}</h2>
                                     <h3> {getCountryByID(id)}</h3>
                                 </button>

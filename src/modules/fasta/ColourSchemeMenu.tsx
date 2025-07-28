@@ -102,7 +102,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           min="0"
           max="1"
           step="0.1"
-          defaultValue="0.5"
+          defaultValue="0"
           onChange={(element) =>
             dispatch(updateOpacity(parseFloat(element.target.value)))
           }

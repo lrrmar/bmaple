@@ -26,7 +26,7 @@ interface Props {
 
 interface localCap {
     link: string | null;
-    fastaId: number | null;
+    fastaId: string | number | null;
     event: string | null;
     severity: string | null;
     start: string | null;
@@ -55,7 +55,7 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                 const subsetAlertDL = alertDL.map((ale: localCap) => {
                     const capObj: localCap = {
                         link: ale.link,
-                        fastaId: ale.fastaId,
+                        fastaId: ale.id,
                         event: ale.event,
                         severity: ale.severity,
                         start: String(ale.onset),
@@ -64,11 +64,12 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                     }
                     return capObj;
                 })
+                
                 console.log(subsetAlertDL, "CAPS");
                 setCurrentCapArray(subsetAlertDL);
             } catch (error) {
+                console.log("ERROR", error);
             }
-
         }
         fetchCaps();
     }, []);

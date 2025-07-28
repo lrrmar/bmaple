@@ -13,21 +13,31 @@ interface InitialState{
     style: string;
     desiredTime: number;
     countryList: string[];
+    clicked: boolean;
+    oluid: string; 
 }
 
 const initialState: InitialState = {   
     severity: 'All',  
     country: 'All',
-    opacity: 0.5,
+    oluid: 'All',
+    opacity: 0,
     style: 'default',
     desiredTime: 0.5,
-    countryList: []
+    countryList: [], 
+    clicked: false,
 }
 
 export const capSlice = createSlice({
     name: 'cap',
     initialState, 
     reducers: {
+        updateOluid( state, oluid:PayloadAction<string>){
+            state.oluid = oluid.payload;
+        },
+        updateClick(state, clicked:PayloadAction<boolean>){
+            state.clicked = clicked.payload;
+        },
         updateOpacity(state, opacity:PayloadAction<number>){
             state.opacity = opacity.payload;
         },
@@ -50,6 +60,8 @@ export const capSlice = createSlice({
 });
 
 export const {
+    updateOluid,
+    updateClick,
     updateOpacity,
     updateCountry,
     updateSeverity, 
@@ -58,11 +70,13 @@ export const {
     updateCountryList
 } = capSlice.actions
 
+export const selectOluid = (state: RootState) => state.cap.oluid;
 export const selectDesiredTime = (state: RootState) => state.cap.desiredTime;
 export const selectOpacity = (state:RootState) => state.cap.opacity;
 export const selectCountry = (state: RootState) => state.cap.country;
 export const selectSeverity = (state: RootState) => state.cap.severity;
 export const selectStyle = (state: RootState) => state.cap.style;
 export const selectCountryList = (state:RootState) => state.cap.countryList;
+export const selectClicked = (state:RootState) => state.cap.clicked;
 
 export default capSlice.reducer;

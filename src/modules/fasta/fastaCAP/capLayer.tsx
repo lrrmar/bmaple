@@ -40,6 +40,7 @@ const CapLayer = ({
             if (layerCache[id]) {
                 const cacheElem = layerCache[id];
                 const link = cacheElem['link'];
+                console.log(link, "ONE");
                 const fullLink = "https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=" + String(link);
                 const xmlFile = await fetch(fullLink);
                 const xmlText = await xmlFile.text();
@@ -54,7 +55,7 @@ const CapLayer = ({
                 }
             }
         } catch (error) {
-            console.log("ERROR", error);
+            console.log("HERE", error);
         }
     }
 
@@ -91,33 +92,32 @@ const CapLayer = ({
                 latlonArr.push(coords);
             });
             try {
-                    const styles = new Style({
-                        stroke: new Stroke({
-                            color: 'black',
-                            width: 2,
-                        }),
-                        fill: new Fill({
-                            color: 'orange',
-                        }),
-                        text: new Text({
-                            textAlign: 'center', 
-                            font: '12px bold Arial', 
-                            fill: new Fill({ color: '#000' }),
-                            stroke: new Stroke({ color: '#fff', width: 4 }),
-                            text: currentText,
-                            offsetX: 0,
-                            offsetY: 0,
-                        }),
-                    })
-             
-                    
+                const styles = new Style({
+                    stroke: new Stroke({
+                        color: 'black',
+                        width: 2,
+                    }),
+                    fill: new Fill({
+                        color: 'orange',
+                    }),
+                    text: new Text({
+                        textAlign: 'center',
+                        font: '16px bold Arial',
+                        fill: new Fill({ color: '#000' }),
+                        stroke: new Stroke({ color: '#fff', width: 4 }),
+                        text: currentText,
+                        offsetX: 0,
+                        offsetY: 0,
+                    }),
 
+                })
 
                 const feature = new Feature({
                     geometry: new Polygon([latlonArr]),
                 })
+                
 
-            
+
                 const source = new VectorSource({
                     features: [feature],
                 })
@@ -126,12 +126,12 @@ const CapLayer = ({
                 const layer = new VectorLayer({
                     source: source,
                     style: styles,
-                    visible: true,
+                    visible: false,
                     zIndex: 100,
                 })
-                
+                feature.set("layer_id", getUid(layer));
+
                 const map = openLayersMap.map;
-                layer.setOpacity(0.5);
                 map.addLayer(layer);
                 const oldLayer = layerCache[id];
                 const toCache: Ingest = {
