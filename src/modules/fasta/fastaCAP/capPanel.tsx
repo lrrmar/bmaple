@@ -6,7 +6,16 @@ import './capPanel.css';
 import PopUp from "../../../features/PopUp";
 import { selectCountry, selectOluid, selectSeverity } from "./capSlice";
 import { current } from "@reduxjs/toolkit";
-
+import View from "ol/View";
+import VectorLayer from "ol/layer/Vector";
+import { Feature } from "ol";
+import { Geometry, Polygon, SimpleGeometry } from 'ol/geom';
+import { getUid } from 'ol/util';
+import BaseLayer from "ol/layer/Base";
+import OpenLayersMap from "../../../mapping/OpenLayersMap";
+import { Coordinate } from "ol/coordinate";
+import { fromLonLat, toLonLat, transform } from "ol/proj";
+import { duration, Zoom } from "@mui/material";
 
 
 /*
@@ -24,10 +33,31 @@ const CapPanel = (({ id }: { id: string }) => {
     const [openPopup, setOpenPopUp] = useState<boolean>(false);
     const [cacheObj, setCacheObj] = useState<CacheElement>();
 
+    const map = OpenLayersMap.map;
     const currentCountry = useSelector(selectCountry);
     const currentSeverity = useSelector(selectSeverity);
     const currentOluid = useSelector(selectOluid);
     const allCache = useSelector(selectCache);
+    const getLayer = (
+        uid: string | null,
+    ): VectorLayer<Feature<Geometry>> | null => {
+        let baseLayer: BaseLayer | undefined = undefined;
+        let vectorTileLayer: VectorLayer<Feature<Geometry>> | null = null;
+        map
+            .getLayers()
+            .getArray()
+            .forEach((l) => {
+                if (getUid(l) === uid) {
+                    baseLayer = l;
+                }
+            });
+
+        if (baseLayer) {
+            vectorTileLayer = baseLayer as VectorLayer<Feature<Geometry>>;
+        }
+        return vectorTileLayer;
+    };
+
 
     const getURL = (() => {
         return String(cacheObj?.link);
@@ -41,8 +71,32 @@ const CapPanel = (({ id }: { id: string }) => {
         return String(allCache[id].country)
     })
 
-    const getFastaIdByID = ((id:string) => {
+    const getFastaIdByID = ((id: string) => {
         return String(allCache[id]?.fastaId)
+    })
+
+    useEffect(() => {
+        map.setView(new View ({
+            center: [0,0], 
+            zoom:1
+        }))
+
+    }, [])
+    // finds the coordinates of the selected polygon and sets it to the centre of the view
+    const centreScreenOnPolygon = ((id: string) => {
+        console.log(id, "ID");
+        if (id) {
+            const layer = getLayer(id);
+            const source = layer?.getSource();
+            const features = source?.getFeatures()[0];
+            const polygon = features?.getGeometry() as SimpleGeometry;
+            if (polygon.getCoordinates()) {
+                const coords = polygon.getFirstCoordinate() as Coordinate;
+            map.getView().setZoom(7);
+            map.getView().setCenter(coords);
+            }
+        }
+
     })
 
     // get updated cap list every time the cache is changed 
@@ -53,7 +107,7 @@ const CapPanel = (({ id }: { id: string }) => {
             const hasUID = !!element?.ol_uid;
             const matchesOLUID = element?.ol_uid === currentOluid || currentOluid === 'All';
             const matchesCountry = element?.country === currentCountry || currentCountry === 'All';
-            const matchesSeverity = element?.severity === currentSeverity || currentSeverity === 'All';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+            const matchesSeverity = element?.severity === currentSeverity || currentSeverity === 'All';
             return matchesSource && hasUID && matchesCountry && matchesSeverity && matchesOLUID;
         });
 
@@ -69,7 +123,7 @@ const CapPanel = (({ id }: { id: string }) => {
                         {
                             capList.map((id, i) => {
                                 return <button className="button-cap" onClick={() => { setOpenPopUp(true); setCacheObj(allCache[id]); }} key={i} value={id} >
-                                    <p> {getFastaIdByID(id)} <br/> </p>
+                                    <p> {getFastaIdByID(id)} <br /> </p>
                                     <h2>{getEventByID(id)}</h2>
                                     <h3> {getCountryByID(id)}</h3>
                                 </button>
@@ -90,6 +144,7 @@ const CapPanel = (({ id }: { id: string }) => {
                         <a className='a-cap' href={getURL()}>link to CAP</a><br />
                     </p>
                 </div>
+                <button onClick={() => { centreScreenOnPolygon(String(cacheObj?.ol_uid)) }}> Find CAP! </button>
             </PopUp>
         </div>
 

@@ -197,19 +197,15 @@ const CapProfile = () => {
         map.on("click", function (event) {
             // if clicked is already true then it sets clicked to false and updates the olUID to all and sets previous polygon stroke to black
             // this is so that if the user clicks an area of the map that isnt the CAP they are not stuck on it
-            console.log(clicked, "click");
             if (clicked) {
                 dispatch(updateClick(false));
                 const layer = getLayer(currentOluid);
                 const style = layer?.getStyle() as Style;
-                console.log(style, "STYLE");
                 if (style) {
-                    console.log("in");
                     const stroke = style.getStroke() as Stroke;
                     stroke.setColor("black");
                     style.setStroke(stroke);
                     layer?.setStyle(style);
-                    console.log("done");
                     dispatch(updateOluid('All'));
                 }
             }
@@ -220,24 +216,23 @@ const CapProfile = () => {
             })
 
             // if the feature has a valid oluid and style highlight it and set the oluid 
-            console.log(features);
+            var counter = 0;
             features.forEach((feature) => {
                 const oluid = feature.get('layer_id');
                 if (oluid) {
                     const layer = getLayer(oluid);
                     const style = layer?.getStyle() as Style;
-                    if (style) {
+                    if (style && counter < 1) {
                         const stroke = style.getStroke() as Stroke;
                         stroke.setColor("#F5F5F5");
                         style.setStroke(stroke);
                         layer?.setStyle(style);
                         dispatch(updateClick(true));
-                        console.log(clicked, "clicked 2");
                         dispatch(updateOluid(oluid));
+                        counter ++;
                     }
                 }
             })
-            console.log("changed style");
         });
 
         }, [clicked, currentOluid])

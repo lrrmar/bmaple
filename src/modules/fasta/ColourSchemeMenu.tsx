@@ -39,7 +39,16 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center'
   };
+  const optionStyle: React.CSSProperties = {
+    color: 'black',
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: "10px",
+    justifyContent:'right'
+  };
+
   const countryList = useSelector(selectCountryList);
 
   return (
@@ -109,7 +118,8 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         />
       </div>
       <div>
-        <label htmlFor="miniCapTime">CAP TimeScroll  </label>
+        <p> </p>
+        <label htmlFor="miniCapTime">CAP Timescroll Bar:</label>
         <input
           type="range"
           id="miniCapTime"
@@ -122,7 +132,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
             dispatch(updateDesiredTime(parseFloat(element.target.value)))
           }
         />
-          <datalist id = 'optionList'>
+          <datalist style = {optionStyle} id = 'optionList'>
             <option value="0" label='-24hrs'></option>
             <option value="0.25" label='-2hrs'></option>
             <option value="0.5" label='now'></option>
