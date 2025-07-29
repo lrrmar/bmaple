@@ -39,14 +39,22 @@ const CapLayer = ({
         try {
             if (layerCache[id]) {
                 const cacheElem = layerCache[id];
-                const link = cacheElem['link'];
-                console.log(link, "ONE");
-                const fullLink = "https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=" + String(link);
+                const link = String(cacheElem['link']);
+                console.log("link", link);
+               
+                const fullLink = "https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=" + link;
+                
                 const xmlFile = await fetch(fullLink);
                 const xmlText = await xmlFile.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "application/xml");
                 const polygonData = xmlDoc.querySelector("polygon")?.innerHTML;
+                if (cacheElem.country === 'ZA') {
+                    console.log("YES")
+                    console.log("FULL LINK", fullLink)
+                    console.log(xmlFile, "PD");
+                }
+
                 if (polygonData) {
                     polyStr = polygonData
                     const descriptionStr = String(cacheElem?.event) + " \n" + String(cacheElem?.severity);
@@ -115,7 +123,7 @@ const CapLayer = ({
                 const feature = new Feature({
                     geometry: new Polygon([latlonArr]),
                 })
-                
+
 
 
                 const source = new VectorSource({

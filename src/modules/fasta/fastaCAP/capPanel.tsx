@@ -134,14 +134,14 @@ const CapPanel = (({ id }: { id: string }) => {
 
             </div>
             <PopUp showPopUp={openPopup} closePopUp={() => setOpenPopUp(false)}>
-                <div className="div=info">
+                <div className="div-info">
                     <p>
-                        Event : {String(cacheObj?.event)} <br />
-                        Severity: {String(cacheObj?.severity)}<br />
-                        Country: {String(cacheObj?.country)}<br />
-                        Start Date/Time: {String(cacheObj?.start)}<br />
-                        End Date/Time: {String(cacheObj?.end)}<br />
-                        <a className='a-cap' href={getURL()}>link to CAP</a><br />
+                        <i>Event</i> : {String(cacheObj?.event)} <br />
+                        <i>Severity</i>: {String(cacheObj?.severity)}<br />
+                        <i>Country</i>: {String(cacheObj?.country)}<br />
+                        <i>Start Date/Time</i>: {String(cacheObj?.start)}<br />
+                        <i>End Date/Time</i>: {String(cacheObj?.end)}<br />
+                        <a className='a-cap' href={getURL()}><i>Link to CAP</i></a><br />
                     </p>
                 </div>
                 <button onClick={() => { centreScreenOnPolygon(String(cacheObj?.ol_uid)) }}> Find CAP! </button>

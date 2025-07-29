@@ -15,8 +15,9 @@ import { Style } from 'ol/style';
 import { Stroke } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { wait } from '@testing-library/user-event/dist/utils';
-import CapLayer  from './capLayer';
+import CapLayer from './capLayer';
 import { JsxElement } from 'typescript';
+import { selectBaseUrl } from '../fastaSlice';
 
 
 interface Props {
@@ -37,6 +38,7 @@ interface localCap {
 
 const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
     const dispatch = useDispatch();
+    const fastaBaseURL = useSelector(selectBaseUrl);
     const allCache = useSelector(selectCache);
     const [currentCapArray, setCurrentCapArray] = useState<localCap[]>([]);
     const [currentPolyArray, setCurrentPolyArray] = useState<string[]>([]);
@@ -47,11 +49,12 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
         let capList: Array<localCap> = [];
         const fetchCaps = async () => {
             try {
+
                 const response = await fetch('https://dev.fastaweather.com/api/v1/alerts/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0');
 
                 const capJson = await response.json();
                 const alertDL = capJson.alerts;
-                
+
                 const subsetAlertDL = alertDL.map((ale: localCap) => {
                     const capObj: localCap = {
                         link: ale.link,
@@ -64,7 +67,7 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                     }
                     return capObj;
                 })
-                
+
                 console.log(subsetAlertDL, "CAPS");
                 setCurrentCapArray(subsetAlertDL);
             } catch (error) {
