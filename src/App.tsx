@@ -77,6 +77,7 @@ const App = () => {
           <WaypointProfile />
           <CapProfile />
         </Profiles>
+        
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
@@ -102,7 +103,6 @@ const App = () => {
       
       <FastaMainMenu>
         <CollapseColourBar id="hello"/>
-        
         <Slider />
         
       </FastaMainMenu>

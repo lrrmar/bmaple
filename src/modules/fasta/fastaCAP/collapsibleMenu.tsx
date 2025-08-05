@@ -66,7 +66,7 @@ const CollapseColourBar = (({ id }: { id: string }) => {
                         <div style={tempStyle}>
                             <p className="p-black">    low   </p>
                             <div className={currentStyle}>
-                                <text> . </text>
+
                             </div>
                             <p className="p-black">     high    </p>
                         </div>) : (<div> </div>)

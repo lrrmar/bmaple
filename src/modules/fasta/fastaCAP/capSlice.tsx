@@ -14,13 +14,13 @@ interface InitialState{
     desiredTime: number;
     countryList: string[];
     clicked: boolean;
-    oluid: string; 
+    oluid: {[key:string] : string[]}; 
 }
 
 const initialState: InitialState = {   
     severity: 'All',  
     country: 'All',
-    oluid: 'All',
+    oluid: {'All' : []},
     opacity: 0,
     style: 'default',
     desiredTime: 0.5,
@@ -32,7 +32,7 @@ export const capSlice = createSlice({
     name: 'cap',
     initialState, 
     reducers: {
-        updateOluid( state, oluid:PayloadAction<string>){
+        updateOluid( state, oluid:PayloadAction<{[key:string] : string[]}>){
             state.oluid = oluid.payload;
         },
         updateClick(state, clicked:PayloadAction<boolean>){

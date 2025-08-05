@@ -38,6 +38,7 @@ const CapPanel = (({ id }: { id: string }) => {
     const currentSeverity = useSelector(selectSeverity);
     const currentOluid = useSelector(selectOluid);
     const allCache = useSelector(selectCache);
+
     const getLayer = (
         uid: string | null,
     ): VectorLayer<Feature<Geometry>> | null => {
@@ -74,17 +75,9 @@ const CapPanel = (({ id }: { id: string }) => {
     const getFastaIdByID = ((id: string) => {
         return String(allCache[id]?.fastaId)
     })
-
-    useEffect(() => {
-        map.setView(new View ({
-            center: [0,0], 
-            zoom:1
-        }))
-
-    }, [])
+    
     // finds the coordinates of the selected polygon and sets it to the centre of the view
     const centreScreenOnPolygon = ((id: string) => {
-        console.log(id, "ID");
         if (id) {
             const layer = getLayer(id);
             const source = layer?.getSource();
@@ -102,12 +95,12 @@ const CapPanel = (({ id }: { id: string }) => {
     // get updated cap list every time the cache is changed 
     useEffect(() => {
         const filteredIds = Object.keys(allCache).filter((id) => {
-            const element = allCache[id];
-            const matchesSource = element?.source === 'cap';
-            const hasUID = !!element?.ol_uid;
-            const matchesOLUID = element?.ol_uid === currentOluid || currentOluid === 'All';
-            const matchesCountry = element?.country === currentCountry || currentCountry === 'All';
-            const matchesSeverity = element?.severity === currentSeverity || currentSeverity === 'All';
+            const cap = allCache[id];
+            const matchesSource = cap?.source === 'cap';
+            const hasUID = !!cap?.ol_uid;
+            const matchesOLUID = currentOluid[Object.keys(currentOluid)[0]]?.includes(String(cap?.ol_uid) )|| Object.keys(currentOluid)[0] === 'All';
+            const matchesCountry = cap?.country === currentCountry || currentCountry === 'All';
+            const matchesSeverity = cap?.severity === currentSeverity || currentSeverity === 'All';
             return matchesSource && hasUID && matchesCountry && matchesSeverity && matchesOLUID;
         });
 
