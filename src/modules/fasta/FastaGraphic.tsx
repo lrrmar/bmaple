@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import GeoJSON from 'ol/format/GeoJSON';
-import { Vector as VectorSource } from 'ol/source';
+import { Raster, Vector as VectorSource } from 'ol/source';
 import { Feature } from 'ol';
 import { Geometry } from 'ol/geom';
 import { getUid } from 'ol/util';
@@ -16,10 +16,14 @@ import {
   selectCrrVisible,
   selectRdtVisible,
   FastaProduct,
+  selectOpacityCRR,
+  selectOpacityRDT,
+  selectCrrChosenStyle,
 } from './fastaSlice';
 import {
   Entry,
   Ingest,
+  isEntry,
   request,
   Request,
   selectCache,
@@ -32,7 +36,9 @@ import Fill from 'ol/style/Fill';
 import { FeatureLike } from 'ol/Feature';
 import { FlatStyleLike } from 'ol/style/flat';
 import Stroke from 'ol/style/Stroke';
+import VectorLayer from 'ol/layer/Vector';
 import missingDataImage from './no_satellites_64.png';
+import OpenLayersMap from '../../mapping/OpenLayersMap';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -41,6 +47,10 @@ const Picker = () => {
 };
 
 const Graphics = () => {
+  const styles: { [key: string] : string[] } = {
+      'rainbow': ['#2579d4', '#2a8cf0', '#1cd0f5', '#428730', '#31c749', '#63dd54','#f9e063', '#fbc65b', '#fb8349', '#fd5740', '#b31b27', '#000'],
+      'tol': ['#332288','#117733', '#44AA99', '#88CCEE', '#DDCC77', '#DDCC77', '#AA4499', '#882255', '#5EF042', '#AA0495', '#DA857C', '#3ACB09'], 
+      'viridis': ['#fde725', '#c2df23', '#86d549', '#52c569', '#2ab07f', '#1e9b8a', '#25858e', '#2d708e', '#38588c', '#433e85', '#482173','#440154']}
   const map = openLayersMap.map;
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
@@ -49,9 +59,11 @@ const Graphics = () => {
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string | null>(null);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
+  const opacityCRR = useSelector(selectOpacityCRR);
+  const opacityRDT = useSelector(selectOpacityRDT);
   const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
-
+  const currentCrrStyle = useSelector(selectCrrChosenStyle);
   const getLayer = (
     uid: string | null,
   ): VectorTileLayer<Feature<Geometry>> | null => {
@@ -72,21 +84,16 @@ const Graphics = () => {
     }
     return vectorTileLayer;
   };
+  
+  function createStyle(hexVal : string){
+    return new Style({fill: new Fill({color: hexVal})});
+  }
 
-  function createCrrStyleFunction() {
-    const style02_1 = new Style({ fill: new Fill({ color: '#2579d4' }) });
-    const style1_2 = new Style({ fill: new Fill({ color: '#2a8cf0' }) });
-    const style2_3 = new Style({ fill: new Fill({ color: '#1cd0f5' }) });
-    const style3_5 = new Style({ fill: new Fill({ color: '#428730' }) });
-    const style5_7 = new Style({ fill: new Fill({ color: '#31c749' }) });
-    const style7_10 = new Style({ fill: new Fill({ color: '#63dd54' }) });
-    const style10_15 = new Style({ fill: new Fill({ color: '#f9e063' }) });
-    const style15_20 = new Style({ fill: new Fill({ color: '#fbc65b' }) });
-    const style20_30 = new Style({ fill: new Fill({ color: '#fb8349' }) });
-    const style30_50 = new Style({ fill: new Fill({ color: '#fd5740' }) });
-    const style50_plus = new Style({ fill: new Fill({ color: '#b31b27' }) });
-    const fallback = new Style({ fill: new Fill({ color: '#000' }) });
-
+  function createCrrStyleFunction(theme: string) {
+    const tempArr = styles[theme];
+    const styleArr = tempArr.map(hexVal => {
+      return createStyle(hexVal);
+    });
     const cnv = document.createElement('canvas');
     const ctx = cnv.getContext('2d');
     const img = new Image();
@@ -96,50 +103,33 @@ const Graphics = () => {
       pattern = ctx.createPattern(img, 'repeat');
     }
     const missingDataStyle = new Style({ fill: new Fill({ color: pattern }) });
-
+    const crrArr = ['CRR_02_1', 'CRR_1_2', 'CRR_2_3', 'CRR_3_5', 'CRR_5_7', 'CRR_7_10', 'CRR_10_15', 'CRR_15_20', 'CRR_20_30', 'CRR_30_50', 'CRR_50_plus']
+    
     return (feature: FeatureLike) => {
       const objectType = feature.get('object_type');
       if (objectType === 'CRR-missing-data') {
         return missingDataStyle;
-      } else {
-        const rainRate = feature.get('rain_rate');
-        if (rainRate === 'CRR_02_1') {
-          return style02_1;
-        } else if (rainRate === 'CRR_1_2') {
-          return style1_2;
-        } else if (rainRate === 'CRR_2_3') {
-          return style2_3;
-        } else if (rainRate === 'CRR_3_5') {
-          return style3_5;
-        } else if (rainRate === 'CRR_5_7') {
-          return style5_7;
-        } else if (rainRate === 'CRR_7_10') {
-          return style7_10;
-        } else if (rainRate === 'CRR_10_15') {
-          return style10_15;
-        } else if (rainRate === 'CRR_15_20') {
-          return style15_20;
-        } else if (rainRate === 'CRR_20_30') {
-          return style20_30;
-        } else if (rainRate === 'CRR_30_50') {
-          return style30_50;
-        } else if (rainRate === 'CRR_50_plus') {
-          return style50_plus;
+      } else{  
+        const rate = feature.get('rain_rate');
+        const index = crrArr.findIndex((x) =>{ return x === rate});
+        if (index === -1){
+          return styleArr[styleArr.length - 1];
         } else {
-          return fallback;
-        }
+          return styleArr[index];
+        }    
       }
     };
   }
 
-  function createRdtStyleFunction() {
+  function createRdtStyleFunction(theme:string) {
+    const hexColour = styles[theme][10];
     const fillStyleCell000 = new Style({
-      fill: new Fill({ color: 'rgb(254, 41, 59, 0.4)' }),
+      fill: new Fill({ color: hexColour+'66'}),
     }); // red, semi-transparent
     const fillFallback = new Style({ fill: new Fill({ color: '#ccc' }) });
 
     const lineStyleCell000 = new Style({
-      stroke: new Stroke({ color: 'rgb(254, 41, 59, 0.9)', width: 1 }),
+      stroke: new Stroke({ color: hexColour+'E6', width: 1 }),
     }); // red
     const lineStyleForecast = new Style({
       stroke: new Stroke({ color: '#000000', width: 2 }),
@@ -152,8 +142,8 @@ const Graphics = () => {
     });
 
     const styleFunction = (feature: FeatureLike) => {
-      let fillStyle = null;
-      let lineStyle = null;
+      let fillStyle: Style;
+      let lineStyle: Style;
 
       const objectType = feature.get('object_type');
 
@@ -186,7 +176,7 @@ const Graphics = () => {
 
     //console.log("FastaGraphic crrLayerId: " + crrLayerId);
 
-    const crrStyle = createCrrStyleFunction();
+    const crrStyle = createCrrStyleFunction(currentCrrStyle);
 
     let newOlUidCrr: string | null = null;
 
@@ -221,7 +211,7 @@ const Graphics = () => {
     }
 
     setCurrentOlUidCrr(newOlUidCrr);
-  }, [crrLayerId, products]);
+  }, [crrLayerId, products, currentCrrStyle]);
 
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
@@ -230,7 +220,7 @@ const Graphics = () => {
 
     //console.log("FastaGraphic rdtLayerId: " + rdtLayerId);
 
-    const rdtStyles = createRdtStyleFunction();
+    const rdtStyles = createRdtStyleFunction(currentCrrStyle);
 
     let newOlUidRdt: string | null = null;
 
@@ -262,7 +252,47 @@ const Graphics = () => {
     }
 
     setCurrentOlUidRdt(newOlUidRdt);
-  }, [rdtLayerId, products]);
+  }, [rdtLayerId, products, currentCrrStyle]);
+
+  // set opacity
+  useEffect(() => {
+    let olLayer: VectorLayer<Feature> | undefined;
+    const mapUtils = new OpenLayersMap();
+    products.forEach((p) => {
+      let id: string | null;
+      if (p.name === "CRR") {
+        id = crrLayerId;
+        if (id) {
+        const layer = layerCache[id];
+        if (layer && isEntry(layer)) {
+          const ol_uid = layer.ol_uid;
+          if (ol_uid) {
+            olLayer = mapUtils.getLayerByUid(ol_uid);
+          }
+          if (olLayer) {
+            olLayer.setOpacity(opacityCRR);
+          }
+        }
+      }
+      } else if (p.name === "RDT") {
+        id = rdtLayerId;
+        if (id) {
+        const layer = layerCache[id];
+        if (layer && isEntry(layer)) {
+          const ol_uid = layer.ol_uid;
+          if (ol_uid) {
+            olLayer = mapUtils.getLayerByUid(ol_uid);
+          }
+          if (olLayer) {
+            olLayer.setOpacity(opacityRDT);
+          }
+        }
+      }
+      } else {
+        return;
+      }
+    });
+  }, [crrLayerId,rdtLayerId, opacityCRR, opacityRDT]);
 
   return <div className="FastaGraphics"></div>;
 };

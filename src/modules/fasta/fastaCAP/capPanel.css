@@ -1,0 +1,44 @@
+.box {
+    float: left;
+    height: 1100000px;
+    width: 50px;
+    margin-bottom: 15px;
+    border: 1px solid black;
+    clear: both;
+}
+
+
+.green {}
+
+
+.scrollable {
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.button-cap {
+    flex-direction: column;
+    border-radius: 4px;
+    width: 100%;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    padding: 5%;
+    transition-duration: 4ms;
+}
+
+.button-cap:hover {
+    box-shadow: 0 0 12px rgba(33, 33, 33, 0.5);
+    background-color: rgb(207, 198, 198);
+    /* color: beige; */
+}
+
+.div-info {
+    width: 90%;
+    background-color: rgb(207, 198, 198);
+    color: black
+}
+
+.a-cap {
+    color: brown;
+}

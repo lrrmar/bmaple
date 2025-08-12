@@ -1,12 +1,18 @@
 
 import React, { useEffect } from 'react';
-/*
+
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
-} from '.
-./hooks';
-*/
+} from '../../hooks';
+
+import { updateCrrChosenStyle, updateOpacityCRR, updateOpacityRDT } from "./fastaSlice";
+
+import { updateCountry, updateSeverity, updateOpacity, updateStyle, updateDesiredTime} from './fastaCAP/capSlice'
+
+import { selectCountryList } from './fastaCAP/capSlice';
+
+/*
 import {
   updateBaseMapId,
   selectBaseMaps,
@@ -23,69 +29,145 @@ import {
 } from '../modules/fasta/geojsonFieldSlice';
 */
 
-const ColourSchemeMenu = ({ id }: { id: string }) => {
-  //const dispatch = useDispatch();
+const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
+  const dispatch = useDispatch();
   //const baseMaps: string[] = useSelector(selectBaseMaps);
   //const baseMapId: string = useSelector(selectBaseMapId);
   //const colourPalettes: string[] = useSelector(selectColourPalettes);
   //const colourPaletteId: string = useSelector(selectColourPaletteId);
   //const opacity: number = useSelector(selectOpacity);
-
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center'
   };
+  const optionStyle: React.CSSProperties = {
+    color: 'black',
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: "10px",
+    justifyContent:'right'
+  };
+
+  const countryList = useSelector(selectCountryList);
 
   return (
     <div style={style}>
-      <label htmlFor="colourScheme">Colour Scheme:</label>
-      <select
-        id="colourScheme"
-        //value={baseMapId}
-        //onChange={(e) => {
-        //  dispatch(updateBaseMapId(e.target.value));
-        //}}
-      >
-        <option key="1" value="Rainbow"></option>
-        
-        {
-        //[...baseMaps].map((val) => (
-        //  <option key={val} value={val}>
-        //    {val}
-        //  </option>
-        //))
-        }
-        
-      </select>
-      <label htmlFor="colourPalette">Colour Palette:</label>
-      <select
-        id="colourPalette"
-        //value={colourPaletteId}
-        //onChange={(e) => {
-        //  dispatch(updateColourPaletteId(e.target.value));
-        //}}
-      >
-        {
-        //[...colourPalettes].map((val) => (
-        //  <option key={val} value={val}>
-        //    {val}
-        //  </option>
-        //))
-        }
-      </select>
-      <label htmlFor="opacity">Opacity:</label>
-      <input
-        type="range"
-        id="opacity"
-        min="0"
-        max="1"
-        step="0.1"
-        //value={opacity}
-        //onChange={(e) => {
-        //  dispatch(updateOpacity(parseFloat(e.target.value)));
-        //}
-        //}
-      ></input>
+      <h3> Weather Filters: </h3>
+      <div>
+        <label htmlFor="style">Style: </label>
+        <select
+          id="style"
+          onChange={(event) => dispatch(updateCrrChosenStyle(event.target.value))}
+        >
+          <option value="rainbow">Rainbow</option>
+          <option value="tol">Tol</option>
+          <option value="viridis">Viridis</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="opacityCRR">CRR Opacity:  </label>
+        <input
+          type="range"
+          id="opacity"
+          min="0"
+          max="1"
+          step="0.1"
+          onChange={(element) =>
+            dispatch(updateOpacityCRR(parseFloat(element.target.value)))
+          }
+        />
+      </div>
+      <div>
+        <label htmlFor="opacityRDT">RDT Opacity:  </label>
+        <input
+          type="range"
+          id="opacity"
+          min="0"
+          max="1"
+          step="0.1"
+          onChange={(element) =>
+            dispatch(updateOpacityRDT(parseFloat(element.target.value)))
+          } />
+      </div>
+      <h3> CAP Filters </h3>
+      <div>
+        <label htmlFor="style">Style: </label>
+        <select
+          id="style"
+          onChange={(event) => dispatch(updateStyle(event.target.value))}
+        >
+          <option value="default"> Default</option>
+          <option value="rainbow">Rainbow</option>
+          <option value="tol">Tol</option>
+          <option value="viridis">Viridis</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="opacityCAP">CAP Opacity:  </label>
+        <input
+          type="range"
+          id="opacity"
+          min="0"
+          max="1"
+          step="0.1"
+          defaultValue="0"
+          onChange={(element) =>
+            dispatch(updateOpacity(parseFloat(element.target.value)))
+          }
+        />
+      </div>
+      <div>
+        <p> </p>
+        <label htmlFor="miniCapTime">CAP Timescroll Bar:</label>
+        <input
+          type="range"
+          id="miniCapTime"
+          min="0"
+          max="1"
+          step="0.25"
+          defaultValue="0.5"
+          list='optionList'
+          onChange={(element) =>
+            dispatch(updateDesiredTime(parseFloat(element.target.value)))
+          }
+        />
+          <datalist style = {optionStyle} id = 'optionList'>
+            <option value="0" label='-24hrs'></option>
+            <option value="0.25" label='-2hrs'></option>
+            <option value="0.5" label='now'></option>
+            <option value="0.75" label='+2hrs'></option>
+            <option value="1" label='+24hrs'></option>
+          </datalist>
+      </div>
+      <br/>
+      <div>
+        <label htmlFor="country">CAP Country: </label>
+        <select name="country" onChange={(event) => dispatch(updateCountry(event.target.value))}>
+          <option value='All'>All</option>
+          {countryList.map((country, i) => {
+            return <option key={i} value={country} onChange={(event) => dispatch(updateCountry(country))}>{country}</option>
+          })}
+        </select>
+      </div>
+      <div>
+        <label htmlFor="Severity">Cap Severity </label>
+        <select
+          id="Severity"
+          onChange={(event) => dispatch(updateSeverity(event.target.value))}
+        >
+          <option value="All">All</option>
+          <option value="Minor">Minor</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Severe">Severe</option>
+          <option value="Extreme">Extreme</option>
+        </select>
+      </div>
+
+
+
+
+
     </div>
   );
 };
