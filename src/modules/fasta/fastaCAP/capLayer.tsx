@@ -1,7 +1,7 @@
 import React, { useDebugValue, useEffect, useState } from 'react';
 import {
-    useAppDispatch as useDispatch,
-    useAppSelector as useSelector,
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector,
 } from '../../../hooks';
 import { selectCache, ingest, Ingest } from '../../../mapping/cacheSlice';
 import { current } from '@reduxjs/toolkit';
@@ -18,143 +18,131 @@ import { fromLonLat } from 'ol/proj';
 import { getUid } from 'ol/util';
 import { wait } from '@testing-library/user-event/dist/utils';
 
-
-
-
-
 const CapLayer = ({
-    id,
-    sourceIdentifier,
+  id,
+  sourceIdentifier,
 }: {
-    id: string;
-    sourceIdentifier: String
+  id: string;
+  sourceIdentifier: string;
 }) => {
-    const dispatch = useDispatch();
-    const [currentPoly, setCurrentPoly] = useState<string>();
-    const [currentText, setCurrentText] = useState<string>();
-    const layerCache = useSelector(selectCache);
+  const dispatch = useDispatch();
+  const [currentPoly, setCurrentPoly] = useState<string>();
+  const [currentText, setCurrentText] = useState<string>();
+  const layerCache = useSelector(selectCache);
 
-    const fetchPolygonData = async (id: string) => {
-        let polyStr: string;
-        try {
-            if (layerCache[id]) {
-                const cacheElem = layerCache[id];
-                const link = String(cacheElem['link']);
-               
-                const fullLink = "https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=" + link;
-                
-                const xmlFile = await fetch(fullLink);
-                const xmlText = await xmlFile.text();
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-                const polygonData = xmlDoc.querySelector("polygon")?.innerHTML;
-                if (polygonData) {
-                    polyStr = polygonData
-                    const descriptionStr = String(cacheElem?.event) + " \n" + String(cacheElem?.severity);
-                    setCurrentPoly(polyStr);
-                    setCurrentText(descriptionStr);
-                }
-            }
-        } catch (error) {
-            console.log(error);
+  const fetchPolygonData = async (id: string) => {
+    let polyStr: string;
+    try {
+      if (layerCache[id]) {
+        const cacheElem = layerCache[id];
+        const link = String(cacheElem['link']);
+
+        const fullLink =
+          'https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=' +
+          link;
+
+        const xmlFile = await fetch(fullLink);
+        const xmlText = await xmlFile.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+        const polygonData = xmlDoc.querySelector('polygon')?.innerHTML;
+        if (polygonData) {
+          polyStr = polygonData;
+          const descriptionStr =
+            String(cacheElem?.event) + ' \n' + String(cacheElem?.severity);
+          setCurrentPoly(polyStr);
+          setCurrentText(descriptionStr);
         }
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
+  // get data from cap warnings
+  useEffect(() => {
+    // if ol_uid already exists, dont fetch
+    const element = layerCache[id];
 
+    let flag = true;
+    Object.keys(element).forEach((key: string) => {
+      if (key === 'ol_uid') flag = false;
+    });
+    if (flag) {
+      fetchPolygonData(id);
+    }
+  }, []);
 
-    // get data from cap warnings
-    useEffect(() => {
-        // if ol_uid already exists, dont fetch
-        const element = layerCache[id];
+  // create vector layers using the polygon data
+  useEffect(() => {
+    const latlonArr: Coordinate[] = [];
+    if (currentPoly) {
+      const polygon = currentPoly;
+      const latlonPairs = polygon.split(' ');
+      latlonPairs.map((latLonString) => {
+        const separate = latLonString.split(',');
+        const lonLatFloat = [parseFloat(separate[1]), parseFloat(separate[0])];
+        const coords = fromLonLat(lonLatFloat);
 
-        let flag = true;
-        Object.keys(element).forEach((key: string) => {
-            if (key === 'ol_uid') flag = false;
-        })
-        if (flag) {
-            fetchPolygonData(id);
-        }
+        latlonArr.push(coords);
+      });
+      try {
+        const styles = new Style({
+          stroke: new Stroke({
+            color: 'black',
+            width: 2,
+          }),
+          fill: new Fill({
+            color: 'orange',
+          }),
+          text: new Text({
+            textAlign: 'center',
+            font: '16px bold Arial',
+            fill: new Fill({ color: '#000' }),
+            stroke: new Stroke({ color: '#fff', width: 4 }),
+            text: currentText,
+            offsetX: 0,
+            offsetY: 0,
+          }),
+        });
 
+        const feature = new Feature({
+          geometry: new Polygon([latlonArr]),
+        });
 
-    }, []);
+        const source = new VectorSource({
+          features: [feature],
+        });
 
-    // create vector layers using the polygon data 
-    useEffect(() => {
+        const layer = new VectorLayer({
+          source: source,
+          style: styles,
+          visible: false,
+          zIndex: 100,
+        });
+        feature.set('layer_id', getUid(layer));
 
-        let latlonArr: Coordinate[] = [];
-        if (currentPoly) {
-            const polygon = currentPoly;
-            const latlonPairs = polygon.split(" ");
-            latlonPairs.map((latLonString) => {
-                const separate = latLonString.split(",");
-                const lonLatFloat = [parseFloat(separate[1]), parseFloat(separate[0])];
-                const coords = fromLonLat(lonLatFloat);
-
-                latlonArr.push(coords);
-            });
-            try {
-                const styles = new Style({
-                    stroke: new Stroke({
-                        color: 'black',
-                        width: 2,
-                    }),
-                    fill: new Fill({
-                        color: 'orange',
-                    }),
-                    text: new Text({
-                        textAlign: 'center',
-                        font: '16px bold Arial',
-                        fill: new Fill({ color: '#000' }),
-                        stroke: new Stroke({ color: '#fff', width: 4 }),
-                        text: currentText,
-                        offsetX: 0,
-                        offsetY: 0,
-                    }),
-
-                })
-
-                const feature = new Feature({
-                    geometry: new Polygon([latlonArr]),
-                })
-
-
-
-                const source = new VectorSource({
-                    features: [feature],
-                })
-
-
-                const layer = new VectorLayer({
-                    source: source,
-                    style: styles,
-                    visible: false,
-                    zIndex: 100,
-                })
-                feature.set("layer_id", getUid(layer));
-
-                const map = openLayersMap.map;
-                map.addLayer(layer);
-                const oldLayer = layerCache[id];
-                const toCache: Ingest = {
-                    id: id,
-                    country: oldLayer.country,
-                    source: 'cap',
-                    ol_uid: getUid(layer),
-                    end: oldLayer.end,
-                    event: oldLayer.event,
-                    severity: oldLayer.severity,
-                    start: oldLayer.start,
-                    link: oldLayer.link,
-                    fastaId: oldLayer.fastaId,
-                };
-                dispatch(ingest(toCache));
-            } catch (error) {
-                console.log("ERROR", error);
-            }
-
-
-        }
-    }, [currentPoly])
-    return <div></div>
-}
+        const map = openLayersMap.map;
+        map.addLayer(layer);
+        const oldLayer = layerCache[id];
+        const toCache: Ingest = {
+          id: id,
+          country: oldLayer.country,
+          source: 'cap',
+          ol_uid: getUid(layer),
+          end: oldLayer.end,
+          event: oldLayer.event,
+          severity: oldLayer.severity,
+          start: oldLayer.start,
+          link: oldLayer.link,
+          fastaId: oldLayer.fastaId,
+        };
+        dispatch(ingest(toCache));
+      } catch (error) {
+        console.log('ERROR', error);
+      }
+    }
+  }, [currentPoly]);
+  return <div></div>;
+};
 export default CapLayer;
