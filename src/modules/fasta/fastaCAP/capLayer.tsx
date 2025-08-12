@@ -17,6 +17,7 @@ import { Stroke, Fill } from 'ol/style';
 import { fromLonLat } from 'ol/proj';
 import { getUid } from 'ol/util';
 import { wait } from '@testing-library/user-event/dist/utils';
+import { selectBaseUrl, selectToken } from '../fastaSlice';
 
 const CapLayer = ({
   id,
@@ -29,6 +30,8 @@ const CapLayer = ({
   const [currentPoly, setCurrentPoly] = useState<string>();
   const [currentText, setCurrentText] = useState<string>();
   const layerCache = useSelector(selectCache);
+  const fastaBaseUrl = useSelector(selectBaseUrl);
+  const fastaToken = useSelector(selectToken);
 
   const fetchPolygonData = async (id: string) => {
     let polyStr: string;
@@ -37,9 +40,7 @@ const CapLayer = ({
         const cacheElem = layerCache[id];
         const link = String(cacheElem['link']);
 
-        const fullLink =
-          'https://dev.fastaweather.com/api/v1/proxy/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0&url=' +
-          link;
+        const fullLink = `https://${fastaBaseUrl}/api/v1/proxy/?token=${fastaToken}&url=${link}`;
 
         const xmlFile = await fetch(fullLink);
         const xmlText = await xmlFile.text();

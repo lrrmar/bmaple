@@ -28,8 +28,8 @@ export interface FastaProduct {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'fastaweather.com',
-  token: '',
+  baseUrl: 'dev.fastaweather.com',
+  token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedCrrId: null,
   selectedRdtId: null,
   profileCrrId: null,
@@ -114,6 +114,7 @@ export const {
 } = fastaSlice.actions;
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
+export const selectToken = (state: RootState) => state.fasta.token;
 export const selectSelectedCrrId = (state: RootState) =>
   state.fasta.selectedCrrId;
 export const selectSelectedRdtId = (state: RootState) =>

@@ -22,7 +22,7 @@ import { fromLonLat } from 'ol/proj';
 import { wait } from '@testing-library/user-event/dist/utils';
 import CapLayer from './capLayer';
 import { JsxElement } from 'typescript';
-import { selectBaseUrl } from '../fastaSlice';
+import { selectBaseUrl, selectToken } from '../fastaSlice';
 
 interface Props {
   sourceIdentifier: string;
@@ -47,6 +47,8 @@ const CapWarningSource = ({ sourceIdentifier, cache }: Props) => {
   const [currentCapArray, setCurrentCapArray] = useState<localCap[]>([]);
   const [currentPolyArray, setCurrentPolyArray] = useState<string[]>([]);
   const [layers, setLayers] = useState<JSX.Element[]>([]);
+  const fastaBaseUrl = useSelector(selectBaseUrl);
+  const fastaToken = useSelector(selectToken);
 
   // fetch the cap warnings and store in cap list
   useEffect(() => {
@@ -54,7 +56,7 @@ const CapWarningSource = ({ sourceIdentifier, cache }: Props) => {
     const fetchCaps = async () => {
       try {
         const response = await fetch(
-          'https://dev.fastaweather.com/api/v1/alerts/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
+          `https://${fastaBaseUrl}/api/v1/alerts/?token=${fastaToken}`,
         );
 
         const capJson = await response.json();
