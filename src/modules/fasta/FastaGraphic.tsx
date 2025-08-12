@@ -47,10 +47,50 @@ const Picker = () => {
 };
 
 const Graphics = () => {
-  const styles: { [key: string] : string[] } = {
-      'rainbow': ['#2579d4', '#2a8cf0', '#1cd0f5', '#428730', '#31c749', '#63dd54','#f9e063', '#fbc65b', '#fb8349', '#fd5740', '#b31b27', '#000'],
-      'tol': ['#332288','#117733', '#44AA99', '#88CCEE', '#DDCC77', '#DDCC77', '#AA4499', '#882255', '#5EF042', '#AA0495', '#DA857C', '#3ACB09'], 
-      'viridis': ['#fde725', '#c2df23', '#86d549', '#52c569', '#2ab07f', '#1e9b8a', '#25858e', '#2d708e', '#38588c', '#433e85', '#482173','#440154']}
+  const styles: { [key: string]: string[] } = {
+    rainbow: [
+      '#2579d4',
+      '#2a8cf0',
+      '#1cd0f5',
+      '#428730',
+      '#31c749',
+      '#63dd54',
+      '#f9e063',
+      '#fbc65b',
+      '#fb8349',
+      '#fd5740',
+      '#b31b27',
+      '#000',
+    ],
+    tol: [
+      '#332288',
+      '#117733',
+      '#44AA99',
+      '#88CCEE',
+      '#DDCC77',
+      '#DDCC77',
+      '#AA4499',
+      '#882255',
+      '#5EF042',
+      '#AA0495',
+      '#DA857C',
+      '#3ACB09',
+    ],
+    viridis: [
+      '#fde725',
+      '#c2df23',
+      '#86d549',
+      '#52c569',
+      '#2ab07f',
+      '#1e9b8a',
+      '#25858e',
+      '#2d708e',
+      '#38588c',
+      '#433e85',
+      '#482173',
+      '#440154',
+    ],
+  };
   const map = openLayersMap.map;
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
@@ -84,14 +124,14 @@ const Graphics = () => {
     }
     return vectorTileLayer;
   };
-  
-  function createStyle(hexVal : string){
-    return new Style({fill: new Fill({color: hexVal})});
+
+  function createStyle(hexVal: string) {
+    return new Style({ fill: new Fill({ color: hexVal }) });
   }
 
   function createCrrStyleFunction(theme: string) {
     const tempArr = styles[theme];
-    const styleArr = tempArr.map(hexVal => {
+    const styleArr = tempArr.map((hexVal) => {
       return createStyle(hexVal);
     });
     const cnv = document.createElement('canvas');
@@ -103,33 +143,47 @@ const Graphics = () => {
       pattern = ctx.createPattern(img, 'repeat');
     }
     const missingDataStyle = new Style({ fill: new Fill({ color: pattern }) });
-    const crrArr = ['CRR_02_1', 'CRR_1_2', 'CRR_2_3', 'CRR_3_5', 'CRR_5_7', 'CRR_7_10', 'CRR_10_15', 'CRR_15_20', 'CRR_20_30', 'CRR_30_50', 'CRR_50_plus']
-    
+    const crrArr = [
+      'CRR_02_1',
+      'CRR_1_2',
+      'CRR_2_3',
+      'CRR_3_5',
+      'CRR_5_7',
+      'CRR_7_10',
+      'CRR_10_15',
+      'CRR_15_20',
+      'CRR_20_30',
+      'CRR_30_50',
+      'CRR_50_plus',
+    ];
+
     return (feature: FeatureLike) => {
       const objectType = feature.get('object_type');
       if (objectType === 'CRR-missing-data') {
         return missingDataStyle;
-      } else{  
+      } else {
         const rate = feature.get('rain_rate');
-        const index = crrArr.findIndex((x) =>{ return x === rate});
-        if (index === -1){
+        const index = crrArr.findIndex((x) => {
+          return x === rate;
+        });
+        if (index === -1) {
           return styleArr[styleArr.length - 1];
         } else {
           return styleArr[index];
-        }    
+        }
       }
     };
   }
 
-  function createRdtStyleFunction(theme:string) {
+  function createRdtStyleFunction(theme: string) {
     const hexColour = styles[theme][10];
     const fillStyleCell000 = new Style({
-      fill: new Fill({ color: hexColour+'66'}),
+      fill: new Fill({ color: hexColour + '66' }),
     }); // red, semi-transparent
     const fillFallback = new Style({ fill: new Fill({ color: '#ccc' }) });
 
     const lineStyleCell000 = new Style({
-      stroke: new Stroke({ color: hexColour+'E6', width: 1 }),
+      stroke: new Stroke({ color: hexColour + 'E6', width: 1 }),
     }); // red
     const lineStyleForecast = new Style({
       stroke: new Stroke({ color: '#000000', width: 2 }),
@@ -260,39 +314,39 @@ const Graphics = () => {
     const mapUtils = new OpenLayersMap();
     products.forEach((p) => {
       let id: string | null;
-      if (p.name === "CRR") {
+      if (p.name === 'CRR') {
         id = crrLayerId;
         if (id) {
-        const layer = layerCache[id];
-        if (layer && isEntry(layer)) {
-          const ol_uid = layer.ol_uid;
-          if (ol_uid) {
-            olLayer = mapUtils.getLayerByUid(ol_uid);
-          }
-          if (olLayer) {
-            olLayer.setOpacity(opacityCRR);
+          const layer = layerCache[id];
+          if (layer && isEntry(layer)) {
+            const ol_uid = layer.ol_uid;
+            if (ol_uid) {
+              olLayer = mapUtils.getLayerByUid(ol_uid);
+            }
+            if (olLayer) {
+              olLayer.setOpacity(opacityCRR);
+            }
           }
         }
-      }
-      } else if (p.name === "RDT") {
+      } else if (p.name === 'RDT') {
         id = rdtLayerId;
         if (id) {
-        const layer = layerCache[id];
-        if (layer && isEntry(layer)) {
-          const ol_uid = layer.ol_uid;
-          if (ol_uid) {
-            olLayer = mapUtils.getLayerByUid(ol_uid);
-          }
-          if (olLayer) {
-            olLayer.setOpacity(opacityRDT);
+          const layer = layerCache[id];
+          if (layer && isEntry(layer)) {
+            const ol_uid = layer.ol_uid;
+            if (ol_uid) {
+              olLayer = mapUtils.getLayerByUid(ol_uid);
+            }
+            if (olLayer) {
+              olLayer.setOpacity(opacityRDT);
+            }
           }
         }
-      }
       } else {
         return;
       }
     });
-  }, [crrLayerId,rdtLayerId, opacityCRR, opacityRDT]);
+  }, [crrLayerId, rdtLayerId, opacityCRR, opacityRDT]);
 
   return <div className="FastaGraphics"></div>;
 };

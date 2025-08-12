@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectBaseUrl,
+  selectToken,
   updateHashTables,
   updateLatestTimeslot,
 } from './fastaSlice';
@@ -19,6 +20,7 @@ export interface HashTable {
 const FastaHashTablesServer = () => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
+  const fastaToken = useSelector(selectToken);
   const [hashTablesToKeep, setHashTablesToKeep] = useState<HashTable[]>([]);
   const [latestTimeslot, setLatestTimeslot] = useState<number | null>(null);
 
@@ -113,7 +115,7 @@ const FastaHashTablesServer = () => {
     };
 
     const response = await fetch(
-      `https://${fastaBaseUrl}/api/v1/vts/?token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0`,
+      `https://${fastaBaseUrl}/api/v1/vts/?token=${fastaToken}`,
     );
     const json = await response.json();
 
