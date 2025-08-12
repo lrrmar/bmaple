@@ -14,11 +14,15 @@ import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 
+import drawReducer from './modules/drawing/drawlingSlice'
+import DrawingSource from './modules/drawing/drawingSource';
+
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
     waypoint: waypointReducer,
+    draw: drawReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -40,6 +44,7 @@ const App = () => {
         </Profiles>
         <Sources>
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+          <DrawingSource cache={{}} sourceIdentifier= {'drawing'}/>
         </Sources>
         <BaseMaps>
           <OSMBaseMap id={'OSM'} />

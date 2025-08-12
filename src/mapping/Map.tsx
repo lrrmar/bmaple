@@ -74,10 +74,13 @@ const Map = ({ children }: Props) => {
   /* INTERACTIONS */
 
   function handleMouseMove(e: React.MouseEvent<HTMLElement>): void {
-    setMouseIsDragging(true);
-    const posX: number = e.clientX - 50;
-    const posY: number = e.clientY - 50;
-    //dispatch(updateMouseLocation([posX, posY]));
+
+      setMouseIsDragging(true);
+      const posX: number = e.clientX - 50;
+      const posY: number = e.clientY - 50;
+      //dispatch(updateMouseLocation([posX, posY]));
+    
+    
   }
 
   function handleMouseDown(): void {
