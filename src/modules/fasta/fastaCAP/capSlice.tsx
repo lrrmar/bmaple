@@ -20,12 +20,12 @@ interface InitialState{
 const initialState: InitialState = {   
     severity: 'All',  
     country: 'All',
-    oluid: {'All' : []},
+    oluid: {'All' : ['123', '456']},
     opacity: 0,
     style: 'default',
     desiredTime: 0.5,
     countryList: [], 
-    clicked: false,
+    clicked: true,
 }
 
 export const capSlice = createSlice({

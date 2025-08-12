@@ -76,6 +76,7 @@ const CapProfile = () => {
         return vectorTileLayer;
     };
 
+    // gets coords of polygon from oluid
     const getCoordinates = ((oluid: string) => {
         const layer = getLayer(oluid);
         const source = layer?.getSource();
@@ -101,6 +102,7 @@ const CapProfile = () => {
             'end': [],
             'ids': [],
         };
+
         // if there is more than one associated id then we need to compare
         if (coordList && coordList[coordinates]) {
             if (coordList?.[coordinates].length > 1) {
@@ -145,6 +147,7 @@ const CapProfile = () => {
         return clusterCapDict;
     })
 
+    // creates a gradient pattern used for when multiple severities are associated with one parent polygon
     const createGradientPattern = ((colourList: string[]) => {
         const canvas = document.createElement('canvas');
         canvas.width = 256;
@@ -170,6 +173,8 @@ const CapProfile = () => {
 
     // get the text for caps that share coordinates
     const getCombinationText = ((clusterCapDict: { [key: string]: string[] }) => {
+
+
         const eventList: string[] = clusterCapDict['event'];
         const sevList: string[] = clusterCapDict['severity'];
         let eventText: string = '';
@@ -200,21 +205,20 @@ const CapProfile = () => {
             offsetX: 0,
             offsetY: 0,
         });
-
-
+        
     })
 
+    // does what is says on the tin
+    // if there is one severity, uses that for colouring if theres more than one then calls the gradient function
     const getCombinationFill = ((clusterCapDict: { [key: string]: string[] }) => {
         const possibleSevs = ['minor', 'moderate', 'severe', 'extreme']
         const sevList = clusterCapDict['severity'];
-        //sevList.push('Severe');
-        //console.log(sevList);
         let fill: Fill;
         if (sevList.length > 1) {
             const hexValList: string[] = [];
             sevList.forEach((severity) => {
                 const index = possibleSevs.findIndex((sev) => {
-                    return sev === severity;
+                    return sev === severity.toLowerCase();
                 })
                 const hexVal = styleList[currentStyle][index]
                 if (hexVal) {
@@ -225,10 +229,8 @@ const CapProfile = () => {
             fill = new Fill({
                 color: gradient,
             })
-            console.log(fill);
 
         } else {
-
             const findSev = sevList[0];
             if (findSev) {
                 const index = possibleSevs.findIndex((lookSev) => {
@@ -252,6 +254,7 @@ const CapProfile = () => {
         return fill;
     })
 
+    // creates the polygon for the parent layer
     const setParentLayer = ((style: Style, coordinates: Coordinate[][]) => {
         const feature = new Feature({
             geometry: new Polygon([coordinates[0]]),
@@ -280,16 +283,21 @@ const CapProfile = () => {
             Object.keys(parentChildOluid).forEach((parentOLUID) => {
                 const coords = getCoordinates(parentOLUID);
                 const clusterCapDict = getFilteredCoordList(String(coords));
-                const text = getCombinationText(clusterCapDict);
-                const fill = getCombinationFill(clusterCapDict);
-                const layer = getLayer(parentOLUID);
-                const style = layer?.getStyle() as Style;
-                style.setText(text);
-                style.setFill(fill);
-                layer?.setStyle(style);
+                if (clusterCapDict) {
+                    const text = getCombinationText(clusterCapDict);
+                    const fill = getCombinationFill(clusterCapDict);
+                    const layer = getLayer(parentOLUID);
+                    const style = layer?.getStyle() as Style;
+                    if ( text && fill && style){   
+                        style.setText(text);    
+                        style.setFill(fill);
+                        layer?.setStyle(style);
+                    }
+                    
+                } 
             })
         }
-    }, [parentChildOluid, currentStyle])
+    }, [currentStyle, parentChildOluid])
 
     useEffect(() => {
         if (layers) {
@@ -326,11 +334,8 @@ const CapProfile = () => {
                     newPandCOLUID[parentOluid] = childOluidList;
                     setParentChildOluid(newPandCOLUID);
                 }
-
             })
-
         }
-
     }, [coordList])
 
     useEffect(() => {
@@ -342,30 +347,34 @@ const CapProfile = () => {
                 }) === -1) {
                     // gets the filtered coordlist for to create the text and the fill
                     const clusterCapDict = getFilteredCoordList(coordinate);
-                    const text: Text = getCombinationText(clusterCapDict);
-                    const fill: Fill = getCombinationFill(clusterCapDict);
-                    const stroke = new Stroke({
-                        color: 'black',
-                        width: 2,
-                    });
-                    const style = new Style({});
-                    style.setStroke(stroke);
-                    style.setFill(fill);
-                    style.setText(text);
-                    const coords = getCoordinates(clusterCapDict['ids'][0]);
-                    // gets the coordinates and creates the parent layer with the style formed from all the children layers
-                    if (coords) {
-                        const newLayer = getUid(setParentLayer(style, coords))
-                        // adds the coordinates and the newly created oluid to a local state 
-                        const newLayerOL: { [key: string]: string } = {};
-                        newLayerOL[String(coords)] = newLayer;
-                        setLayers(prev => ({ ...prev, ...newLayerOL }));
+                    if (clusterCapDict) {
+                        const text: Text = getCombinationText(clusterCapDict);
+                        const fill: Fill = getCombinationFill(clusterCapDict);
+                        const stroke = new Stroke({
+                            color: 'black',
+                            width: 2,
+                        });
+                        const style = new Style({});
+                        if ( text && fill && stroke){
+                            style.setStroke(stroke);
+                            style.setFill(fill);
+                            console.log(text);
+                            style.setText(text);
+
+                            const coords = getCoordinates(clusterCapDict['ids'][0]);
+                            // gets the coordinates and creates the parent layer with the style formed from all the children layers
+                            if (coords) {
+                                const newLayer = getUid(setParentLayer(style, coords))
+                                // adds the coordinates and the newly created oluid to a local state 
+                                const newLayerOL: { [key: string]: string } = {};
+                                newLayerOL[String(coords)] = newLayer;
+                                setLayers(prev => ({ ...prev, ...newLayerOL }));
+                            }
+                    }
                     }
                 }
-
             })
         }
-
     }, [idList])
 
     useEffect(() => {
@@ -376,7 +385,6 @@ const CapProfile = () => {
             if (clicked) {
                 dispatch(updateClick(false));
 
-                // not working because those oluids arent being highlighted the parent is 
                 const currentOL = Object.keys(currentOluid)[0]
                 const layer = getLayer(currentOL);
                 const style = layer?.getStyle() as Style;
@@ -390,7 +398,7 @@ const CapProfile = () => {
                 let newOl: { [key: string]: string[] } = {}
                 newOl['All'] = ['123', '456'];
                 dispatch(updateOluid(newOl));
-            }
+            } 
             const features: FeatureLike[] = map.getFeaturesAtPixel(event.pixel, {
                 layerFilter: function (layer) {
                     return true;
@@ -400,7 +408,7 @@ const CapProfile = () => {
             // if the feature has a valid oluid and style highlight it and set the oluid 
             //var counter = 0;
             let oluidArr: { [key: string]: string[] } = {};
-            features.forEach((feature) => {
+            features.forEach((feature) => {   
                 const oluid = feature.get('layer_id');
                 if (oluid) {
                     const layer = getLayer(oluid);
@@ -426,7 +434,7 @@ const CapProfile = () => {
             }
         });
 
-    }, [clicked, currentOluid])
+    }, [clicked, currentOluid, parentChildOluid])
 
     useEffect(() => {
         const coordGroups: { [key: string]: string[] } = {}
@@ -443,7 +451,9 @@ const CapProfile = () => {
                 }
             }
         })
-        setCoordList(coordGroups);
+        if ( JSON.stringify(coordList) != JSON.stringify(coordGroups)){
+            setCoordList(coordGroups);
+        }  
     }, [idList])
 
     // get list of all ids from cap source
@@ -490,6 +500,7 @@ const CapProfile = () => {
 
 
     useEffect(() => {
+        console.log("NOW")
         if (coordList && layers) {
             // initialise first time constants
             let currentTime = Date.now()
@@ -523,7 +534,7 @@ const CapProfile = () => {
                         inTimeRange = true;
                     } else if (startTime.getTime() > currentTime || endTime.getTime() < currentTime) {
                         inTimeRange = false;
-                    }
+                    } 
                     if (countryMatches && severityMatches && inTimeRange) {
                         childList.push(String(currentCap.ol_uid));
                     }
@@ -539,7 +550,7 @@ const CapProfile = () => {
 
 
         }
-    }, [currentCountry, currentSeverity, desTime])
+    }, [currentCountry, currentSeverity, desTime, layers])
 
 
     return <div></div>

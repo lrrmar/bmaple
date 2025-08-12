@@ -68,7 +68,7 @@ const capWarningSource = ({ sourceIdentifier, cache }: Props) => {
                     return capObj;
                 })
 
-                console.log(subsetAlertDL, "CAPS");
+                //console.log(subsetAlertDL, "CAPS");
                 setCurrentCapArray(subsetAlertDL);
             } catch (error) {
                 console.log("ERROR", error);

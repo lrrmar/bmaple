@@ -48,7 +48,6 @@ const CapLayer = ({
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "application/xml");
                 const polygonData = xmlDoc.querySelector("polygon")?.innerHTML;
-
                 if (polygonData) {
                     polyStr = polygonData
                     const descriptionStr = String(cacheElem?.event) + " \n" + String(cacheElem?.severity);
@@ -57,7 +56,7 @@ const CapLayer = ({
                 }
             }
         } catch (error) {
-            console.log("HERE", error);
+            console.log(error);
         }
     }
 

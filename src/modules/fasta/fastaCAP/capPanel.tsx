@@ -47,9 +47,9 @@ const CapPanel = (({ id }: { id: string }) => {
         map
             .getLayers()
             .getArray()
-            .forEach((l) => {
-                if (getUid(l) === uid) {
-                    baseLayer = l;
+            .forEach((layer) => {
+                if (getUid(layer) === uid) {
+                    baseLayer = layer;
                 }
             });
 
