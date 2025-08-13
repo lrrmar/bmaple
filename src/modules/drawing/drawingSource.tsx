@@ -29,8 +29,10 @@ import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { Draw, Modify } from 'ol/interaction'
 import Map from 'ol/Map'
 import VectorSource from 'ol/source/Vector';
-import { Polygon } from 'ol/geom';
+import { Polygon, SimpleGeometry } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
+import DrawingLayer from './drawingLayer';
+import { Coordinate } from 'ol/coordinate';
 
 interface Props {
     sourceIdentifier: string;
@@ -46,6 +48,9 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
     const drawMode = useSelector(selectMode);
     const layerID = useSelector(selectLayerID);
     const sliceOluids = useSelector(selectOluids);
+    const allCache = useSelector(selectCache);
+    const [layers, setLayers] = useState<JSX.Element[]>([]);
+    const[currentCoordinates, setCurrentCoordinates] = useState<number[]>([]);
 
     useEffect(() => {
         /*
@@ -63,7 +68,7 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
             const vectorSource = new VectorSource({
                 wrapX: false
             });
-            const layer = new VectorLayer({ source: vectorSource });
+            //const layer = new VectorLayer({ source: vectorSource });
             let draw: Draw | undefined;
             let modify: Modify | undefined;
             let value = 'LineString';
@@ -78,12 +83,20 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                 const modify = new Modify({
                     source: vectorSource
                 });
+
                 map.addInteraction(modify);
+
                 draw.on("drawend", (event) => {
                     const feature = event.feature;
+                    console.log(event.feature);
+                    // capture coords put in cache
+                    const geometry = feature.getGeometry() as Polygon;
+                    const coordinates = geometry.getCoordinates()[0].flat();
+                    console.log(coordinates);
                     const oluid = getUid(feature);
                     console.log("ID", oluid);
                     setCurrentOluid(oluid)
+                    setCurrentCoordinates(coordinates);
                 })
             }
 
@@ -105,20 +118,33 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
             const drawRequest: Request = {
                 id: cacheID,
                 source: sourceIdentifier,
+                coordinates: currentCoordinates,
                 layerId: layerID,
                 ol_uid: String(currentOluid),
             }
             dispatch(request(drawRequest))
         }
 
-       
+
     }, [currentOluid])
 
+    useEffect(() => {
+        // Get the IDs of all cache elements that have come from this source
+        const filteredIds = Object.keys(allCache).filter((id) => {
+            const element = allCache[id];
+            const source = element.source;
+            return source === sourceIdentifier;
+        });
 
+        const components = filteredIds.map((id) => {
+            return <DrawingLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
+        });
 
+        setLayers(components);
 
+    }, [allCache]);
 
-    return <div className="DrawingSource"></div>;
+    return <div className="drawingSource">{layers}</div>;
 });
 
 export default DrawingSource;
