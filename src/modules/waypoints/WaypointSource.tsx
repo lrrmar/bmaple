@@ -20,6 +20,7 @@ import OpenLayersMap from '../../mapping/OpenLayersMap';
 import WaypointSourceLayer from './WaypointSourceLayer';
 
 import { selectMode } from './waypointSlice';
+import { selectIsDrawing } from '../drawing/drawlingSlice';
 
 interface Props {
   sourceIdentifier: string;
@@ -34,9 +35,11 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
   const verticalLevel = useSelector(selectVerticalLevel);
   const mode = useSelector(selectMode);
   const [clickEvents, setClickEvents] = useState([]);
+  const isDrawing = useSelector(selectIsDrawing)
 
   useEffect(() => {
-    if (!clickEvent) {
+    //waypoints disabled when drawing is enabled
+    if (!clickEvent || isDrawing) {
       return;
     }
     // detect click on exisiting point

@@ -16,6 +16,11 @@ import WaypointProfile from './modules/waypoints/WaypointProfile';
 
 import drawReducer from './modules/drawing/drawlingSlice'
 import DrawingSource from './modules/drawing/drawingSource';
+import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
+import DrawingMenu from './modules/drawing/drawingMenu';
+import DrawingProfile from './modules/drawing/drawingProfile';
+import FloatingBox from './features/FloatingBox';
+import DrawButton from './modules/drawing/drawButton';
 
 export const store = configureStore({
   reducer: {
@@ -32,6 +37,22 @@ export const store = configureStore({
     }),
 });
 
+const floatingBoxStyle = {
+  top: '0px',
+  right: '50%',
+  height: '10%',
+  width: '15%',
+  display: 'flex',
+  justifyContent: 'around',
+  flexDirection:'row',
+  borderColor: 'rgba(0,0,0,0)',
+  borderWidth: '3px',
+  borderStyle: 'solid',
+  backgroundColor: 'rgba(0,0,0,0)',
+  overflow:'hidden',
+};
+
+
 const App = () => {
   useEffect(() => {
     sessionStorage.clear();
@@ -41,15 +62,23 @@ const App = () => {
       <Map>
         <Profiles>
           <WaypointProfile />
+          <DrawingProfile />
         </Profiles>
         <Sources>
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-          <DrawingSource cache={{}} sourceIdentifier= {'drawing'}/>
+          <DrawingSource cache={{}} sourceIdentifier={'draw'} />
         </Sources>
         <BaseMaps>
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
+        <FoldOutMenu align={'left'}>
+          <DrawingMenu id = "draw"/>
+        </FoldOutMenu>
+        <FloatingBox style={floatingBoxStyle}>
+          <DrawButton type="enableDraw"/>
+        </FloatingBox>
       </Map>
+
     </div>
   );
 };

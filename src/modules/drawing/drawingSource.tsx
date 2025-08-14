@@ -7,6 +7,9 @@ import {
 import { selectCache, Cache, Request, request } from '../../mapping/cacheSlice';
 
 import {
+    selectEraser,
+    selectFreehand,
+    selectIsDrawing,
     selectLayerID,
     selectMode,
     selectName,
@@ -41,16 +44,18 @@ interface Props {
 
 export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
     const dispatch = useDispatch();
-    const clickEvent = useSelector(selectClickEvent);
-    const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
+    const map = OpenLayersMap.map;
     const [currentOluid, setCurrentOluid] = useState<String>();
     const layerName = useSelector(selectName);
     const drawMode = useSelector(selectMode);
     const layerID = useSelector(selectLayerID);
-    const sliceOluids = useSelector(selectOluids);
     const allCache = useSelector(selectCache);
     const [layers, setLayers] = useState<JSX.Element[]>([]);
-    const[currentCoordinates, setCurrentCoordinates] = useState<number[]>([]);
+    const [currentCoordinates, setCurrentCoordinates] = useState<number[]>([]);
+    const isDrawing = useSelector(selectIsDrawing);
+    const mode  = useSelector(selectMode);
+    const freehand = useSelector(selectFreehand);
+    const isEraser = useSelector(selectEraser);
 
     useEffect(() => {
         /*
@@ -64,6 +69,9 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
         //map.getSource() 
         if (!map) {
             return
+        } else if (!isDrawing || isEraser) {
+            console.log("returned");
+            return
         } else {
             const vectorSource = new VectorSource({
                 wrapX: false
@@ -71,11 +79,11 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
             //const layer = new VectorLayer({ source: vectorSource });
             let draw: Draw | undefined;
             let modify: Modify | undefined;
-            let value = 'LineString';
-            if (value) {
+            if (mode) {
                 draw = new Draw({
                     source: vectorSource,
-                    type: "Polygon",
+                    type: mode,
+                    freehand: freehand,
                 });
                 map.addInteraction(draw);
 
@@ -100,14 +108,17 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                 })
             }
 
+
             return () => {
-                if (draw && modify) {
+                if (draw) {
                     map.removeInteraction(draw);
+                }
+                if (modify) {
                     map.removeInteraction(modify);
                 }
             };
         }
-    }, []);
+    }, [isDrawing, freehand, isEraser]);
 
     // create a request to cache and 
     useEffect(() => {
@@ -119,6 +130,7 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                 id: cacheID,
                 source: sourceIdentifier,
                 coordinates: currentCoordinates,
+                layerName: layerName,
                 layerId: layerID,
                 ol_uid: String(currentOluid),
             }

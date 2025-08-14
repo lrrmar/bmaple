@@ -20,6 +20,8 @@ import { wait } from '@testing-library/user-event/dist/utils';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { Geometry } from 'ol/geom';
 import BaseLayer from 'ol/layer/Base';
+import { selectName } from './drawlingSlice'
+import { getuid } from 'process';
 
 
 const DrawingLayer = ({
@@ -32,34 +34,15 @@ const DrawingLayer = ({
     const allCache = useSelector(selectCache);
     const mapUtils = new OpenLayersMap();
     const map = OpenLayersMap.map;
-    console.log("IN");
-    const getLayer = (
-        uid: string | null,
-    ): VectorLayer<Feature<Geometry>> | null => {
-        let baseLayer: BaseLayer | undefined = undefined;
-        let vectorTileLayer: VectorLayer<Feature<Geometry>> | null = null;
-        map
-            .getLayers()
-            .getArray()
-            .forEach((l) => {
-                if (getUid(l) === uid) {
-                    baseLayer = l;
-                }
-            });
+    const layerName = useSelector(selectName);
+    const dispatch = useDispatch();
 
-        if (baseLayer) {
-            vectorTileLayer = baseLayer as VectorLayer<Feature<Geometry>>;
-        }
-        return vectorTileLayer;
-    };
-
-
-
-
+    // get the drawn coordinates and create a layer for them.
     useEffect(() => {
         if (id) {
             const getDrawing = allCache[id];
             const coordinates = getDrawing['coordinates'] as number[];
+            
             console.log(coordinates);
 
             if (coordinates) {
@@ -74,7 +57,7 @@ const DrawingLayer = ({
 
                 // close the polygon 
                 latlonArr.push(latlonArr[0]);
-                
+
                 // add feature to current layer
                 const feature = new Feature({
                     geometry: new Polygon([latlonArr]),
@@ -90,19 +73,30 @@ const DrawingLayer = ({
                     visible: false,
                     zIndex: 100,
                 });
+                console.log(getUid(layer), " UID");
                 feature.set('layer_id', getUid(layer));
 
                 const map = openLayersMap.map;
                 map.addLayer(layer);
                 console.log(layer);
                 const oldLayer = allCache[id];
-            }
 
+                // update the cache to include the oluid of the new layer
+                const toCache: Ingest = {
+                    id: id,
+                    source: sourceIdentifier,
+                    coordinates: coordinates,
+                    layerName: layerName,
+                    layerId: getUid(layer),
+                    ol_uid: String(oldLayer.ol_uid),
+                }
+                dispatch(ingest( toCache));
+            }
         }
 
+    }, [])
 
 
-    }, [allCache])
 
 
     return <div></div>
