@@ -66,13 +66,13 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
             - request all necessary data into cache 
         */
 
-        //map.getSource() 
         if (!map) {
             return
         } else if (!isDrawing || isEraser) {
-            console.log("returned");
+            console.log(isEraser, "erase")
             return
         } else {
+            console.log(isEraser, "erase");
             const vectorSource = new VectorSource({
                 wrapX: false
             });
@@ -86,13 +86,6 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                     freehand: freehand,
                 });
                 map.addInteraction(draw);
-
-
-                const modify = new Modify({
-                    source: vectorSource
-                });
-
-                map.addInteraction(modify);
 
                 draw.on("drawend", (event) => {
                     const feature = event.feature;
