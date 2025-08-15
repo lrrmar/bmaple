@@ -12,8 +12,22 @@
 
 
 .scrollable {
-    overflow: auto;
+    padding: 0 5%;
+    box-sizing: border-box;
+    overflow-y: auto;
     overflow-x: hidden;
+}
+
+.button-cap {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition-duration: 4ms;
+    text-wrap: balance;
 }
 
 .button-cap {
@@ -23,8 +37,10 @@
     align-content: center;
     align-items: center;
     justify-content: center;
-    padding: 5%;
+    padding-left: 5%;
+    padding-right: 5%;
     transition-duration: 4ms;
+    text-wrap: balance;
 }
 
 .button-cap:hover {
@@ -34,11 +50,16 @@
 }
 
 .div-info {
-    width: 90%;
+    width: 95%;
     background-color: rgb(207, 198, 198);
-    color: black
+    color: black;
+    text-wrap: wrap;
 }
 
 .a-cap {
     color: brown;
+}
+
+.h2 {
+    color: black;
 }

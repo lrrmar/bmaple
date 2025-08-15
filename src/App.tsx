@@ -93,16 +93,17 @@ const App = () => {
           <ColourSchemeMenu />
           {/* <ProductSelector /> */}
         </FloatingBox>
-        <FoldOutMenu align='left'>
+        <FoldOutMenu align='left' >
           {/* <CapKeyPanel id="Caps Key"/> */}
-          <CapPanel id="Caps"/>
-          
+          <CapPanel id="alerts"  />
+          <CollapseColourBar id="CRR-Key" name="CRR"/>
+          <CollapseColourBar id="CAP-Key" name="CAP"/>
         </FoldOutMenu>
         
       </Map>
       
       <FastaMainMenu>
-        <CollapseColourBar id="hello"/>
+        
         <Slider />
         
       </FastaMainMenu>

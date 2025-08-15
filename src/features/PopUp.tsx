@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './PopUp.css'
 
 type PopUpProps = {
   showPopUp: boolean;
@@ -12,9 +12,9 @@ const PopUp: React.FunctionComponent<PopUpProps> = (({ showPopUp, closePopUp, ch
     return null;
   }
   return (
-    <div className="PopUp" >
-        <button onClick={closePopUp}>close</button>
+    <div className="popUp" >
         {children}
+        <button onClick={closePopUp}>close</button>
     </div>
   );
 });

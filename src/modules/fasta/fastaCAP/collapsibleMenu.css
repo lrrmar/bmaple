@@ -1,34 +1,31 @@
 .rainbowStyle {
-    background: linear-gradient(to right, #2579d4, #2a8cf0, #1cd0f5, #428730, #31c749, #63dd54, #f9e063, #fbc65b, #fb8349, #fd5740, #b31b27, #000);
+    background: linear-gradient(to bottom, #2579d4, #2a8cf0, #1cd0f5, #428730, #31c749, #63dd54, #f9e063, #fbc65b, #fb8349, #fd5740, #b31b27, #000);
     border-radius: 4px;
     border-style: solid;
     border-width: 2px;
     border-color: black;
-    width: 90%;
-    height: 90%;
-    padding: 10px;
+    width: 100px;
+    height: 30vh;
 }
 
 .tolStyle {
-    background: linear-gradient(to right, #332288, #117733, #44AA99, #88CCEE, #DDCC77, #DDCC77, #AA4499, #882255, #5EF042, #AA0495, #DA857C, #3ACB09);
+    background: linear-gradient(to bottom, #332288, #117733, #44AA99, #88CCEE, #DDCC77, #DDCC77, #AA4499, #882255, #5EF042, #AA0495, #DA857C, #3ACB09);
     border-style: solid;
     border-radius: 4px;
     border-width: 2px;
     border-color: black;
-    width: 90%;
-    height: 90%;
-    padding: 10px;
+    width: 100px;
+    height: 30vh;
 }
 
 .viridisStyle {
-    background: linear-gradient(to right, #fde725, #c2df23, #86d549, #52c569, #2ab07f, #1e9b8a, #25858e, #2d708e, #38588c, #433e85, #482173, #440154);
+    background: linear-gradient(to bottom, #fde725, #c2df23, #86d549, #52c569, #2ab07f, #1e9b8a, #25858e, #2d708e, #38588c, #433e85, #482173, #440154);
     border-style: solid;
     border-radius: 4px;
     border-width: 2px;
     border-color: black;
-    width: 90%;
-    height: 90%;
-    padding: 10px;
+    width: 100px;
+    height: 30vh;
 }
 
 .littleBox { 
@@ -38,10 +35,13 @@
     border-color: #000;
     width: 40px;
     height: 40px;
-    padding: 10px;
+
 }
 
 .p-black {
-    padding: 10px;
+    color: #000;
+}
+
+.h2 {
     color: #000;
 }
