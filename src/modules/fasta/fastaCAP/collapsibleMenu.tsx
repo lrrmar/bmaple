@@ -75,10 +75,10 @@ const CollapseColourBar = (({ id, name }: Props) => {
                 ) : (
                 <div >
                     <h2 className="h2"> Key for CAP Alerts: </h2>
-                    <p className="p-black"> minor</p> <div style={{ background: currentCapStyle[0] }} className="littleBox"> </div>
-                    <p className="p-black"> moderate</p> <div style={{ background: currentCapStyle[1] }} className="littleBox"> </div>
-                    <p className="p-black"> severe</p> <div style={{ background: currentCapStyle[2] }} className="littleBox"> </div>
-                    <p className="p-black"> extreme</p> <div style={{ background: currentCapStyle[3] }} className="littleBox"> </div>
+                    <p className="p-black"> minor</p> <div style={{ background: currentCapStyle[3] }} className="littleBox"> </div>
+                    <p className="p-black"> moderate</p> <div style={{ background: currentCapStyle[2] }} className="littleBox"> </div>
+                    <p className="p-black"> severe</p> <div style={{ background: currentCapStyle[1] }} className="littleBox"> </div>
+                    <p className="p-black"> extreme</p> <div style={{ background: currentCapStyle[0] }} className="littleBox"> </div>
                 </div>
                 )
 

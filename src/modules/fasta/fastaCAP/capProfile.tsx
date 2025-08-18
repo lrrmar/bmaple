@@ -222,7 +222,7 @@ const CapProfile = () => {
   // does what is says on the tin
   // if there is one severity, uses that for colouring if theres more than one then calls the gradient function
   const getCombinationFill = (clusterCapDict: { [key: string]: string[] }) => {
-    const possibleSevs = ['minor', 'moderate', 'severe', 'extreme'];
+    const possibleSevs = ['extreme', 'severe', 'moderate', 'minor'];
     const sevList = clusterCapDict['severity'];
     let fill: Fill;
     if (sevList.length > 1) {
@@ -375,7 +375,6 @@ const CapProfile = () => {
             if (text && fill && stroke) {
               style.setStroke(stroke);
               style.setFill(fill);
-              console.log(text);
               style.setText(text);
 
               const coords = getCoordinates(clusterCapDict['ids'][0]);
@@ -513,7 +512,6 @@ const CapProfile = () => {
   }, [idList, currentOpacity]);
 
   useEffect(() => {
-    console.log('NOW');
     if (coordList && layers) {
       // initialise first time constants
       let currentTime = Date.now();
