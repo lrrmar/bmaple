@@ -11,11 +11,26 @@ const DrawingMenu = (({ id }: { id: string }) => {
     const oldLayerName = useSelector(selectName);
     const [layerList, setLayerList] = useState<string[]>();
 
+    const overallStyle: React.CSSProperties = {
+        color: 'black', 
+        width: '90%', 
+        height: '95%', 
+        margin: '5%',
+        display: 'flex',
+        flexDirection: 'column',
+    }
+    
+    const inputStyle: React.CSSProperties = { 
+        width: '90%',
+    }
+
     // creates a new layer
     const handleClick = (() => {
         if (currentText !== oldLayerName && currentText) {
             dispatch(updateName(currentText))
+            setCurrentText("");
         }
+
 
     })
 
@@ -48,9 +63,9 @@ const DrawingMenu = (({ id }: { id: string }) => {
     })
 
     return (
-        <div>
-            <h4> Enter New Layer Name </h4>
-            <input type="text" id="layerName" name="layerName" onChange={(element) => { setCurrentText(element.target.value) }} />
+        <div style={overallStyle}>
+            <p> Enter New Layer Name </p>
+            <input style={inputStyle} value= { currentText} type="text" id="layerName" name="layerName" onChange={(element) => { setCurrentText(element.target.value) }} />
             <input type="button" value="confirm" onClick={handleClick} />
             <div>
                 {layerList?.map((layerName) => {

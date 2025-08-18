@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectEraser, selectName } from "./drawlingSlice";
+import { selectEraser, selectIsDrawing, selectName, updateIsDrawing, updateIsEraser } from "./drawlingSlice";
 import { remove, Remove, selectCache } from "../../mapping/cacheSlice";
 import { Geometry } from "ol/geom";
 import { Feature } from "ol";
@@ -8,6 +8,8 @@ import BaseLayer from "ol/layer/Base";
 import VectorLayer from "ol/layer/Vector";
 import { getUid } from "ol";
 import OpenLayersMap from "../../mapping/OpenLayersMap";
+import { unByKey } from "ol/Observable";
+import { EventsKey } from "openlayers";
 
 
 
@@ -17,8 +19,10 @@ const DrawingProfile = (() => {
     const allCache = useSelector(selectCache);
     const map = OpenLayersMap.map;
     const isEraser = useSelector(selectEraser);
+    const isDrawing = useSelector(selectIsDrawing);
     const [drawingIdList, setDrawingList] = useState<string[]>([]);
     const dispatch = useDispatch();
+    const [eraserEvent, setEraserEvent] = useState<EventsKey>();
     const getLayer = (
         uid: string | null,
     ): VectorLayer<Feature<Geometry>> | null => {
@@ -84,7 +88,7 @@ const DrawingProfile = (() => {
     //erase items off of the map when eraser is true
     useEffect(() => {
         if (isEraser) {
-            map.on('click', function (event) {
+            const newClick = map.on('click', function (event) {
                 const features = map.getFeaturesAtPixel(event.pixel, {
                     layerFilter: function (layer) {
                         return true;
@@ -95,39 +99,31 @@ const DrawingProfile = (() => {
                     const source = element.source;
                     return source === 'draw';
                 });
-                console.log(features, "FEAT");
                 const toDeleteOluids: Remove[] = [];
                 features.forEach((feature) => {
                     const oluid = feature.get('layer_id')
                     const layer = getLayer(oluid);
-                    if (layer){
+                    if (layer) {
                         map.removeLayer(layer);
                     }
-                    
-                    // filteredIds.forEach((id) => {
-                    //     console.log(String(allCache[id].ol_uid), " ", String(oluid))
-                    //     if (String(allCache[id].ol_uid) === String(oluid)) {
-                    //         const toRemoveId: Remove = {
-                    //             id: id,
-                    //         };
-                    //         toDeleteOluids.push(toRemoveId);
 
-                    //     }
-                    // })
                 })
-                console.log(toDeleteOluids);
                 dispatch(remove(toDeleteOluids));
+                setEraserEvent(newClick);
+
             })
+
         } else {
-            map.removeEventListener("click", function (event) {
-                return
-            });
+            if(eraserEvent) {
+                unByKey(eraserEvent.current);
+                console.log("YES")
+            }
         }
 
 
-    }, [isEraser])
 
-    // select or unselect drawing mode
+
+    }, [isEraser])
 
     // change the colour of the lines
 

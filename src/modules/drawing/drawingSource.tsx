@@ -69,10 +69,8 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
         if (!map) {
             return
         } else if (!isDrawing || isEraser) {
-            console.log(isEraser, "erase")
             return
         } else {
-            console.log(isEraser, "erase");
             const vectorSource = new VectorSource({
                 wrapX: false
             });
@@ -89,13 +87,10 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
 
                 draw.on("drawend", (event) => {
                     const feature = event.feature;
-                    console.log(event.feature);
                     // capture coords put in cache
                     const geometry = feature.getGeometry() as Polygon;
                     const coordinates = geometry.getCoordinates()[0].flat();
-                    console.log(coordinates);
                     const oluid = getUid(feature);
-                    console.log("ID", oluid);
                     setCurrentOluid(oluid)
                     setCurrentCoordinates(coordinates);
                 })

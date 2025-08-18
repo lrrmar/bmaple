@@ -42,8 +42,6 @@ const DrawingLayer = ({
         if (id) {
             const getDrawing = allCache[id];
             const coordinates = getDrawing['coordinates'] as number[];
-            
-            console.log(coordinates);
 
             if (coordinates) {
                 const latlonArr = []
@@ -52,7 +50,6 @@ const DrawingLayer = ({
                     const lon = coordinates[i];
                     const lat = coordinates[i + 1];
                     latlonArr.push([lon, lat])
-                    console.log([lon, lat])
                 }
 
                 // close the polygon 
@@ -73,12 +70,10 @@ const DrawingLayer = ({
                     visible: false,
                     zIndex: 100,
                 });
-                console.log(getUid(layer), " UID");
                 feature.set('layer_id', getUid(layer));
 
                 const map = openLayersMap.map;
                 map.addLayer(layer);
-                console.log(layer);
                 const oldLayer = allCache[id];
 
                 // update the cache to include the oluid of the new layer
