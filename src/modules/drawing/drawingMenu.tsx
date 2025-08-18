@@ -24,18 +24,23 @@ const DrawingMenu = (({ id }: { id: string }) => {
         width: '90%',
     }
 
+    const buttonStyle: React.CSSProperties = { 
+        width: '80%',
+        height: '15%',
+        margin: '3px',
+
+    }
     // creates a new layer
     const handleClick = (() => {
         if (currentText !== oldLayerName && currentText) {
             dispatch(updateName(currentText))
             setCurrentText("");
         }
-
-
     })
 
     // gets all the layer names currently in cache
     useEffect(() => {
+
         const filteredIds = Object.keys(allCache).filter((id) => {
             const cacheObj = allCache[id];
             return cacheObj.source === 'draw';
@@ -51,12 +56,19 @@ const DrawingMenu = (({ id }: { id: string }) => {
             }
         })
 
+        const currentLayerIndex = layerNameList.findIndex((layerName) => { 
+            return layerName === oldLayerName;
+        })
+
+        if ( currentLayerIndex === -1) { 
+            layerNameList.push(String(oldLayerName))
+        }
+
         if ( JSON.stringify(layerList) !== JSON.stringify(layerNameList)){
             setLayerList(layerNameList);
         }
 
-
-    }, [allCache])
+    }, [allCache, oldLayerName])
 
     const changeLayerName = ((layerName:string) => { 
         dispatch(updateName(layerName));
@@ -70,7 +82,7 @@ const DrawingMenu = (({ id }: { id: string }) => {
             <div>
                 {layerList?.map((layerName) => {
                     return(
-                        <button onClick={() => changeLayerName(layerName)}>{layerName}</button>
+                        <button style={buttonStyle} onClick={() => changeLayerName(layerName)}>{layerName}</button>
                     );
                 })}
             </div>

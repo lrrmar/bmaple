@@ -110,7 +110,6 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
 
     // create a request to cache and 
     useEffect(() => {
-        console.log(currentOluid);
         if (currentOluid) {
             const cacheID = drawMode + "__" + String(Date.now()) + "__" + String(currentOluid);
 
