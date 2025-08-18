@@ -26,8 +26,10 @@ const DrawingMenu = (({ id }: { id: string }) => {
 
     const buttonStyle: React.CSSProperties = { 
         width: '80%',
-        height: '15%',
+        height: '100%',
         margin: '3px',
+        border: 'solid 2px black',
+        borderRadius: '4px'
 
     }
     // creates a new layer
@@ -80,11 +82,13 @@ const DrawingMenu = (({ id }: { id: string }) => {
             <input style={inputStyle} value= { currentText} type="text" id="layerName" name="layerName" onChange={(element) => { setCurrentText(element.target.value) }} />
             <input type="button" value="confirm" onClick={handleClick} />
             <div>
+                <ul> 
                 {layerList?.map((layerName) => {
                     return(
-                        <button style={buttonStyle} onClick={() => changeLayerName(layerName)}>{layerName}</button>
+                       <li> <button style={buttonStyle} onClick={() => changeLayerName(layerName)}>{layerName}</button></li>
                     );
                 })}
+                </ul>
             </div>
             
         </div>

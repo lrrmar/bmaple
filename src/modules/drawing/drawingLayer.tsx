@@ -7,6 +7,7 @@ import { selectCache, ingest, Ingest } from '../../mapping/cacheSlice';
 import { current } from '@reduxjs/toolkit';
 import Feature from 'ol/Feature.js';
 import Polygon from 'ol/geom/Polygon.js';
+import LineString from 'ol/geom/LineString'
 import { Text } from 'ol/style';
 import { Coordinate } from 'ol/coordinate';
 import VectorSource from 'ol/source/Vector';
@@ -20,7 +21,7 @@ import { wait } from '@testing-library/user-event/dist/utils';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { Geometry } from 'ol/geom';
 import BaseLayer from 'ol/layer/Base';
-import { selectName } from './drawlingSlice'
+import { selectMode, selectName } from './drawlingSlice'
 import { getuid } from 'process';
 
 
@@ -35,6 +36,7 @@ const DrawingLayer = ({
     const mapUtils = new OpenLayersMap();
     const map = OpenLayersMap.map;
     const layerName = useSelector(selectName);
+    const mode = useSelector(selectMode)
     const dispatch = useDispatch();
 
     // get the drawn coordinates and create a layer for them.
@@ -45,21 +47,24 @@ const DrawingLayer = ({
 
             if (coordinates) {
                 const latlonArr = []
-                // format the coordinates
-                for (let i = 0; i <= coordinates.length / 2; i += 2) {
+
+                for (let i = 0; i < coordinates.length ; i += 2) {
                     const lon = coordinates[i];
                     const lat = coordinates[i + 1];
                     latlonArr.push([lon, lat])
                 }
-
-                // close the polygon 
-                latlonArr.push(latlonArr[0]);
-
-                // add feature to current layer
-                const feature = new Feature({
-                    geometry: new Polygon([latlonArr]),
-                });
-
+                let feature: Feature;
+                if ( mode === 'Polygon' ) { 
+                    // add feature to current layer
+                    feature = new Feature({
+                        geometry: new Polygon([latlonArr]),
+                    });
+                } else { 
+                    feature = new Feature({
+                        geometry: new LineString(latlonArr),
+                    });
+                }
+            
                 const source = new VectorSource({
                     wrapX: false,
                     features: [feature],

@@ -36,6 +36,7 @@ import { Polygon, SimpleGeometry } from 'ol/geom';
 import VectorLayer from 'ol/layer/Vector';
 import DrawingLayer from './drawingLayer';
 import { Coordinate } from 'ol/coordinate';
+import { LineString } from 'ol/geom';
 
 interface Props {
     sourceIdentifier: string;
@@ -53,7 +54,7 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
     const [layers, setLayers] = useState<JSX.Element[]>([]);
     const [currentCoordinates, setCurrentCoordinates] = useState<number[]>([]);
     const isDrawing = useSelector(selectIsDrawing);
-    const mode  = useSelector(selectMode);
+    const mode = useSelector(selectMode);
     const freehand = useSelector(selectFreehand);
     const isEraser = useSelector(selectEraser);
 
@@ -84,18 +85,29 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                     freehand: freehand,
                 });
                 map.addInteraction(draw);
+                if (mode === 'Polygon') {
+                    draw.on("drawend", (event) => {
+                        const feature = event.feature;
+                        // capture coords put in cache
+                        const geometry = feature.getGeometry() as Polygon;
+                        const coordinates = geometry.getCoordinates()[0].flat();
+                        const oluid = getUid(feature);
+                        setCurrentOluid(oluid)
+                        setCurrentCoordinates(coordinates);
+                    })
+                } else {
+                    draw.on("drawend", (event) => {
+                        const feature = event.feature;
+                        // capture coords put in cache
+                        const geometry = feature.getGeometry() as LineString;
+                        const coordinates = geometry.getCoordinates().flat();
+                        const oluid = getUid(feature);
+                        setCurrentOluid(oluid)
+                        setCurrentCoordinates(coordinates);
+                    })
+                }
 
-                draw.on("drawend", (event) => {
-                    const feature = event.feature;
-                    // capture coords put in cache
-                    const geometry = feature.getGeometry() as Polygon;
-                    const coordinates = geometry.getCoordinates()[0].flat();
-                    const oluid = getUid(feature);
-                    setCurrentOluid(oluid)
-                    setCurrentCoordinates(coordinates);
-                })
             }
-
 
             return () => {
                 if (draw) {
@@ -106,7 +118,7 @@ export const DrawingSource = (({ sourceIdentifier, cache }: Props) => {
                 }
             };
         }
-    }, [isDrawing, freehand, isEraser]);
+    }, [isDrawing, freehand, isEraser, mode]);
 
     // create a request to cache and 
     useEffect(() => {

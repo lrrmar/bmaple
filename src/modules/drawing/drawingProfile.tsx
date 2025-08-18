@@ -88,7 +88,6 @@ const DrawingProfile = (() => {
 
     //erase items off of the map when eraser is true
     useEffect(() => {
-        console.log(isEraser);
         if (isEraser) {
             const newClick = map.on('click', function (event) {
                 const features = map.getFeaturesAtPixel(event.pixel, {
@@ -112,7 +111,6 @@ const DrawingProfile = (() => {
                 })
                 dispatch(remove(toDeleteOluids));
             });
-            const listener = newClick['listener']
             setEraserEvent(newClick)
 
         } else if (!isEraser) {
@@ -128,10 +126,6 @@ const DrawingProfile = (() => {
     // change the colour of the lines
 
     // change the drawing mode between line string and polygon
-
-
-
-
 
     return <div></div>
 })
