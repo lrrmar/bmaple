@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 
 import {
@@ -6,9 +5,19 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 
-import { updateCrrChosenStyle, updateOpacityCRR, updateOpacityRDT } from "./fastaSlice";
+import {
+  updateCrrChosenStyle,
+  updateOpacityCRR,
+  updateOpacityRDT,
+} from './fastaSlice';
 
-import { updateCountry, updateSeverity, updateOpacity, updateStyle, updateDesiredTime} from './fastaCAP/capSlice'
+import {
+  updateCountry,
+  updateSeverity,
+  updateOpacity,
+  updateStyle,
+  updateDesiredTime,
+} from './fastaCAP/capSlice';
 
 import { selectCountryList } from './fastaCAP/capSlice';
 
@@ -27,9 +36,16 @@ import {
   selectColourPaletteId,
   selectOpacity,
 } from '../modules/fasta/geojsonFieldSlice';
+ 
 */
 
-const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
+interface Props {
+    name: string,
+    id: string,
+}
+
+
+const ColourSchemeMenu = (({ name, id }: Props) => {
   const dispatch = useDispatch();
   //const baseMaps: string[] = useSelector(selectBaseMaps);
   //const baseMapId: string = useSelector(selectBaseMapId);
@@ -39,15 +55,24 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    color: 'black',
+    paddingLeft: '10px',
   };
   const optionStyle: React.CSSProperties = {
     color: 'black',
     display: 'flex',
     flexDirection: 'row',
-    fontSize: "10px",
-    justifyContent:'right'
+    fontSize: '10px',
+    justifyContent: 'space-between',
   };
+
+  const timescrollBarStyle: React.CSSProperties = { 
+    color: 'black',
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+  }
 
   const countryList = useSelector(selectCountryList);
 
@@ -58,7 +83,9 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         <label htmlFor="style">Style: </label>
         <select
           id="style"
-          onChange={(event) => dispatch(updateCrrChosenStyle(event.target.value))}
+          onChange={(event) =>
+            dispatch(updateCrrChosenStyle(event.target.value))
+          }
         >
           <option value="rainbow">Rainbow</option>
           <option value="tol">Tol</option>
@@ -66,7 +93,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         </select>
       </div>
       <div>
-        <label htmlFor="opacityCRR">CRR Opacity:  </label>
+        <label htmlFor="opacityCRR">CRR Opacity: </label>
         <input
           type="range"
           id="opacity"
@@ -79,7 +106,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         />
       </div>
       <div>
-        <label htmlFor="opacityRDT">RDT Opacity:  </label>
+        <label htmlFor="opacityRDT">RDT Opacity: </label>
         <input
           type="range"
           id="opacity"
@@ -88,7 +115,8 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           step="0.1"
           onChange={(element) =>
             dispatch(updateOpacityRDT(parseFloat(element.target.value)))
-          } />
+          }
+        />
       </div>
       <h3> CAP Filters </h3>
       <div>
@@ -104,7 +132,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
         </select>
       </div>
       <div>
-        <label htmlFor="opacityCAP">CAP Opacity:  </label>
+        <label htmlFor="opacityCAP">CAP Opacity: </label>
         <input
           type="range"
           id="opacity"
@@ -127,26 +155,38 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           max="1"
           step="0.25"
           defaultValue="0.5"
-          list='optionList'
+          list="optionList"
+          style={timescrollBarStyle}
           onChange={(element) =>
             dispatch(updateDesiredTime(parseFloat(element.target.value)))
           }
         />
-          <datalist style = {optionStyle} id = 'optionList'>
-            <option value="0" label='-24hrs'></option>
-            <option value="0.25" label='-2hrs'></option>
-            <option value="0.5" label='now'></option>
-            <option value="0.75" label='+2hrs'></option>
-            <option value="1" label='+24hrs'></option>
-          </datalist>
+        <datalist style={optionStyle} id="optionList">
+          <option value="0" label="-24hrs"></option>
+          <option value="0.25" label="-2hrs"></option>
+          <option value="0.5" label="now"></option>
+          <option value="0.75" label="+2hrs"></option>
+          <option value="1" label="+24hrs"></option>
+        </datalist>
       </div>
-      <br/>
+      <br />
       <div>
         <label htmlFor="country">CAP Country: </label>
-        <select name="country" onChange={(event) => dispatch(updateCountry(event.target.value))}>
-          <option value='All'>All</option>
+        <select
+          name="country"
+          onChange={(event) => dispatch(updateCountry(event.target.value))}
+        >
+          <option value="All">All</option>
           {countryList.map((country, i) => {
-            return <option key={i} value={country} onChange={(event) => dispatch(updateCountry(country))}>{country}</option>
+            return (
+              <option
+                key={i}
+                value={country}
+                onChange={(event) => dispatch(updateCountry(country))}
+              >
+                {country}
+              </option>
+            );
           })}
         </select>
       </div>
@@ -163,12 +203,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           <option value="Extreme">Extreme</option>
         </select>
       </div>
-
-
-
-
-
     </div>
   );
-};
+});
 export default ColourSchemeMenu;

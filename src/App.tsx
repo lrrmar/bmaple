@@ -3,7 +3,7 @@ import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
 import cacheReducer, { update } from './mapping/cacheSlice';
-import capReducer from './modules/fasta/fastaCAP/capSlice'
+import capReducer from './modules/fasta/fastaCAP/capSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
@@ -21,7 +21,7 @@ import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import FloatingBox from './features/FloatingBox';
 import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
-import TimeScrollBar from './features/TimeScrollBar'
+import TimeScrollBar from './features/TimeScrollBar';
 import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
 import CapWarningSource from './modules/fasta/fastaCAP/capWarningSource';
@@ -77,7 +77,7 @@ const App = () => {
           <WaypointProfile />
           <CapProfile />
         </Profiles>
-        
+
         <Sources>
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
@@ -89,29 +89,25 @@ const App = () => {
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox style={floatingBoxStyle} >
-          <ColourSchemeMenu />
-          {/* <ProductSelector /> */}
-        </FloatingBox>
+        
+        <FoldOutMenu align='right'>
+          <ColourSchemeMenu id="Options" name="settings" />
+        </FoldOutMenu>
         <FoldOutMenu align='left' >
           {/* <CapKeyPanel id="Caps Key"/> */}
-          <CapPanel id="alerts"  />
-          <CollapseColourBar id="CRR-Key" name="CRR"/>
-          <CollapseColourBar id="CAP-Key" name="CAP"/>
+          <CapPanel id="alerts" />
+          <CollapseColourBar id="CRR-Key" name="CRR" />
+          <CollapseColourBar id="CAP-Key" name="CAP" />
         </FoldOutMenu>
-        
       </Map>
-      
+
       <FastaMainMenu>
-        
+
         <Slider />
-        
       </FastaMainMenu>
     </div>
   );
 };
-
-
 
 export default App;
 export type AppStore = typeof store;

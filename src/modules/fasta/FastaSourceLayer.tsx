@@ -10,6 +10,7 @@ import {
 import { selectCache, ingest, Ingest } from '../../mapping/cacheSlice';
 import {
   selectBaseUrl,
+  selectToken,
   updateProfileCrrId,
   updateProfileRdtId,
   selectSelectedCrrId,
@@ -26,6 +27,7 @@ interface Props {
 const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const fastaBaseUrl = useSelector(selectBaseUrl);
+  const fastaToken = useSelector(selectToken);
   const layerCache = useSelector(selectCache);
 
   const urlParams = id.split('?');
@@ -34,7 +36,7 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     forecastQs = 'forecast=' + urlParams[1] + '&';
   }
   const [url, setUrl] = useState(
-    `https://${fastaBaseUrl}/api/v1/vts/${id.split('?')[0]}/{z}/{x}/{y}.pbf?${forecastQs}token=1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0`,
+    `https://${fastaBaseUrl}/api/v1/vts/${id.split('?')[0]}/{z}/{x}/{y}.pbf?${forecastQs}&token=${fastaToken}`,
   );
   const hasFetched = useRef(false);
 

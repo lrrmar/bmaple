@@ -10,7 +10,8 @@
   BsExclamationTriangleFill,
   BsKeyFill,
   BsCloudDrizzle,
-  BsExclamationCircle
+  BsExclamationCircle,
+  BsSliders
 } from 'react-icons/bs';
 
 import React from 'react';
@@ -25,6 +26,7 @@ export default function IconReference ({ name }) {
    function Alert (){ return <BsExclamationTriangleFill /> };
    function CrrKey () { return <div><BsCloudDrizzle/><BsKeyFill /> </div>};
    function CapKey () { return <div><BsExclamationTriangleFill/><BsKeyFill /> </div>};
+   function Slider () { return <BsSliders/>}
 
 
    const reference = {
@@ -36,6 +38,7 @@ export default function IconReference ({ name }) {
        'alerts': Alert,
        'CRR-Key': CrrKey,
        'CAP-Key': CapKey,
+       'Options': Slider,
        
    };
 

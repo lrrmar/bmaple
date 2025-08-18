@@ -7,7 +7,11 @@ type PopUpProps = {
   children: React.ReactNode;
 };
 
-const PopUp: React.FunctionComponent<PopUpProps> = (({ showPopUp, closePopUp, children }) => {
+const PopUp: React.FunctionComponent<PopUpProps> = ({
+  showPopUp,
+  closePopUp,
+  children,
+}) => {
   if (!showPopUp) {
     return null;
   }
@@ -17,6 +21,6 @@ const PopUp: React.FunctionComponent<PopUpProps> = (({ showPopUp, closePopUp, ch
         <button onClick={closePopUp}>close</button>
     </div>
   );
-});
+};
 
 export default PopUp;
