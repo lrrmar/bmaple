@@ -263,7 +263,7 @@ const Graphics = () => {
         newLayer.setStyle(invisibleStyle);
       }
     }
-
+    newLayer?.setZIndex(5);
     setCurrentOlUidCrr(newOlUidCrr);
   }, [crrLayerId, products, currentCrrStyle]);
 
@@ -305,6 +305,7 @@ const Graphics = () => {
       }
     }
 
+    newLayer?.setZIndex(5);
     setCurrentOlUidRdt(newOlUidRdt);
   }, [rdtLayerId, products, currentCrrStyle]);
 
@@ -324,6 +325,7 @@ const Graphics = () => {
               olLayer = mapUtils.getLayerByUid(ol_uid);
             }
             if (olLayer) {
+              olLayer.setZIndex(5);
               olLayer.setOpacity(opacityCRR);
             }
           }
@@ -338,6 +340,7 @@ const Graphics = () => {
               olLayer = mapUtils.getLayerByUid(ol_uid);
             }
             if (olLayer) {
+              olLayer.setZIndex(5);
               olLayer.setOpacity(opacityRDT);
             }
           }

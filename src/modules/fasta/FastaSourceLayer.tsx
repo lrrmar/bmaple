@@ -73,6 +73,7 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
       },
     });
 
+    vtLayer.setZIndex(6);
     const map = openLayersMap.map;
     map.addLayer(vtLayer);
 

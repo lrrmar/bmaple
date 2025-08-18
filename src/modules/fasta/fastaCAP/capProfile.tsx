@@ -282,6 +282,7 @@ const CapProfile = () => {
     });
 
     feature.set('layer_id', getUid(layer));
+    layer.setZIndex(1);
     map.addLayer(layer);
 
     return layer;

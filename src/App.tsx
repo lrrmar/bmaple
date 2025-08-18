@@ -76,14 +76,16 @@ const App = () => {
       <Map>
         
         <Profiles>
+          <CapProfile />
           <FastaProfile />
           <WaypointProfile />
-          <CapProfile />
+          
         </Profiles>
         <Sources>
+          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
+          
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
