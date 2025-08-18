@@ -10,6 +10,7 @@ import { getUid } from "ol";
 import OpenLayersMap from "../../mapping/OpenLayersMap";
 import { unByKey } from "ol/Observable";
 import { EventsKey } from "openlayers";
+import { ListenerFunction } from "ol/events";
 
 
 
@@ -87,6 +88,7 @@ const DrawingProfile = (() => {
 
     //erase items off of the map when eraser is true
     useEffect(() => {
+        console.log(isEraser);
         if (isEraser) {
             const newClick = map.on('click', function (event) {
                 const features = map.getFeaturesAtPixel(event.pixel, {
@@ -109,18 +111,16 @@ const DrawingProfile = (() => {
 
                 })
                 dispatch(remove(toDeleteOluids));
-                setEraserEvent(newClick);
+            });
+            const listener = newClick['listener']
+            setEraserEvent(newClick)
 
-            })
-
-        } else {
-            if(eraserEvent) {
-                unByKey(eraserEvent.current);
-                console.log("YES")
+        } else if (!isEraser) {
+            if (eraserEvent) {
+                const listener: ListenerFunction = eraserEvent['listener']
+                map.un("click", listener);
             }
         }
-
-
 
 
     }, [isEraser])
