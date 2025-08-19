@@ -40,7 +40,7 @@ const ForceNwrLayer = ({ id, sourceIdentifier }: Props) => {
   const [map, setMap] = useState<MapType | null>(OpenLayersMap.map);
   const hasFetched = useRef(false);
   const [layerData, setLayerData] = useState<Blob | null>(null);
-  const apiUrl = 'http://localhost:8383';
+  const apiUrl = useSelector(selectApiUrl);
 
   const fetchResourceInfo = async () => {
     const response = await fetch(`${apiUrl}/resourceInfoById/?id=${id}`, {

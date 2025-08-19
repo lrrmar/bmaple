@@ -6,35 +6,41 @@ import {
 
 import { selectProfileId } from '../modules/force-nwr/forceNwrSlice';
 
-const ImgViewPort = ({ id, setRatio }: { id: string, setRatio?: React.Dispatch<React.SetStateAction<number>> }) => {
-  const profileId = useSelector(selectProfileId);
+const ImgViewPort = ({ id, apiUrl }: { id: string; apiUrl: string }) => {
   const [srcUrl, setSrcUrl] = useState<string | null>(null);
+  const [ratio, setRatio] = useState<number>(0);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
-  const apiUrl = 'http://localhost:8383';
   useEffect(() => {
-    if (profileId) {
-      setSrcUrl(apiUrl + '/resourceById?id=' + profileId);
+    if (id) {
+      setSrcUrl(apiUrl + '/resourceById/?id=' + id);
     }
-  }, [profileId]);
+  }, [id]);
 
   useEffect(() => {
-    if(setRatio && srcUrl) {
-        const img = new Image();
-        img.src = srcUrl;
-      img.onload = () => {
-        setRatio(img.naturalWidth/img.naturalHeight);
-        setImg(img);
-      }
+    if (srcUrl) {
+      const img = new Image();
+      img.src = srcUrl;
+      setImg(img);
     }
-
   }, [srcUrl]);
-  const style: React.CSSProperties = {
+  const containerStyle: React.CSSProperties = {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  };
+
+  const imgStyle: React.CSSProperties = {
     maxHeight: '100%',
     maxWidth: '100%',
+    width: 'auto',
+    height: 'auto',
+    display: 'block',
   };
   return (
-    <div style={style}>
-      {img && <img src={img.src} style={style}></img>}
+    <div data-ratio={ratio} style={containerStyle}>
+      {srcUrl && <img style={imgStyle} src={srcUrl}></img>}
     </div>
   );
 };

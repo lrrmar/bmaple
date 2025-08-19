@@ -12,9 +12,11 @@ import {
 //import { updateVerticalLevels  } from '../../mapping/mapSlice';
 
 import {
+  selectApiUrl,
   selectDiscreteMetaData,
   updateProfileId,
   selectProfileId,
+  selectSelectedResources,
 } from './forceNwrSlice';
 import { selectCache, request } from '../../mapping/cacheSlice';
 
@@ -45,7 +47,9 @@ interface Query {
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
+  const apiUrl = useSelector(selectApiUrl);
   const profileId = useSelector(selectProfileId);
+  const selectedResources = useSelector(selectSelectedResources);
   const discreteMetaData = useSelector(selectDiscreteMetaData);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
@@ -53,10 +57,10 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     useState<ContinuousMetaData | null>(null);
   const [currentHashes, setCurrentHashes] = useState<Hash[]>([]);
   const [layers, setLayers] = useState<React.ReactNode[]>([]);
+  const [loadedResources, setLoadedResources] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchMetaData = async () => {
-      const apiUrl = 'http://localhost:8383';
       const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
         method: 'POST',
         headers: {
@@ -204,14 +208,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [discreteMetaData, displayTime, verticalLevel, currentHashes, cache]);
 
   useEffect(() => {
-    const filteredCacheIds = Object.keys(cache).filter((id) => {
-      return cache[id].source === sourceIdentifier;
-    });
-    const components = filteredCacheIds.map((id) => (
+    const resourceIds = Object.values(selectedResources).filter(
+      (id) => id !== null,
+    ); // not null
+    const updatedLoadedResources = [
+      ...new Set(loadedResources.concat(resourceIds)),
+    ];
+    setLoadedResources(updatedLoadedResources);
+  }, [selectedResources]);
+
+  useEffect(() => {
+    const components = loadedResources.map((id) => (
       <ForceNwrImage key={id} id={id} sourceIdentifier={sourceIdentifier} />
     ));
     setLayers(components);
-  }, [cache]);
+  }, [loadedResources]);
 
   useEffect(() => {
     if (profileId) {

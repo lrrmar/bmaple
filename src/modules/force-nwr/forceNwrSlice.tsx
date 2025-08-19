@@ -17,12 +17,17 @@ interface InitialState {
   level: number | null;
   levels: number[];
   levelUnits: string | null;
+  discreteMetaDataSelections: DiscreteMetaData[];
   discreteMetaData: DiscreteMetaData;
   setMapExtent: boolean;
+  selectedResources: {
+    [key: number]: string | null;
+  };
 }
 
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
+//const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://force-test.ddns.net/hash-table/';
 const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8383';
 
 const initialState: InitialState = {
@@ -35,12 +40,14 @@ const initialState: InitialState = {
   level: null,
   levels: [],
   levelUnits: '',
+  discreteMetaDataSelections: [],
   discreteMetaData: {
     domain: null,
     field: null,
     start_time: null,
   },
   setMapExtent: false,
+  selectedResources: {},
 };
 
 export const forceNwrSlice = createSlice({
@@ -49,6 +56,13 @@ export const forceNwrSlice = createSlice({
   reducers: {
     updateSelectedId: (state, id: PayloadAction<string | null>) => {
       state.selectedId = id.payload;
+    },
+    updateSelectedResources: (
+      state,
+      update: PayloadAction<{ viewId: number; resourceId: string | null }>,
+    ) => {
+      state.selectedResources[update.payload.viewId] =
+        update.payload.resourceId;
     },
     updateProfileId: (state, id: PayloadAction<string | null>) => {
       state.profileId = id.payload;
@@ -79,6 +93,7 @@ export const forceNwrSlice = createSlice({
 
 export const {
   updateSelectedId,
+  updateSelectedResources,
   updateProfileId,
   updateOpacity,
   //updateField,
@@ -91,6 +106,8 @@ export const {
 } = forceNwrSlice.actions;
 
 export const selectSelectedId = (state: RootState) => state.forceNwr.selectedId;
+export const selectSelectedResources = (state: RootState) =>
+  state.forceNwr.selectedResources;
 export const selectProfileId = (state: RootState) => state.forceNwr.profileId;
 export const selectOpacity = (state: RootState) => state.forceNwr.opacity;
 export const selectApiUrl = (state: RootState) => state.forceNwr.apiUrl;

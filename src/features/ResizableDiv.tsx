@@ -62,7 +62,13 @@ interface LeftTop {
   top: number;
 }
 
-const ResizableDiv = ({ minWidth, children }: { minWidth: number; children: React.ReactElement }) => {
+const ResizableDiv = ({
+  minWidth,
+  children,
+}: {
+  minWidth: number;
+  children: React.ReactElement;
+}) => {
   const [left, setLeft] = useState<number>(minWidth);
   const [top, setTop] = useState<number>(minWidth);
   const [currentI, setCurrentI] = useState<0 | 1>(0);
@@ -86,63 +92,65 @@ const ResizableDiv = ({ minWidth, children }: { minWidth: number; children: Reac
     position: 'absolute',
   };
 
-
   useEffect(() => {
     // Handle ratio
-    if (ratio) { // non-zero
-      setHeight(width/ratio)
+    if (ratio) {
+      // non-zero
+      setHeight(width / ratio);
     }
-  }, [width, ratio])
-
+  }, [width, ratio]);
 
   useEffect(() => {
     // Handle horizontal resizing
     if (!pageX && !pageY) return; // initial render
-    if (currentI) { // 1
+    if (currentI) {
+      // 1
       const dX = pageX - (left + width);
-      if (width + dX < minWidth){
+      if (width + dX < minWidth) {
         setWidth(minWidth);
       } else {
         setWidth(width + dX);
-      };
+      }
     }
-    if (!currentI) { // 0
+    if (!currentI) {
+      // 0
       const dX = pageX - left;
-      if (width - dX < minWidth){
+      if (width - dX < minWidth) {
         setWidth(minWidth);
       } else {
         setWidth(width - dX);
         setLeft(left + dX);
-      };
-     }
+      }
+    }
   }, [pageX]);
 
   useEffect(() => {
     // Handle vertical resizing
     if (!pageX && !pageY) return; // initial render
-    if (currentJ) { // 1
+    if (currentJ) {
+      // 1
       const dY = pageY - (top + height);
-      if (height + dY < minWidth){
+      if (height + dY < minWidth) {
         setHeight(minWidth);
       } else if (ratio) {
         setWidth(width + ratio * dY);
       } else {
         setHeight(height + dY);
-      };
+      }
     }
-    if (!currentJ) { // 0
+    if (!currentJ) {
+      // 0
       const dY = pageY - top;
-      if (height + dY < minWidth){
+      if (height + dY < minWidth) {
         setHeight(minWidth);
       } else if (ratio) {
         setWidth(ratio * (height - dY));
-        setTop(top + ratio*dY);
+        setTop(top + ratio * dY);
       } else {
         setHeight(height - dY);
         setTop(top + dY);
-      };
-     }
-
+      }
+    }
   }, [pageY]);
   return (
     <div style={style}>
@@ -150,7 +158,7 @@ const ResizableDiv = ({ minWidth, children }: { minWidth: number; children: Reac
         i={0}
         j={0}
         left={0}
-        top={0} 
+        top={0}
         setPageX={setPageX}
         setPageY={setPageY}
         setCurrentI={setCurrentI}
@@ -186,9 +194,17 @@ const ResizableDiv = ({ minWidth, children }: { minWidth: number; children: Reac
         setCurrentI={setCurrentI}
         setCurrentJ={setCurrentJ}
       />
-      <div ref={childRef}
-
-        style={{width: '100%', height: '100%', overflow: 'hidden', display: 'flex', alignItems: 'stretch', justifyContent: 'center'}} >
+      <div
+        ref={childRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          display: 'flex',
+          alignItems: 'stretch',
+          justifyContent: 'center',
+        }}
+      >
         {modifiedChild}
       </div>
     </div>

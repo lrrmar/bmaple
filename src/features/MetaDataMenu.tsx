@@ -27,13 +27,12 @@ interface Selection {
   [key: string]: number;
 }
 
-const MetaDataMenu = () => {
+const MetaDataMenu = ({ apiUrl }: { apiUrl: string }) => {
   const dispatch = useDispatch();
   const selection = useSelector(selectDiscreteMetaData);
   const [metaData, setMetaData] = useState<MetaData | null>(null);
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const fetchMetaData = async () => {
-    const apiUrl = 'http://localhost:8383';
     const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
       method: 'GET',
       headers: {

@@ -28,12 +28,14 @@ import WaypointsSource from './modules/waypoints/WaypointSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
+import ImageViewerWithMenu from './features/ImageViewerWithMenu';
 import ImgViewPort from './features/ImgViewPort';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MetaDataMenu from './features/MetaDataMenu';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
+import Tiles from './features/Tiles';
 import './App.css';
 
 // Configure the reducers that will be used in the app
@@ -70,21 +72,31 @@ const App = () => {
           <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
-          <ForceNwrSource sourceIdentifier={'forceNwr'} />
-          <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
+          <ForceNwrSource sourceIdentifier={'123'} />
           {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
         </Sources>
-        <BaseMaps>
-          {/*<DarkBaseMap id={'dark'} />
-          <OSMBaseMap id={'Open Street Map'} />
-          <SwissTopoBaseMap id={'Swiss Topo'} />*/}
-        </BaseMaps>
+        <BaseMaps></BaseMaps>
       </Map>
-      <FloatingBox
-        minimise={''}
-        style={{ top: '10px', flexDirection: 'column-reverse', width: 'auto' }}
-      ></FloatingBox>
-      <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
+      <div
+        style={{
+          position: 'absolute',
+          left: '12vw',
+          top: '12vh',
+          width: '76vw',
+          height: '76vh',
+          zIndex: '20',
+          display: 'flex',
+          alignItems: 'centre',
+        }}
+      >
+        <Tiles>
+          <ImageViewerWithMenu id={0} apiUrl={'http://localhost:8383'} />
+          <ImageViewerWithMenu id={1} apiUrl={'http://localhost:8383'} />
+          <ImageViewerWithMenu id={2} apiUrl={'http://localhost:8383'} />
+          <ImageViewerWithMenu id={3} apiUrl={'http://localhost:8383'} />
+        </Tiles>
+      </div>
+      <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         <TimeScrollBar />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
@@ -94,19 +106,16 @@ const App = () => {
           orientation={'vertical'}
         />
       </FloatingBox>
-      <ResizableDiv minWidth={100}>
-        <ImgViewPort id={'nwr-img'} />
-      </ResizableDiv>
-      <FoldOutMenu align={'left'} theme={'glassTablet'}>
+      {/*<FoldOutMenu align={'left'} theme={'glassTablet'}>
         {/*<FoldOutItem id={'Style'} icon={'paint brush'}>
           <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
         </FoldOutItem>*/}
-        {/*<FoldOutItem id={'Flight'} icon={'paper plane outline'}>
+      {/*<FoldOutItem id={'Flight'} icon={'paper plane outline'}>
           <FlightTrackMenu />
         </FoldOutItem>*/}
-        {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
+      {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
           <WaypointsMenu />
-        </FoldOutItem>*/}
+        </FoldOutItem>}
         <FoldOutItem id={'data'} icon={'image outline'}>
           <MetaDataMenu />
         </FoldOutItem>
@@ -114,9 +123,9 @@ const App = () => {
           <ForceNwrMenu />
         </FoldOutItem>
         <FoldOutItem id={'example'} icon={'question mark'}>
-          <div>{'I am an example'}</div>
+          {'I am an example'}
         </FoldOutItem>
-      </FoldOutMenu>
+      </FoldOutMenu>*/}
       <Themes>
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />

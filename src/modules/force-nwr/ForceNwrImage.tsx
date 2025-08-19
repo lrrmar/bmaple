@@ -38,7 +38,7 @@ const ForceNwrImage = ({ id, sourceIdentifier }: Props) => {
   const cacheElement = cache[id];
   const hasFetched = useRef(false);
   const [srcUrl, setSrcUrl] = useState<string | null>(null);
-  const apiUrl = 'http://localhost:8383';
+  const apiUrl = useSelector(selectApiUrl);
 
   useEffect(() => {
     if (hasFetched.current) return;
