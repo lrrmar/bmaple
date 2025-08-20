@@ -42,6 +42,7 @@ const ForceNwrImage = ({ id, sourceIdentifier }: Props) => {
 
   useEffect(() => {
     if (hasFetched.current) return;
+    console.log('fetching', id);
     setSrcUrl(apiUrl + '/resourceById?id=' + id);
     const toCache = {
       // what metadata?

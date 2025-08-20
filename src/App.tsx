@@ -28,7 +28,6 @@ import WaypointsSource from './modules/waypoints/WaypointSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
-import ImageViewerWithMenu from './features/ImageViewerWithMenu';
 import ImgViewPort from './features/ImgViewPort';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 //import TempBaseMapMenu from './features/TempBaseMapMenu';
@@ -89,12 +88,7 @@ const App = () => {
           alignItems: 'centre',
         }}
       >
-        <Tiles>
-          <ImageViewerWithMenu id={0} apiUrl={'http://localhost:8383'} />
-          <ImageViewerWithMenu id={1} apiUrl={'http://localhost:8383'} />
-          <ImageViewerWithMenu id={2} apiUrl={'http://localhost:8383'} />
-          <ImageViewerWithMenu id={3} apiUrl={'http://localhost:8383'} />
-        </Tiles>
+        <Tiles/>
       </div>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         <TimeScrollBar />
