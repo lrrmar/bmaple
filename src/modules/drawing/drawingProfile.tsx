@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectEraser, selectIsDrawing, selectName, updateIsDrawing, updateIsEraser } from "./drawlingSlice";
+import { selectEraser, selectIsDrawing, selectStyleArray, selectName, updateIsDrawing, updateIsEraser } from "./drawlingSlice";
 import { remove, Remove, selectCache } from "../../mapping/cacheSlice";
 import { Geometry } from "ol/geom";
 import { Feature } from "ol";
@@ -9,8 +9,11 @@ import VectorLayer from "ol/layer/Vector";
 import { getUid } from "ol";
 import OpenLayersMap from "../../mapping/OpenLayersMap";
 import { unByKey } from "ol/Observable";
-import { EventsKey } from "openlayers";
+import { color, EventsKey, style } from "openlayers";
 import { ListenerFunction } from "ol/events";
+import { Stroke, Fill, Style } from "ol/style";
+import { ColorType } from "ol/expr/expression";
+import { lchaToRgba, rgbaToLcha } from "ol/color";
 
 
 
@@ -22,8 +25,15 @@ const DrawingProfile = (() => {
     const isEraser = useSelector(selectEraser);
     const isDrawing = useSelector(selectIsDrawing);
     const [drawingIdList, setDrawingList] = useState<string[]>([]);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch();;
     const [eraserEvent, setEraserEvent] = useState<EventsKey>();
+    const styleArray = useSelector(selectStyleArray);
+    // local style state
+    const [currentFill, setCurrentFill] = useState<string>();
+    const [currentStrokeCol, setCurrentStrokeCol] = useState<string>();
+    const [currentStrokeWid, setCurrentStrokeWid] = useState<number>();
+    const [currentOpacity, setCurrentOpacity] = useState<string>();
+
     const getLayer = (
         uid: string | null,
     ): VectorLayer<Feature<Geometry>> | null => {
@@ -59,15 +69,38 @@ const DrawingProfile = (() => {
 
     }, [allCache])
 
-    // make selected layer visible
+    const styleObj =  (() => { 
+        let fillCol;
+        if ( styleArray['fillColour'] === 'none'){
+            fillCol = 'rgba(0,0,0,0)'
+        } else {
+            fillCol = styleArray['fillColour']
+        }
+        let strokeCol; 
+        if (styleArray['strokeColour'] === 'none'){
+            strokeCol = 'rgba(0,0,0,0)'
+        } else {
+            strokeCol = styleArray['strokeColour']
+        }
+
+        return new Style ({
+            fill: new Fill ({ 
+                color: fillCol
+            }),
+            stroke: new Stroke ({
+                color: strokeCol,
+                width: Number(currentStrokeWid),
+            })
+        })
+    })
+
+    // make selected layer visible and set style accordingly
     useEffect(() => {
         const filteredIds = Object.keys(allCache).filter((id) => {
             const element = allCache[id];
             const source = element.source;
             return source === 'draw';
         });
-
-        // set all 
 
         filteredIds.forEach((id) => {
             const currentDrawingObj = allCache[id];
@@ -76,6 +109,9 @@ const DrawingProfile = (() => {
                 const layerOluid = currentDrawingObj.layerId;
                 const layer = getLayer(String(layerOluid));
                 layer?.setVisible(true);
+                layer?.setStyle(styleObj)
+                console.log(Number(styleArray['opacity']))
+                layer?.setOpacity(Number(styleArray['opacity']))
             } else {
                 const layerOluid = currentDrawingObj.layerId;
                 const layer = getLayer(String(layerOluid));
@@ -84,7 +120,7 @@ const DrawingProfile = (() => {
 
         })
 
-    }, [layerName, allCache])
+    }, [layerName, allCache, styleArray])
 
     //erase items off of the map when eraser is true
     useEffect(() => {
@@ -122,10 +158,6 @@ const DrawingProfile = (() => {
 
 
     }, [isEraser])
-
-    // change the colour of the lines
-
-    // change the drawing mode between line string and polygon
 
     return <div></div>
 })

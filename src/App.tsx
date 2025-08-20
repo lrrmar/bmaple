@@ -21,6 +21,7 @@ import DrawingMenu from './modules/drawing/drawingMenu';
 import DrawingProfile from './modules/drawing/drawingProfile';
 import FloatingBox from './features/FloatingBox';
 import DrawingToggles from './modules/drawing/drawingToggles';
+import DrawingStyleMenu from './modules/drawing/drawingStyleMenu';
 
 export const store = configureStore({
   reducer: {
@@ -74,6 +75,7 @@ const App = () => {
         <FoldOutMenu align={'left'}>
           <DrawingMenu id = "draw"/>
           <DrawingToggles id='Options'/>
+          <DrawingStyleMenu id='Colours'/>
         </FoldOutMenu>
         
       </Map>

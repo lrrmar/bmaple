@@ -14,6 +14,8 @@ interface InitialState {
     mode: 'Polygon' | 'LineString';
     freehand: boolean,
     isEraser: boolean,
+    // array will look like: [stroke colour, stroke width, fill colour, fill opacity]
+    styleArray: {[key:string]: string},
 }
 
 const initialState: InitialState = {
@@ -24,6 +26,13 @@ const initialState: InitialState = {
     mode: 'Polygon',
     freehand: true,
     isEraser: false,
+    // strokecolour, stroke width, fill colour, opacity
+    styleArray: {
+        strokeColour: 'black', 
+        strokeWidth: '3', 
+        fillColour: 'none',
+        opacity: '1',
+    }
 };
 
 export const drawingSlice = createSlice({
@@ -49,8 +58,11 @@ export const drawingSlice = createSlice({
             state.freehand = freehand.payload;
         },
         updateIsEraser( state, erase:PayloadAction<boolean>) { 
-            state.isEraser = erase.payload
+            state.isEraser = erase.payload;
         },
+        updateStyleArray( state, array: PayloadAction<{[key:string]: string}>) {
+            state.styleArray = array.payload;
+        }
     }
 })
 
@@ -62,6 +74,7 @@ export const {
     updateMode,
     updateFreehand,
     updateIsEraser,
+    updateStyleArray,
 } = drawingSlice.actions
 
 export const selectIsDrawing = (state:RootState) => state.draw.isDrawing;
@@ -71,5 +84,6 @@ export const selectOluids = (state: RootState) => state.draw.oluids;
 export const selectMode = (state: RootState) => state.draw.mode;
 export const selectFreehand = (state:RootState) => state.draw.freehand;
 export const selectEraser = (state: RootState) => state.draw.isEraser;
+export const selectStyleArray = (state:RootState) => state.draw.styleArray;
 
 export default drawingSlice.reducer;
