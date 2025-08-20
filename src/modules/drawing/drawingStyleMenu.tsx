@@ -8,7 +8,7 @@ const DrawingStyleMenu = (({ id }: { id: string }) => {
     // strokecolour, stroke width, fill colour, opacity
     const styleArray = useSelector(selectStyleArray);
     const numberArray: number[] = (() => {
-        const arr: number[] = [0];
+        const arr: number[] = [];
         for (let i = 1; i < 11; i++) {
             arr.push(i);
         }
@@ -70,10 +70,10 @@ const DrawingStyleMenu = (({ id }: { id: string }) => {
                 <option value="red">Red</option>
             </select>
             <br /> <br />
-            <label style={blackText} defaultValue={styleArray['strokeColour'].toLowerCase()} htmlFor="strokeColour"> Select Line Colour: </label>
-            <select id="line" onChange={(event) => handleLineColour(event.target.value)}>
-                <option value="none">No Line</option>
-                <option value="black">black</option>
+            <label style={blackText} htmlFor="strokeColour"> Select Line Colour: </label>
+            <select id="line" defaultValue={styleArray['strokeColour']}  onChange={(event) => handleLineColour(event.target.value)}>
+                <option value="none">No Fill</option>
+                <option value="black">Black</option>
                 <option value="green">Green</option>
                 <option value="red">Red</option>
             </select>
