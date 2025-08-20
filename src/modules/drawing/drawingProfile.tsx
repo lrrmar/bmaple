@@ -28,11 +28,6 @@ const DrawingProfile = (() => {
     const dispatch = useDispatch();;
     const [eraserEvent, setEraserEvent] = useState<EventsKey>();
     const styleArray = useSelector(selectStyleArray);
-    // local style state
-    const [currentFill, setCurrentFill] = useState<string>();
-    const [currentStrokeCol, setCurrentStrokeCol] = useState<string>();
-    const [currentStrokeWid, setCurrentStrokeWid] = useState<number>();
-    const [currentOpacity, setCurrentOpacity] = useState<string>();
 
     const getLayer = (
         uid: string | null,
@@ -89,7 +84,7 @@ const DrawingProfile = (() => {
             }),
             stroke: new Stroke ({
                 color: strokeCol,
-                width: Number(currentStrokeWid),
+                width: Number(styleArray['strokeWidth']),
             })
         })
     })
