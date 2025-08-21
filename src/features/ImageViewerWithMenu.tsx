@@ -5,6 +5,7 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
+import { selectCache } from '../mapping/cacheSlice';
 import {
   updateDisplayTimes,
   updateVerticalLevels,
@@ -12,12 +13,11 @@ import {
   selectVerticalLevel,
 } from '../mapping/mapSlice';
 
-import ImgViewPort from './ImgViewPort';
+import CanvasImgViewPortPreloaded from './CanvasImgViewPortPreloaded';
 
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import {
@@ -81,13 +81,16 @@ const HeaderLock = ({
 const ImageViewerWithMenu = ({
   id,
   apiUrl,
+  configChange,
   hidden,
 }: {
   id: number;
   apiUrl: string;
+  configChange: string;
   hidden?: boolean;
 }) => {
   const dispatch = useDispatch();
+  const cache = useSelector(selectCache);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [selection, setSelection] = useState<DiscreteMetaData | null>(null);
@@ -99,6 +102,7 @@ const ImageViewerWithMenu = ({
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [resourceId, setResourceId] = useState<string | null>(null);
+  const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
 
   const fetchMetaData = async () => {
     const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
@@ -120,7 +124,6 @@ const ImageViewerWithMenu = ({
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
     // selectionRef i.e. due to a change in tiling
-    console.log(selectionRef.current);
     if (selectionRef.current) {
       setSelection(selectionRef.current);
     }
@@ -128,9 +131,7 @@ const ImageViewerWithMenu = ({
 
   useEffect(() => {
     // After any selection change, store a copy in selectionRef
-    console.log(selection);
     if (selection) selectionRef.current = selection;
-    console.log(selectionRef.current);
   }, [selection]);
 
   useEffect(() => {
@@ -333,6 +334,14 @@ const ImageViewerWithMenu = ({
     }
   }, [selection, displayTime, verticalLevel, currentHashes]);
 
+  useEffect(() => {
+    if (resourceId) {
+      setResourceLoaded(!!cache[resourceId]);
+    } else {
+      setResourceLoaded(false);
+    }
+  }, [resourceId, cache]);
+
   return (
     <div
       style={{
@@ -382,9 +391,10 @@ const ImageViewerWithMenu = ({
         >
           {menus}
         </div>
-        {resourceId && !hidden && (
-          <ImgViewPort id={resourceId} apiUrl={apiUrl} />
-        )}
+        <CanvasImgViewPortPreloaded
+          id={resourceLoaded && !hidden ? 'img' + resourceId : null}
+          configChange={configChange}
+        />
       </div>
     </div>
   );

@@ -39,24 +39,31 @@ const ForceNwrImage = ({ id, sourceIdentifier }: Props) => {
   const hasFetched = useRef(false);
   const [srcUrl, setSrcUrl] = useState<string | null>(null);
   const apiUrl = useSelector(selectApiUrl);
+  const imgRef = useRef<HTMLImageElement>(new Image());
 
   useEffect(() => {
     if (hasFetched.current) return;
-    console.log('fetching', id);
-    setSrcUrl(apiUrl + '/resourceById?id=' + id);
-    const toCache = {
-      // what metadata?
-      ...cacheElement,
-      id: id,
-      ol_uid: id,
+    imgRef.current.onload = () => {
+      const toCache = {
+        source: sourceIdentifier,
+        id: id,
+        ol_uid: id,
+      };
+      dispatch(ingest(toCache));
+      hasFetched.current = true;
     };
-    dispatch(ingest(toCache));
-    hasFetched.current = true;
+    imgRef.current.src = apiUrl + '/resourceById/?id=' + id;
   }, []);
 
   return (
-    <div id={id} style={{ display: 'none' }}>
-      {srcUrl && <img id={id} src={srcUrl}></img>}
+    <div style={{}}>
+      {hasFetched.current && (
+        <img
+          id={'img' + id}
+          style={{ opacity: 0 }}
+          src={imgRef.current.src}
+        ></img>
+      )}
     </div>
   );
 };

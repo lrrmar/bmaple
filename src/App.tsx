@@ -88,7 +88,7 @@ const App = () => {
           alignItems: 'centre',
         }}
       >
-        <Tiles/>
+        <Tiles />
       </div>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         <TimeScrollBar />

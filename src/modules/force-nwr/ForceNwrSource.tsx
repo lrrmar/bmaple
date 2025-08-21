@@ -208,8 +208,8 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [discreteMetaData, displayTime, verticalLevel, currentHashes, cache]);
 
   useEffect(() => {
-    const resourceIds = Object.values(selectedResources).filter(
-      (id) => id !== null,
+    const resourceIds: string[] = Object.values(selectedResources).filter(
+      (e): e is Exclude<typeof e, null> => e !== null,
     ); // not null
     const updatedLoadedResources = [
       ...new Set(loadedResources.concat(resourceIds)),

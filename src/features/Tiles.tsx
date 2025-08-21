@@ -79,21 +79,31 @@ const Tiles = () => {
           <ImageViewerWithMenu
             id={0}
             apiUrl={'http://localhost:8383'}
+            configChange={configuration}
             hidden={1 > viewerCount[configuration]}
           />
         </div>
         <div style={tileStyles[configuration + '1']}>
-          <ImageViewerWithMenu id={1} apiUrl={'http://localhost:8383'}
+          <ImageViewerWithMenu
+            id={1}
+            apiUrl={'http://localhost:8383'}
+            configChange={configuration}
             hidden={2 > viewerCount[configuration]}
           />
         </div>
         <div style={tileStyles[configuration + '2']}>
-          <ImageViewerWithMenu id={2} apiUrl={'http://localhost:8383'}
+          <ImageViewerWithMenu
+            id={2}
+            apiUrl={'http://localhost:8383'}
+            configChange={configuration}
             hidden={3 > viewerCount[configuration]}
           />
         </div>
         <div style={tileStyles[configuration + '3']}>
-          <ImageViewerWithMenu id={3} apiUrl={'http://localhost:8383'}
+          <ImageViewerWithMenu
+            id={3}
+            apiUrl={'http://localhost:8383'}
+            configChange={configuration}
             hidden={4 > viewerCount[configuration]}
           />
         </div>

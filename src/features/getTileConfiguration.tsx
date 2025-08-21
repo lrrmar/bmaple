@@ -1,4 +1,5 @@
 import React from 'react';
+/*
 
 export type TileConfigurations =
   | 'single'
@@ -120,4 +121,4 @@ const getTileConfiguration = ({
   return lookUp[configuration];
 };
 
-export default getTileConfiguration;
+export default getTileConfiguration;*/
