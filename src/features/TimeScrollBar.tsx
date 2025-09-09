@@ -29,12 +29,20 @@ const ScrollingScale = () => {
   const [marks, setMarks] = useState<Mark[]>([]);
   // TODO: update based on size allocated to slider...
   const [optimalTickCount, setOptimalTickCount] = useState<number>(10);
+  const [lastKey, setLastKey] = useState<string | null>(null);
+  const [keyPress, setKeyPress] = useState<number>(0);
 
   const sources = Object.keys(displayTimes);
   let allTimeInts: number[] = [];
   Object.values(displayTimes).forEach((array) => {
     allTimeInts = [...allTimeInts, ...array];
   });
+
+  useEffect(() => {
+    console.log(displayTime);
+    console.log(new Date(displayTime).getTime());
+    console.log(getUTCString(displayTime));
+  }, [displayTime]);
 
   useEffect(() => {
     // Get min time and floor it to nearest hour
@@ -54,7 +62,7 @@ const ScrollingScale = () => {
   }, [displayTimes]);
 
   useEffect(() => {
-    if (displayTimes) return;
+    //if (displayTimes) return;
     // Find increment based on different between lower and upper
     // lims of scroll bar
 
@@ -126,16 +134,16 @@ const ScrollingScale = () => {
   }, [lowerLim, upperLim]);
 
   useEffect(() => {
-    const times = displayTimes['forceNwr'];
+    const times = displayTimes['one'];
     if (times) {
       setLowerLim(Math.min(...times));
       setUpperLim(Math.max(...times));
       const newMarks = times.map((timeInt) => {
         const dt = new Date(timeInt);
-        const hour = dt.getHours();
-        const minute = dt.getMinutes();
-        const day = dt.getDate();
-        const month = dt.getMonth() + 1;
+        const hour = dt.getUTCHours();
+        const minute = dt.getUTCMinutes();
+        const day = dt.getUTCDate();
+        const month = dt.getUTCMonth() + 1;
 
         const zf = (num: number) => {
           // zero formatter
@@ -154,6 +162,37 @@ const ScrollingScale = () => {
     }
   }, [displayTimes]);
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      setLastKey(event.key);
+      setKeyPress(Date.now());
+    };
+
+    // Add global keydown listener
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Handling key strokes
+  useEffect(() => {
+    if (lastKey == 'ArrowLeft' || lastKey == 'ArrowRight' ) {
+      let index = displayTimes['one'].indexOf(displayTime);
+      if (index) {
+        if (index == -1) index += 1; // HACK
+        const newIndex  = lastKey == 'ArrowLeft'  ? index - 1 : index + 1;
+        if (newIndex == 0 || newIndex == displayTimes['one'].length) {
+          return
+        } else {
+          dispatch(updateDisplayTime(displayTimes['one'][newIndex]));
+        }
+      }
+    }
+  }, [keyPress]);
+
   if (Object.keys(displayTimes).length === 0) {
     return <div></div>;
   }
@@ -168,10 +207,14 @@ const ScrollingScale = () => {
         track={false}
         marks={marks}
         value={new Date(displayTime).getTime()}
-        valueLabelDisplay={'auto'}
+        valueLabelDisplay={'on'}
         valueLabelFormat={getUTCString}
         onChange={(e: Event, value: number | number[]) => {
           if (typeof value === 'number') dispatch(updateDisplayTime(value));
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
         }}
         color={'info'}
         sx={{

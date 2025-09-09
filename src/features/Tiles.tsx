@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import ImageViewerWithMenu from './ImageViewerWithMenu';
 
 type TileConfigurations = 'single' | 'duo' | 'trio' | 'quad' | 'bottom bar';
+
+const isTileConfigurations = (e: any): e is TileConfigurations => {
+  return ['single', 'duo', 'trio', 'quad', 'bottom bar'].includes(e);
+};
 const Tiles = () => {
+  const apiUrl = 'http://localhost:8989';
   const [tileIndex, setTileIndex] = useState<{
     0: number;
     1: number;
@@ -10,7 +15,7 @@ const Tiles = () => {
     3: number;
   }>({ 0: 0, 1: 1, 2: 2, 3: 3 });
   const [configuration, setConfiguration] =
-    useState<TileConfigurations>('quad');
+    useState<TileConfigurations>('single');
 
   const tileConfigurations: TileConfigurations[] = [
     'single',
@@ -78,7 +83,7 @@ const Tiles = () => {
         <div style={tileStyles[configuration + '0']}>
           <ImageViewerWithMenu
             id={0}
-            apiUrl={'http://localhost:8383'}
+            apiUrl={apiUrl}
             configChange={configuration}
             hidden={1 > viewerCount[configuration]}
           />
@@ -86,7 +91,7 @@ const Tiles = () => {
         <div style={tileStyles[configuration + '1']}>
           <ImageViewerWithMenu
             id={1}
-            apiUrl={'http://localhost:8383'}
+            apiUrl={apiUrl}
             configChange={configuration}
             hidden={2 > viewerCount[configuration]}
           />
@@ -94,7 +99,7 @@ const Tiles = () => {
         <div style={tileStyles[configuration + '2']}>
           <ImageViewerWithMenu
             id={2}
-            apiUrl={'http://localhost:8383'}
+            apiUrl={apiUrl}
             configChange={configuration}
             hidden={3 > viewerCount[configuration]}
           />
@@ -102,7 +107,7 @@ const Tiles = () => {
         <div style={tileStyles[configuration + '3']}>
           <ImageViewerWithMenu
             id={3}
-            apiUrl={'http://localhost:8383'}
+            apiUrl={apiUrl}
             configChange={configuration}
             hidden={4 > viewerCount[configuration]}
           />
@@ -111,10 +116,15 @@ const Tiles = () => {
       <div style={{ bottom: '-1em', left: '-1em' }}>
         <select
           value={configuration}
-          onChange={(e) => setConfiguration(e.target.value)}
+          onChange={(e) => {
+            const conf = e.target.value;
+            if (isTileConfigurations(conf)) setConfiguration(conf);
+          }}
         >
           {tileConfigurations.map((name) => (
-            <option value={name}>{name}</option>
+            <option key={name} value={name}>
+              {name}
+            </option>
           ))}
         </select>
       </div>

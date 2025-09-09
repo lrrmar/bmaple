@@ -20,7 +20,7 @@ interface InitialState {
   extent: number[] | null;
   projection: string;
   units: string | null;
-  displayTime: string;
+  displayTime: number;
   clickEvent: { longitude: number; latitude: number } | null;
   featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
@@ -42,7 +42,7 @@ const initialState: InitialState = {
   extent: null,
   projection: 'force_nwr_projection',
   units: null,
-  displayTime: '',
+  displayTime: 0,
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
@@ -71,9 +71,7 @@ export const mapSlice = createSlice({
       state.units = units.payload;
     },
     updateDisplayTime: (state, displayTime: PayloadAction<number>) => {
-      const iso = new Date(displayTime.payload).toISOString();
-      const reducedIso = iso.substring(0, iso.length - 2);
-      state.displayTime = reducedIso;
+      state.displayTime = displayTime.payload;
     },
     updateClickEvent: (
       state,
@@ -173,6 +171,15 @@ export const {
   updateVerticalLevels,
   updateVerticalLevelUnits,
 } = mapSlice.actions;
+
+export const selectIsoDisplayTime = (state: RootState) => {
+  const isoDisplayTime = new Date(state.map.displayTime).toISOString();
+  const reducedIsoDisplayTime = isoDisplayTime.substring(
+    0,
+    isoDisplayTime.length - 2,
+  );
+  return reducedIsoDisplayTime.replace('.00', '');
+};
 
 export const selectCenter = (state: RootState) => state.map.center;
 export const selectZoom = (state: RootState) => state.map.zoom;

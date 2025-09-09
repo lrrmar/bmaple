@@ -6,7 +6,7 @@ import {
 import {
   updateDisplayTimes,
   updateVerticalLevels,
-  selectDisplayTime,
+  selectIsoDisplayTime,
   selectVerticalLevel,
 } from '../../mapping/mapSlice';
 //import { updateVerticalLevels  } from '../../mapping/mapSlice';
@@ -51,7 +51,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const profileId = useSelector(selectProfileId);
   const selectedResources = useSelector(selectSelectedResources);
   const discreteMetaData = useSelector(selectDiscreteMetaData);
-  const displayTime = useSelector(selectDisplayTime);
+  const displayTime = useSelector(selectIsoDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [continuousMetaData, setContinuousMetaData] =
     useState<ContinuousMetaData | null>(null);
@@ -189,7 +189,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
 
     const query: Query = {
       ...discreteMetaData,
-      valid_time: displayTime.replace('.00', ''),
+      valid_time: displayTime,
       level: verticalLevel,
     };
     if (Object.values(query).every((val) => !!val)) {

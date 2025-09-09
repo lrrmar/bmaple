@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Icon } from 'semantic-ui-react';
 import {
   useAppSelector as useSelector,
@@ -9,7 +9,7 @@ import { selectCache } from '../mapping/cacheSlice';
 import {
   updateDisplayTimes,
   updateVerticalLevels,
-  selectDisplayTime,
+  selectIsoDisplayTime,
   selectVerticalLevel,
 } from '../mapping/mapSlice';
 
@@ -91,9 +91,10 @@ const ImageViewerWithMenu = ({
 }) => {
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
-  const displayTime = useSelector(selectDisplayTime);
+  const displayTime = useSelector(selectIsoDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
-  const [selection, setSelection] = useState<DiscreteMetaData | null>(null);
+  const [selection, setSelection] = useState<DiscreteMetaData | null>(
+    { domain: null, field: null, start_time: null});
   const selectionRef = useRef<DiscreteMetaData | null>(null);
   const [metaData, setMetaData] = useState<MetaData | null>(null);
   const [validTimeLocked, setValidTimeLocked] = useState<string | null>(null);
@@ -103,6 +104,7 @@ const ImageViewerWithMenu = ({
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [resourceId, setResourceId] = useState<string | null>(null);
   const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
+  const [dims, setDims] = useState({ width: 0, height: 0 });
 
   const fetchMetaData = async () => {
     const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
@@ -142,12 +144,12 @@ const ImageViewerWithMenu = ({
       const tables = metaData.tables;
       if (!selection) {
         //Get initial selection
-        const newSelection = {
+        /*const newSelection = {
           field: values['field'][0],
           domain: values['domain'][0],
           start_time: values['start_time'][0],
         };
-        setSelection(newSelection);
+        setSelection(newSelection);*/
         return;
       }
       const selects = discreteHeaders.map(

@@ -88,10 +88,10 @@ const Graphics = () => {
     if (currentLayer) {
       currentLayer.setOpacity(opacity);
       const source = currentLayer.getSource();
-      if (source) {
+      /*if (source) {
         const extent = source.getImageExtent();
         if (extent && setMapExtent) dispatch(updateExtent(extent));
-      }
+      }*/
     }
   }, [currentLayer]);
 
