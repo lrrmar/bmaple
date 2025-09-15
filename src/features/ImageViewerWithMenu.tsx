@@ -197,9 +197,8 @@ const ImageViewerWithMenu = ({
           let displayName = '...';
           if (selection[thisDiscreteHeader]) {
             displayName = selection[thisDiscreteHeader];
-            if (readableNames && readableNames[displayName]){
+            if (readableNames && readableNames[displayName]) {
               displayName = readableNames[selection[thisDiscreteHeader]];
-
             }
           }
           const select = (
@@ -229,13 +228,7 @@ const ImageViewerWithMenu = ({
                     setSelection(newSelection);
                   }
                 }}
-                input={
-                  <OutlinedInput
-                    value={
-                      displayName
-                    }
-                  />
-                }
+                input={<OutlinedInput value={displayName} />}
               >
                 {menuItems}
               </Select>

@@ -7,6 +7,7 @@ import {
   updateDisplayTimes,
   updateVerticalLevels,
   selectIsoDisplayTime,
+  selectDisplayTimesSet,
   selectVerticalLevel,
 } from '../../mapping/mapSlice';
 //import { updateVerticalLevels  } from '../../mapping/mapSlice';
@@ -67,6 +68,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     {},
   );
   const displayTime = useSelector(selectIsoDisplayTime);
+  const displayTimes = useSelector(selectDisplayTimesSet);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [continuousMetaData, setContinuousMetaData] = useState<{
     [key: string]: ContinuousMetaData | null;
@@ -76,6 +78,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   );
   const [layers, setLayers] = useState<React.ReactNode[]>([]);
   const [loadedResources, setLoadedResources] = useState<string[]>([]);
+  const [preloadIds, setPreloadIds] = useState<{ [key: string]: string[] }>({});
 
   useEffect(() => {
     const fetchMetaData = async () => {
@@ -151,7 +154,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [discreteMetaDataSelections]);
 
   useEffect(() => {
-    // On discrete meta data change, request continuous meta data
+    // Populat sliders with continuous variable values
     if (currentHashes) {
       Object.keys(currentHashes).forEach((key) => {
         const hashes = currentHashes[key];
@@ -201,14 +204,17 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         if (Object.values(query).every((val) => !!val)) {
           const theseHashes = currentHashes[id];
           if (theseHashes) {
-            const thisHash = theseHashes.find((dict: Hash) =>
+            // Get single profile id
+            const profileHash = theseHashes.find((dict: Hash) =>
               Object.entries(query).every(([key, value]) => {
                 const match = dict[key];
                 if (match) return match == value;
               }),
             );
-            if (thisHash) {
-              dispatch(updateProfileIds({ host: id, resource: thisHash.id }));
+            if (profileHash) {
+              dispatch(
+                updateProfileIds({ host: id, resource: profileHash.id }),
+              );
             } else {
               dispatch(updateProfileIds({ host: id, resource: null }));
             }
@@ -226,14 +232,115 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   ]);
 
   useEffect(() => {
+    // Preload all along vertical axis
+
+    Object.keys(discreteMetaDataSelections).forEach((id) => {
+      const selection = discreteMetaDataSelections[id];
+      const time = displayTime;
+      const timesQuery = {
+        ...selection,
+        valid_time: time,
+      };
+      // Get all hashes that match the query for any time
+      const theseHashes = currentHashes[id];
+      if (theseHashes) {
+        let thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
+          Object.entries(timesQuery).every(([key, value]) => {
+            const match = dict[key];
+            if (match) return match == value;
+          }),
+        );
+  
+        if (thesePreloadHashes) {
+          const thesePreloadIds = thesePreloadHashes.map((hash: Hash) => hash.id);
+          const updatedTimeHashes = { ...preloadIds, id: thesePreloadIds };
+          setPreloadIds(updatedTimeHashes);
+        }
+      }
+    });
+  }, [
+    discreteMetaDataSelections,
+    verticalLevel,
+    currentHashes,
+  ]);
+  useEffect(() => {
+    // Preload all along time axis
+
+    Object.keys(discreteMetaDataSelections).forEach((id) => {
+      const selection = discreteMetaDataSelections[id];
+      const level = verticalLevel;
+      const timesQuery = {
+        ...selection,
+        level: level,
+      };
+      // Get all hashes that match the query for any time
+      const theseHashes = currentHashes[id];
+      if (theseHashes) {
+        let thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
+          Object.entries(timesQuery).every(([key, value]) => {
+            const match = dict[key];
+            if (match) return match == value;
+          }),
+        );
+  
+        // Filter hashes that have a timeoutside of display times
+        thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
+          displayTimes.includes(new Date(hash.valid_time).getTime()),
+        );
+  
+        // Order base on distance from current display time
+        thesePreloadHashes = thesePreloadHashes.sort((a: Hash, b: Hash) => {
+          const diffA = Math.abs(
+            new Date(a.valid_time).getTime() - new Date(displayTime).getTime(),
+          );
+          const diffB = Math.abs(
+            new Date(b.valid_time).getTime() - new Date(displayTime).getTime(),
+          );
+          if (diffA < diffB) {
+            return -1;
+          } else if (diffA > diffB) {
+            return 1;
+          }
+          return 0;
+        });
+  
+        if (thesePreloadHashes) {
+          const thesePreloadIds = thesePreloadHashes.map((hash: Hash) => hash.id);
+          const updatedTimeHashes = { ...preloadIds, id: thesePreloadIds };
+          setPreloadIds(updatedTimeHashes);
+        }
+      }
+    });
+  }, [
+    discreteMetaDataSelections,
+    displayTime,
+    currentHashes,
+  ]);
+
+  useEffect(() => {
     const resourceIds: string[] = Object.values(profileIds).filter(
       (e): e is Exclude<typeof e, null> => e !== null,
     ); // not null
-    const updatedLoadedResources = [
+    let updatedLoadedResources = [
       ...new Set(loadedResources.concat(resourceIds)),
     ];
+
+    const maxLength = Math.max(
+      ...Object.values(preloadIds).map((arr) => arr.length),
+    );
+    const orderedIds: string[] = [];
+    for (let i = 0; i < maxLength; i++) {
+      Object.values(preloadIds).forEach((idArr) => {
+        if (idArr[i]) orderedIds.push(idArr[i]);
+      });
+    }
+
+    updatedLoadedResources = [
+      ...new Set(updatedLoadedResources.concat(orderedIds)),
+    ];
+
     setLoadedResources(updatedLoadedResources);
-  }, [profileIds]);
+  }, [profileIds, preloadIds]);
 
   useEffect(() => {
     const components = loadedResources.map((id) => (
