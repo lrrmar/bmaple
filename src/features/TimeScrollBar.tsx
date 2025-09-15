@@ -22,6 +22,7 @@ const ScrollingScale = () => {
   const dispatch = useDispatch();
   const displayTime = useSelector(selectDisplayTime);
   const displayTimes = useSelector(selectDisplayTimes);
+  const [intersectionTimes, setIntersectionTimes] = useState<number[]>([]);
   const [upperLim, setUpperLim] = useState<number>(0);
   const [lowerLim, setLowerLim] = useState<number>(1);
   const [dataIncrement, setDataIncrement] = useState<number>(60 * 60 * 1000);
@@ -32,19 +33,12 @@ const ScrollingScale = () => {
   const [lastKey, setLastKey] = useState<string | null>(null);
   const [keyPress, setKeyPress] = useState<number>(0);
 
-  const sources = Object.keys(displayTimes);
-  let allTimeInts: number[] = [];
-  Object.values(displayTimes).forEach((array) => {
-    allTimeInts = [...allTimeInts, ...array];
-  });
-
   useEffect(() => {
-    console.log(displayTime);
-    console.log(new Date(displayTime).getTime());
-    console.log(getUTCString(displayTime));
-  }, [displayTime]);
-
-  useEffect(() => {
+    const sources = Object.keys(displayTimes);
+    let allTimeInts: number[] = [];
+    Object.values(displayTimes).forEach((array) => {
+      allTimeInts = [...allTimeInts, ...array];
+    });
     // Get min time and floor it to nearest hour
     const minDateTime = new Date(Math.min(...allTimeInts));
     minDateTime.setMinutes(0);
@@ -134,8 +128,15 @@ const ScrollingScale = () => {
   }, [lowerLim, upperLim]);
 
   useEffect(() => {
-    const times = displayTimes['one'];
-    if (times) {
+    if (displayTimes) {
+      let timesSet = new Set(Object.values(displayTimes)[0]);
+      for (let i = 1; i < Object.keys(displayTimes).length; i++) {
+        timesSet = timesSet.intersection(
+          new Set(Object.values(displayTimes)[i]),
+        );
+      }
+      const times = [...timesSet];
+      console.log(times);
       setLowerLim(Math.min(...times));
       setUpperLim(Math.max(...times));
       const newMarks = times.map((timeInt) => {
@@ -159,6 +160,7 @@ const ScrollingScale = () => {
         };
       });
       setMarks(newMarks);
+      setIntersectionTimes(times);
     }
   }, [displayTimes]);
 
@@ -169,31 +171,31 @@ const ScrollingScale = () => {
     };
 
     // Add global keydown listener
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
 
     // Cleanup on unmount
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
   // Handling key strokes
   useEffect(() => {
-    if (lastKey == 'ArrowLeft' || lastKey == 'ArrowRight' ) {
-      let index = displayTimes['one'].indexOf(displayTime);
-      if (index) {
-        if (index == -1) index += 1; // HACK
-        const newIndex  = lastKey == 'ArrowLeft'  ? index - 1 : index + 1;
-        if (newIndex == 0 || newIndex == displayTimes['one'].length) {
-          return
+    if (lastKey == 'ArrowLeft' || lastKey == 'ArrowRight') {
+      let index = intersectionTimes.indexOf(displayTime);
+      if (index !== null) {
+        if (index == -1) index = 0; // HACK
+        const newIndex = lastKey == 'ArrowLeft' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex == intersectionTimes.length) {
+          return;
         } else {
-          dispatch(updateDisplayTime(displayTimes['one'][newIndex]));
+          dispatch(updateDisplayTime(intersectionTimes[newIndex]));
         }
       }
     }
   }, [keyPress]);
 
-  if (Object.keys(displayTimes).length === 0) {
+  if (Object.keys(intersectionTimes).length === 0) {
     return <div></div>;
   }
 

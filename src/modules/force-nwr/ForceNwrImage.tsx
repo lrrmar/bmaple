@@ -13,7 +13,7 @@ import {
 } from '../../hooks';
 
 import { ingest, Ingest, selectCache } from '../../mapping/cacheSlice';
-import { updateProfileId, selectApiUrl, selectOpacity } from './forceNwrSlice';
+import { selectApiUrl, selectOpacity } from './forceNwrSlice';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
@@ -56,11 +56,11 @@ const ForceNwrImage = ({ id, sourceIdentifier }: Props) => {
   }, []);
 
   return (
-    <div style={{}}>
+    <div style={{ overflow: 'hidden', width: '100px', height: '100px' }}>
       {hasFetched.current && (
         <img
           id={'img' + id}
-          style={{ opacity: 0 }}
+          style={{ opacity: 0, position: 'absolute', zIndex: 0 }}
           src={imgRef.current.src}
         ></img>
       )}

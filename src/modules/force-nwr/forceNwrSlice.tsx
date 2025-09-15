@@ -1,15 +1,28 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
 
+export type DiscreteHeader = 'domain' | 'field' | 'start_time';
+export interface BackendDiscreteMetaData {
+  headers: DiscreteHeader[];
+  values: { [key in DiscreteHeader]: string[] };
+  tables: { [key in DiscreteHeader]: { [key: string]: (0 | 1)[][] } };
+}
 export interface DiscreteMetaData {
+  [key: string]: string | null;
   domain: string | null;
   field: string | null;
   start_time: string | null;
 }
 
+export interface ContinuousMetaData {
+  [key: string]: string | null;
+  valid_time: string | null;
+  level: string | null;
+}
+
 interface InitialState {
   selectedId: string | null;
-  profileId: string | null;
+  profileIds: { [key: string]: string | null };
   hashesFlag: number;
   opacity: number;
   apiUrl: string;
@@ -17,8 +30,10 @@ interface InitialState {
   level: number | null;
   levels: number[];
   levelUnits: string | null;
-  discreteMetaDataSelections: DiscreteMetaData[];
-  discreteMetaData: DiscreteMetaData;
+  discreteMetaDataSelections: { [key: string]: DiscreteMetaData | null };
+  continuousMetaDataLocks: { [key: string]: ContinuousMetaData | null };
+  backendDiscreteMetaData: BackendDiscreteMetaData | null;
+  readableNames: { [key: string]: string } | null;
   setMapExtent: boolean;
   selectedResources: {
     [key: number]: string | null;
@@ -32,7 +47,7 @@ const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8989';
 
 const initialState: InitialState = {
   selectedId: null,
-  profileId: null,
+  profileIds: {},
   hashesFlag: 0,
   opacity: 1,
   apiUrl: apiUrl,
@@ -40,12 +55,10 @@ const initialState: InitialState = {
   level: null,
   levels: [],
   levelUnits: '',
-  discreteMetaDataSelections: [],
-  discreteMetaData: {
-    domain: null,
-    field: null,
-    start_time: null,
-  },
+  discreteMetaDataSelections: {},
+  continuousMetaDataLocks: {},
+  backendDiscreteMetaData: null,
+  readableNames: null,
   setMapExtent: false,
   selectedResources: {},
 };
@@ -64,8 +77,11 @@ export const forceNwrSlice = createSlice({
       state.selectedResources[update.payload.viewId] =
         update.payload.resourceId;
     },
-    updateProfileId: (state, id: PayloadAction<string | null>) => {
-      state.profileId = id.payload;
+    updateProfileIds: (
+      state,
+      update: PayloadAction<{ host: string; resource: string | null }>,
+    ) => {
+      state.profileIds[update.payload.host] = update.payload.resource;
     },
     updateOpacity: (state, opacity: PayloadAction<number>) => {
       state.opacity = opacity.payload;
@@ -82,11 +98,36 @@ export const forceNwrSlice = createSlice({
     updateVerticalLevelUnits: (state, levelUnits: PayloadAction<string>) => {
       state.levelUnits = levelUnits.payload;
     },
-    updateDiscreteMetaData: (
+    updateBackendDiscreteMetaData: (
       state,
-      metadata: PayloadAction<DiscreteMetaData>,
+      metadata: PayloadAction<BackendDiscreteMetaData>,
     ) => {
-      state.discreteMetaData = metadata.payload;
+      state.backendDiscreteMetaData = metadata.payload;
+    },
+    updateReadableNames: (
+      state,
+      names: PayloadAction<{ [key: string]: string }>,
+    ) => {
+      state.readableNames = names.payload;
+    },
+    updateDiscreteMetaDataSelections: (
+      state,
+      selection: PayloadAction<{
+        id: string;
+        selection: DiscreteMetaData | null;
+      }>,
+    ) => {
+      state.discreteMetaDataSelections[selection.payload.id] =
+        selection.payload.selection;
+    },
+    updateContinuousMetaDataLocks: (
+      state,
+      locks: PayloadAction<{
+        id: string;
+        locks: ContinuousMetaData | null;
+      }>,
+    ) => {
+      state.continuousMetaDataLocks[locks.payload.id] = locks.payload.locks;
     },
   },
 });
@@ -94,7 +135,7 @@ export const forceNwrSlice = createSlice({
 export const {
   updateSelectedId,
   updateSelectedResources,
-  updateProfileId,
+  updateProfileIds,
   updateOpacity,
   //updateField,
   updateStartTime,
@@ -102,13 +143,16 @@ export const {
   updateVerticalLevel,
   updateVerticalLevels,
   updateVerticalLevelUnits,
-  updateDiscreteMetaData,
+  updateBackendDiscreteMetaData,
+  updateReadableNames,
+  updateDiscreteMetaDataSelections,
+  updateContinuousMetaDataLocks,
 } = forceNwrSlice.actions;
 
 export const selectSelectedId = (state: RootState) => state.forceNwr.selectedId;
 export const selectSelectedResources = (state: RootState) =>
   state.forceNwr.selectedResources;
-export const selectProfileId = (state: RootState) => state.forceNwr.profileId;
+export const selectProfileIds = (state: RootState) => state.forceNwr.profileIds;
 export const selectOpacity = (state: RootState) => state.forceNwr.opacity;
 export const selectApiUrl = (state: RootState) => state.forceNwr.apiUrl;
 export const selectStartTime = (state: RootState) => state.forceNwr.startTime;
@@ -116,8 +160,14 @@ export const selectVerticalLevel = (state: RootState) => state.forceNwr.level;
 export const selectVerticalLevels = (state: RootState) => state.forceNwr.levels;
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.forceNwr.levelUnits;
-export const selectDiscreteMetaData = (state: RootState) =>
-  state.forceNwr.discreteMetaData;
+export const selectBackendDiscreteMetaData = (state: RootState) =>
+  state.forceNwr.backendDiscreteMetaData;
+export const selectReadableNames = (state: RootState) =>
+  state.forceNwr.readableNames;
+export const selectDiscreteMetaDataSelections = (state: RootState) =>
+  state.forceNwr.discreteMetaDataSelections;
+export const selectContinuousMetaDataLocks = (state: RootState) =>
+  state.forceNwr.continuousMetaDataLocks;
 export const selectSetMapExtent = (state: RootState) =>
   state.forceNwr.setMapExtent;
 export default forceNwrSlice.reducer;

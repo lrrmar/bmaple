@@ -21,10 +21,14 @@ import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import {
+  BackendDiscreteMetaData,
   DiscreteMetaData,
-  selectDiscreteMetaData,
-  updateDiscreteMetaData,
+  selectBackendDiscreteMetaData,
+  selectReadableNames,
+  updateContinuousMetaDataLocks,
+  updateDiscreteMetaDataSelections,
   updateSelectedResources,
+  selectProfileIds,
 } from '../modules/force-nwr/forceNwrSlice';
 
 type DiscreteHeader = 'domain' | 'field' | 'start_time';
@@ -93,10 +97,17 @@ const ImageViewerWithMenu = ({
   const cache = useSelector(selectCache);
   const displayTime = useSelector(selectIsoDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
-  const [selection, setSelection] = useState<DiscreteMetaData | null>(
-    { domain: null, field: null, start_time: null});
+  const profileIds = useSelector(selectProfileIds);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [selection, setSelection] = useState<DiscreteMetaData | null>({
+    domain: null,
+    field: null,
+    start_time: null,
+  });
   const selectionRef = useRef<DiscreteMetaData | null>(null);
-  const [metaData, setMetaData] = useState<MetaData | null>(null);
+  const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
+  const readableNames = useSelector(selectReadableNames);
+  //const [backendDiscreteMetaData, setMetaData] = useState<MetaData | null>(null);
   const [validTimeLocked, setValidTimeLocked] = useState<string | null>(null);
   const [levelLocked, setLevelLocked] = useState<string | null>(null);
   const [currentHashes, setCurrentHashes] = useState<Hash[]>([]);
@@ -105,23 +116,6 @@ const ImageViewerWithMenu = ({
   const [resourceId, setResourceId] = useState<string | null>(null);
   const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
   const [dims, setDims] = useState({ width: 0, height: 0 });
-
-  const fetchMetaData = async () => {
-    const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-    const json = await response.json();
-    setMetaData(json);
-  };
-
-  useEffect(() => {
-    // on initial render, fetch meta data
-    if (metaData) return;
-    fetchMetaData();
-  }, []);
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
@@ -138,10 +132,10 @@ const ImageViewerWithMenu = ({
 
   useEffect(() => {
     // Generate drop down for each heading
-    if (metaData) {
-      const discreteHeaders = metaData.headers;
-      const values = metaData.values;
-      const tables = metaData.tables;
+    if (backendDiscreteMetaData) {
+      const discreteHeaders = backendDiscreteMetaData.headers;
+      const values = backendDiscreteMetaData.values;
+      const tables = backendDiscreteMetaData.tables;
       if (!selection) {
         //Get initial selection
         /*const newSelection = {
@@ -195,17 +189,28 @@ const ImageViewerWithMenu = ({
             };
             return (
               <MenuItem key={val} value={i} sx={sx}>
-                {val}
+                {readableNames && readableNames[val] ? readableNames[val] : val}
               </MenuItem>
             );
           });
+          console.log(selection[thisDiscreteHeader]);
+          let displayName = '...';
+          if (selection[thisDiscreteHeader]) {
+            displayName = selection[thisDiscreteHeader];
+            if (readableNames && readableNames[displayName]){
+              displayName = readableNames[selection[thisDiscreteHeader]];
+
+            }
+          }
           const select = (
-            <div>
+            <div key={thisDiscreteHeader}>
               <InputLabel
                 id={`${thisDiscreteHeader} label`}
                 style={{ color: 'white' }}
               >
-                {thisDiscreteHeader}
+                {readableNames && readableNames[thisDiscreteHeader]
+                  ? readableNames[thisDiscreteHeader]
+                  : thisDiscreteHeader}
               </InputLabel>
               <Select
                 labelId={`${thisDiscreteHeader} label`}
@@ -224,7 +229,13 @@ const ImageViewerWithMenu = ({
                     setSelection(newSelection);
                   }
                 }}
-                input={<OutlinedInput value={selection[thisDiscreteHeader]} />}
+                input={
+                  <OutlinedInput
+                    value={
+                      displayName
+                    }
+                  />
+                }
               >
                 {menuItems}
               </Select>
@@ -238,6 +249,7 @@ const ImageViewerWithMenu = ({
 
       selects.push(
         <HeaderLock
+          key={'valid_time'}
           header={'valid_time'}
           current={displayTime}
           locked={validTimeLocked}
@@ -246,6 +258,7 @@ const ImageViewerWithMenu = ({
       );
       selects.push(
         <HeaderLock
+          key={'level'}
           header={'level'}
           current={verticalLevel}
           locked={levelLocked}
@@ -254,31 +267,36 @@ const ImageViewerWithMenu = ({
       );
       setMenus(selects);
     }
-  }, [metaData, validTimeLocked, levelLocked, selection]);
+  }, [
+    readableNames,
+    backendDiscreteMetaData,
+    validTimeLocked,
+    levelLocked,
+    selection,
+  ]);
 
   useEffect(() => {
-    const fetchHashes = async () => {
-      if (selection) {
-        const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
-          body: JSON.stringify({
-            field: selection.field,
-            domain: selection.domain,
-            start_time: selection.start_time,
-          }),
-        });
-        const json = await response.json();
-        setCurrentHashes(json);
-      }
-    };
-    if (selection && Object.values(selection).every((val) => !!val))
-      fetchHashes();
+    dispatch(
+      updateDiscreteMetaDataSelections({
+        id: id.toString(),
+        selection: selection,
+      }),
+    );
   }, [selection]);
 
   useEffect(() => {
+    dispatch(
+      updateContinuousMetaDataLocks({
+        id: id.toString(),
+        locks: {
+          valid_time: validTimeLocked,
+          level: levelLocked,
+        },
+      }),
+    );
+  }, [validTimeLocked, levelLocked]);
+
+  /* useEffect(() => {
     // On hash change, get times and levels from hashes
     if (currentHashes.length > 0) {
       const timeStrings = [
@@ -294,7 +312,7 @@ const ImageViewerWithMenu = ({
         const orderedLevels = allLevels.filter((level) =>
           levels.includes(level),
         );*/
-        }
+  /* }
         const orderedLevels = levels;
         const times = timeStrings
           .map((timeString) => new Date(timeString).getTime())
@@ -335,7 +353,7 @@ const ImageViewerWithMenu = ({
       }
     }
   }, [selection, displayTime, verticalLevel, currentHashes]);
-
+   */
   useEffect(() => {
     if (resourceId) {
       setResourceLoaded(!!cache[resourceId]);
@@ -343,6 +361,13 @@ const ImageViewerWithMenu = ({
       setResourceLoaded(false);
     }
   }, [resourceId, cache]);
+
+  useEffect(() => {
+    const profileId = profileIds[id.toString()];
+    if (profileId) {
+      setProfileId(profileId);
+    }
+  }, [profileIds]);
 
   return (
     <div
@@ -394,7 +419,7 @@ const ImageViewerWithMenu = ({
           {menus}
         </div>
         <CanvasImgViewPortPreloaded
-          id={resourceLoaded && !hidden ? 'img' + resourceId : null}
+          id={profileId && !hidden ? 'img' + profileId : null}
           configChange={configChange}
         />
       </div>

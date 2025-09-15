@@ -18,6 +18,7 @@ interface Mark {
 }
 
 interface Props<T, U> {
+  selectValue: Selector<string | null>;
   selectValues: Selector<string[]>;
   updateValue: Action<string>;
   orientation: 'horizontal' | 'vertical';
@@ -28,15 +29,19 @@ interface Props<T, U> {
  */
 
 const MultiUnitScrollBar = <T, U>({
+  selectValue,
   selectValues,
   updateValue,
   orientation,
 }: Props<string[], string | null>) => {
   const dispatch = useDispatch();
+  const value: string = useSelector(selectValue);
   const values: string[] = useSelector(selectValues);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [content, setContent] = useState<React.ReactNode>([]);
+  const [lastKey, setLastKey] = useState<string | null>(null);
+  const [keyPress, setKeyPress] = useState<number>(0);
 
   useEffect(() => {
     const newMarks: Mark[] = values.map((val, i) => {
@@ -48,15 +53,50 @@ const MultiUnitScrollBar = <T, U>({
   }, [values, verticalLevel]);
 
   useEffect(() => {
+    const handleKeyDown = (event) => {
+      setLastKey(event.key);
+      setKeyPress(Date.now());
+    };
+
+    // Add global keydown listener
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Handling key strokes
+  useEffect(() => {
+    if (lastKey == 'ArrowDown' || lastKey == 'ArrowUp') {
+      let index = values.indexOf(value);
+      if (index !== null) {
+        if (index == -1) index += 1; // HACK
+        const newIndex = lastKey == 'ArrowDown' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex == values.length) {
+          return;
+        } else {
+          dispatch(updateValue(values[newIndex]));
+        }
+      }
+    }
+  }, [keyPress]);
+
+  useEffect(() => {
     setContent(
       <Slider
         defaultValue={0}
         marks={marks}
         min={0}
         max={values.length - 1}
-        //valueLabelDisplay={'on'}
-        //valueLabelFormat={(i) => values[i]}
+        step={1}
+        value={values.indexOf(value)}
         orientation={orientation}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         onChange={(e: Event, value: number | number[]) => {
           if (typeof value === 'number') dispatch(updateValue(values[value]));
         }}

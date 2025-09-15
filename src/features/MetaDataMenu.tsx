@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useAppSelector as useSelector,
@@ -12,6 +13,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import {
   DiscreteMetaData,
+  MetaDataInstance,
   selectDiscreteMetaData,
   updateDiscreteMetaData,
 } from '../modules/force-nwr/forceNwrSlice';
@@ -30,7 +32,7 @@ interface Selection {
 const MetaDataMenu = ({ apiUrl }: { apiUrl: string }) => {
   const dispatch = useDispatch();
   const selection = useSelector(selectDiscreteMetaData);
-  const [metaData, setMetaData] = useState<MetaData | null>(null);
+  const [metaData, setMetaData] = useState<DiscreteMetaData | null>(null);
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const fetchMetaData = async () => {
     const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {

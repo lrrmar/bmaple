@@ -4,8 +4,6 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-import { selectProfileId } from '../modules/force-nwr/forceNwrSlice';
-
 const CanvasImgViewPort = ({
   id,
   configChange,

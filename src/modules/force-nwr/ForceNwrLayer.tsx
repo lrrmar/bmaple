@@ -13,7 +13,7 @@ import {
 } from '../../hooks';
 
 import { ingest, Ingest, selectCache } from '../../mapping/cacheSlice';
-import { updateProfileId, selectApiUrl, selectOpacity } from './forceNwrSlice';
+import { selectApiUrl, selectOpacity } from './forceNwrSlice';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';

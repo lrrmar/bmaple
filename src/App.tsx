@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 
 import mapReducer, {
+  selectVerticalLevel,
   selectVerticalLevels,
   updateVerticalLevel,
 } from './mapping/mapSlice';
@@ -95,6 +96,7 @@ const App = () => {
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <MultiUnitScrollBar
+          selectValue={selectVerticalLevel}
           selectValues={selectVerticalLevels}
           updateValue={updateVerticalLevel}
           orientation={'vertical'}

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useEffect, useState, useRef } from 'react';
 import { Button, ButtonGroup, Icon, Dropdown } from 'semantic-ui-react';
 import DropDownList from '../../features/DropDownList';

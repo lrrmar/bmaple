@@ -14,7 +14,7 @@ import {
   isEntry,
 } from '../../mapping/cacheSlice';
 import {
-  selectProfileId,
+  selectProfileIds,
   selectOpacity,
   selectSetMapExtent,
 } from './forceNwrSlice';
@@ -34,8 +34,9 @@ const isForceNwrEntry = (a: any): a is ForceNwrEntry => {
 };
 
 const Graphics = () => {
+  const id = 'layers';
   const dispatch = useDispatch();
-  const profileId = useSelector(selectProfileId);
+  const profileIds = useSelector(selectProfileIds);
   const opacity = useSelector(selectOpacity);
   const setMapExtent = useSelector(selectSetMapExtent);
   const cache = useSelector(selectCacheEntries);
@@ -56,6 +57,7 @@ const Graphics = () => {
     let newLayer: ImageLayer<ImageSource> | undefined;
 
     // Get layer info from cache
+    const profileId = profileIds[id];
     if (profileId) cacheEntry = cache[profileId];
 
     // Verifying type
@@ -76,7 +78,7 @@ const Graphics = () => {
     }
     if (!forceNwrCacheEntry) return;
     setCurrentLayer(newLayer);
-  }, [profileId, cache]);
+  }, [profileIds, cache]);
 
   // Exchange layer visibility ASAP, dependant on styling bool
   useEffect(() => {

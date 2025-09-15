@@ -4,8 +4,6 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-import { selectProfileId } from '../modules/force-nwr/forceNwrSlice';
-
 const ImgViewPort = ({
   id,
   setRatio,
@@ -13,15 +11,14 @@ const ImgViewPort = ({
   id: string;
   setRatio?: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const profileId = useSelector(selectProfileId);
   const [srcUrl, setSrcUrl] = useState<string | null>(null);
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const apiUrl = 'http://localhost:8383';
   useEffect(() => {
-    if (profileId) {
-      setSrcUrl(apiUrl + '/resourceById?id=' + profileId);
+    if (id) {
+      setSrcUrl(apiUrl + '/resourceById?id=' + id);
     }
-  }, [profileId]);
+  }, [id]);
 
   useEffect(() => {
     if (setRatio && srcUrl) {

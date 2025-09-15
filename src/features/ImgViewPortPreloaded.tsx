@@ -4,8 +4,6 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-import { selectProfileId } from '../modules/force-nwr/forceNwrSlice';
-
 const ImgViewPort = ({ id }: { id: string }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {

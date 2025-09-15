@@ -4,8 +4,6 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-import { selectProfileId } from '../modules/force-nwr/forceNwrSlice';
-
 const ImgViewPort = ({ id, apiUrl }: { id: string; apiUrl: string }) => {
   const [srcUrl, setSrcUrl] = useState<string | null>(null);
   const [ratio, setRatio] = useState<number>(0);
