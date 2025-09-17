@@ -7,6 +7,7 @@ import {
 import {
   selectDisplayTime,
   selectDisplayTimes,
+  selectDisplayTimesIntersection,
   updateDisplayTime,
 } from '../mapping/mapSlice';
 
@@ -22,6 +23,7 @@ const ScrollingScale = () => {
   const dispatch = useDispatch();
   const displayTime = useSelector(selectDisplayTime);
   const displayTimes = useSelector(selectDisplayTimes);
+  const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
   const [intersectionTimes, setIntersectionTimes] = useState<number[]>([]);
   const [upperLim, setUpperLim] = useState<number>(0);
   const [lowerLim, setLowerLim] = useState<number>(1);
@@ -34,26 +36,23 @@ const ScrollingScale = () => {
   const [keyPress, setKeyPress] = useState<number>(0);
 
   useEffect(() => {
-    const sources = Object.keys(displayTimes);
-    let allTimeInts: number[] = [];
-    Object.values(displayTimes).forEach((array) => {
-      allTimeInts = [...allTimeInts, ...array];
-    });
-    // Get min time and floor it to nearest hour
-    const minDateTime = new Date(Math.min(...allTimeInts));
-    minDateTime.setMinutes(0);
-    minDateTime.setSeconds(0);
-    setLowerLim(minDateTime.getTime());
-
-    // Get max time and ceil it to nearest hour
-    const maxDateTime = new Date(Math.max(...allTimeInts));
-    if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
-      maxDateTime.setHours(maxDateTime.getHours() + 1);
+    if (displayTimesIntersection) {
+      // Get min time and floor it to nearest hour
+      const minDateTime = new Date(Math.min(...displayTimesIntersection));
+      minDateTime.setMinutes(0);
+      minDateTime.setSeconds(0);
+      setLowerLim(minDateTime.getTime());
+  
+      // Get max time and ceil it to nearest hour
+      const maxDateTime = new Date(Math.max(...displayTimesIntersection));
+      if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
+        maxDateTime.setHours(maxDateTime.getHours() + 1);
+      }
+      maxDateTime.setMinutes(0);
+      maxDateTime.setSeconds(0);
+      setUpperLim(maxDateTime.getTime());
     }
-    maxDateTime.setMinutes(0);
-    maxDateTime.setSeconds(0);
-    setUpperLim(maxDateTime.getTime());
-  }, [displayTimes]);
+  }, [displayTimesIntersection]);
 
   useEffect(() => {
     //if (displayTimes) return;
@@ -128,15 +127,8 @@ const ScrollingScale = () => {
   }, [lowerLim, upperLim]);
 
   useEffect(() => {
-    if (displayTimes) {
-      let timesSet = new Set(Object.values(displayTimes)[0]);
-      for (let i = 1; i < Object.keys(displayTimes).length; i++) {
-        timesSet = timesSet.intersection(
-          new Set(Object.values(displayTimes)[i]),
-        );
-      }
-      const times = [...timesSet];
-      console.log(times);
+    const times = displayTimesIntersection;
+    if (times) {
       setLowerLim(Math.min(...times));
       setUpperLim(Math.max(...times));
       const newMarks = times.map((timeInt) => {
@@ -162,10 +154,10 @@ const ScrollingScale = () => {
       setMarks(newMarks);
       setIntersectionTimes(times);
     }
-  }, [displayTimes]);
+  }, [displayTimesIntersection]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       setLastKey(event.key);
       setKeyPress(Date.now());
     };

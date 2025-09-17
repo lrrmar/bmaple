@@ -7,7 +7,7 @@ import {
   updateDisplayTimes,
   updateVerticalLevels,
   selectIsoDisplayTime,
-  selectDisplayTimesSet,
+  selectDisplayTimesIntersection,
   selectVerticalLevel,
 } from '../../mapping/mapSlice';
 //import { updateVerticalLevels  } from '../../mapping/mapSlice';
@@ -68,7 +68,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     {},
   );
   const displayTime = useSelector(selectIsoDisplayTime);
-  const displayTimes = useSelector(selectDisplayTimesSet);
+  const displayTimes = useSelector(selectDisplayTimesIntersection);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [continuousMetaData, setContinuousMetaData] = useState<{
     [key: string]: ContinuousMetaData | null;
@@ -290,16 +290,11 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
          * the current one in the array of displayTimes, i.e. if we are at image 10
          * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
          */
-        
-        // get Id of current display time from all display times
-        const currentDisplayTimeIndex = displayTimes.indexOf((new Date(displayTime).getTime()))
-        const bufferInteger = 12;
 
         // Filter hashes that have a time outside of display times
         thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
           displayTimes.includes(new Date(hash.valid_time).getTime()),
         );
-
 
         // Filter hashes that have been loaded
         thesePreloadHashes = thesePreloadHashes.filter(

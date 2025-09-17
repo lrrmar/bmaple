@@ -35,7 +35,7 @@ const MultiUnitScrollBar = <T, U>({
   orientation,
 }: Props<string[], string | null>) => {
   const dispatch = useDispatch();
-  const value: string = useSelector(selectValue);
+  const value: string | null = useSelector(selectValue);
   const values: string[] = useSelector(selectValues);
   const verticalLevel = useSelector(selectVerticalLevel);
   const [marks, setMarks] = useState<Mark[]>([]);
@@ -53,7 +53,7 @@ const MultiUnitScrollBar = <T, U>({
   }, [values, verticalLevel]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       setLastKey(event.key);
       setKeyPress(Date.now());
     };
@@ -70,8 +70,8 @@ const MultiUnitScrollBar = <T, U>({
   // Handling key strokes
   useEffect(() => {
     if (lastKey == 'ArrowDown' || lastKey == 'ArrowUp') {
-      let index = values.indexOf(value);
-      if (index !== null) {
+      if (value) {
+        let index = values.indexOf(value);
         if (index == -1) index += 1; // HACK
         const newIndex = lastKey == 'ArrowDown' ? index - 1 : index + 1;
         if (newIndex < 0 || newIndex == values.length) {
@@ -91,7 +91,7 @@ const MultiUnitScrollBar = <T, U>({
         min={0}
         max={values.length - 1}
         step={1}
-        value={values.indexOf(value)}
+        value={value ? values.indexOf(value) : undefined}
         orientation={orientation}
         onMouseDown={(e) => {
           e.stopPropagation();

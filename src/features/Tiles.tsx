@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ImageViewerWithMenu from './ImageViewerWithMenu';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 
 type TileConfigurations = 'single' | 'duo' | 'trio' | 'quad' | 'bottom bar';
 
@@ -78,7 +82,7 @@ const Tiles = () => {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={baseRow}>
         <div style={tileStyles[configuration + '0']}>
           <ImageViewerWithMenu
@@ -113,20 +117,21 @@ const Tiles = () => {
           />
         </div>
       </div>
-      <div style={{ bottom: '-1em', left: '-1em' }}>
-        <select
+      <div style={{ alignSelf: 'flex-end' }}>
+        <Select
           value={configuration}
+          input={<OutlinedInput value={configuration} />}
           onChange={(e) => {
             const conf = e.target.value;
             if (isTileConfigurations(conf)) setConfiguration(conf);
           }}
         >
           {tileConfigurations.map((name) => (
-            <option key={name} value={name}>
+            <MenuItem key={name} value={name}>
               {name}
-            </option>
+            </MenuItem>
           ))}
-        </select>
+        </Select>
       </div>
     </div>
   );

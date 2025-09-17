@@ -208,14 +208,15 @@ export const selectVerticalLevels = (state: RootState) =>
   state.map.verticalLevels;
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
-export const selectDisplayTimesSet = (state: RootState) => {
-  let timesSet = new Set(Object.values(state.map.displayTimes)[0]);
-  for (let i = 1; i < Object.keys(state.map.displayTimes).length; i++) {
-    timesSet = timesSet.intersection(
-      new Set(Object.values(state.map.displayTimes)[i]),
-    );
+export const selectDisplayTimesIntersection = (state: RootState) => {
+  let times = Object.values(state.map.displayTimes)[0];
+  if (times) {
+    for (let i = 1; i < Object.keys(state.map.displayTimes).length; i++) {
+      times = times.filter((time) =>
+        Object.values(state.map.displayTimes)[i].includes(time),
+      );
+    }
   }
-  const times = [...timesSet];
   return times;
 };
 export default mapSlice.reducer;
