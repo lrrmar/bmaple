@@ -72,12 +72,12 @@ const HeaderLock = ({
   setLocked: React.Dispatch<React.SetStateAction<string | null>>;
 }) => {
   return (
-    <div>
-      {header}
-      <button onClick={() => (locked ? setLocked(null) : setLocked(current))}>
-        <Icon name={locked ? 'lock open' : 'lock'} />
-      </button>
-      {locked ? locked : ''}
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      {locked ? locked : header}
+      <Icon
+        name={locked ? 'lock' : 'lock open'}
+        onClick={() => (locked ? setLocked(null) : setLocked(current))}
+      />
     </div>
   );
 };
@@ -193,12 +193,13 @@ const ImageViewerWithMenu = ({
               </MenuItem>
             );
           });
-          console.log(selection[thisDiscreteHeader]);
           let displayName = '...';
-          if (selection[thisDiscreteHeader]) {
-            displayName = selection[thisDiscreteHeader];
+          const selectionHeader = selection[thisDiscreteHeader];
+
+          if (selectionHeader) {
+            displayName = selectionHeader;
             if (readableNames && readableNames[displayName]) {
-              displayName = readableNames[selection[thisDiscreteHeader]];
+              displayName = readableNames[selectionHeader];
             }
           }
           const select = (
@@ -243,7 +244,11 @@ const ImageViewerWithMenu = ({
       selects.push(
         <HeaderLock
           key={'valid_time'}
-          header={'valid_time'}
+          header={
+            readableNames && readableNames['valid_time']
+              ? readableNames['valid_time']
+              : ' Valid Time '
+          }
           current={displayTime}
           locked={validTimeLocked}
           setLocked={setValidTimeLocked}
@@ -252,7 +257,11 @@ const ImageViewerWithMenu = ({
       selects.push(
         <HeaderLock
           key={'level'}
-          header={'level'}
+          header={
+            readableNames && readableNames['level']
+              ? readableNames['level']
+              : ' Vertical Level'
+          }
           current={verticalLevel}
           locked={levelLocked}
           setLocked={setLevelLocked}
@@ -265,6 +274,8 @@ const ImageViewerWithMenu = ({
     backendDiscreteMetaData,
     validTimeLocked,
     levelLocked,
+    displayTime,
+    verticalLevel,
     selection,
   ]);
 

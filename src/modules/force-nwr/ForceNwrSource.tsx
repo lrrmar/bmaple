@@ -234,6 +234,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     // Preload all along vertical axis
 
+    const updatedLevelHashes: { [key: string]: string[] } = {};
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
       const time = displayTime;
@@ -244,28 +245,31 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       // Get all hashes that match the query for any time
       const theseHashes = currentHashes[id];
       if (theseHashes) {
-        let thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
+        const thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
           Object.entries(timesQuery).every(([key, value]) => {
             const match = dict[key];
             if (match) return match == value;
           }),
         );
-  
+
         if (thesePreloadHashes) {
-          const thesePreloadIds = thesePreloadHashes.map((hash: Hash) => hash.id);
-          const updatedTimeHashes = { ...preloadIds, id: thesePreloadIds };
-          setPreloadIds(updatedTimeHashes);
+          const thesePreloadIds = thesePreloadHashes.map(
+            (hash: Hash) => hash.id,
+          );
+          updatedLevelHashes[id] = thesePreloadIds;
         }
       }
     });
-  }, [
-    discreteMetaDataSelections,
-    verticalLevel,
-    currentHashes,
-  ]);
+    setPreloadIds(updatedLevelHashes);
+  }, [discreteMetaDataSelections, verticalLevel, currentHashes]);
   useEffect(() => {
     // Preload all along time axis
 
+    const updatedTimeHashes: { [key: string]: string[] } = {};
+    let activeHosts = Object.values(profileIds).filter((e) => !!e).length;
+    activeHosts = activeHosts == 0 ? 1 : activeHosts;
+    const maxImagesPerScroll = 12;
+    const limiter = Math.floor(maxImagesPerScroll / activeHosts);
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
       const level = verticalLevel;
@@ -282,12 +286,26 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
             if (match) return match == value;
           }),
         );
-  
-        // Filter hashes that have a timeoutside of display times
+        /* The ideal behaviour here is to preload all images that are N away from
+         * the current one in the array of displayTimes, i.e. if we are at image 10
+         * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
+         */
+        
+        // get Id of current display time from all display times
+        const currentDisplayTimeIndex = displayTimes.indexOf((new Date(displayTime).getTime()))
+        const bufferInteger = 12;
+
+        // Filter hashes that have a time outside of display times
         thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
           displayTimes.includes(new Date(hash.valid_time).getTime()),
         );
-  
+
+
+        // Filter hashes that have been loaded
+        thesePreloadHashes = thesePreloadHashes.filter(
+          (hash: Hash) => !loadedResources.includes(hash.id),
+        );
+
         // Order base on distance from current display time
         thesePreloadHashes = thesePreloadHashes.sort((a: Hash, b: Hash) => {
           const diffA = Math.abs(
@@ -303,19 +321,18 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           }
           return 0;
         });
-  
+
         if (thesePreloadHashes) {
-          const thesePreloadIds = thesePreloadHashes.map((hash: Hash) => hash.id);
-          const updatedTimeHashes = { ...preloadIds, id: thesePreloadIds };
-          setPreloadIds(updatedTimeHashes);
+          const thesePreloadIds = thesePreloadHashes.map(
+            (hash: Hash) => hash.id,
+          );
+          console.log(limiter);
+          updatedTimeHashes[id] = thesePreloadIds.slice(0, limiter); // limited
         }
       }
     });
-  }, [
-    discreteMetaDataSelections,
-    displayTime,
-    currentHashes,
-  ]);
+    setPreloadIds(updatedTimeHashes);
+  }, [discreteMetaDataSelections, displayTime, currentHashes]);
 
   useEffect(() => {
     const resourceIds: string[] = Object.values(profileIds).filter(
