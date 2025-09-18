@@ -205,8 +205,8 @@ const ImageViewerWithMenu = ({
           const select = (
             <div key={thisDiscreteHeader}>
               <InputLabel
+                style={{ color: '#f1f1f1' }}
                 id={`${thisDiscreteHeader} label`}
-                style={{ color: 'white' }}
               >
                 {readableNames && readableNames[thisDiscreteHeader]
                   ? readableNames[thisDiscreteHeader]
@@ -218,7 +218,6 @@ const ImageViewerWithMenu = ({
                 renderValue={(val: string) => {
                   return val;
                 }}
-                style={{ color: 'white' }}
                 onChange={(e) => {
                   if (typeof e.target.value === 'number') {
                     const newSelection: DiscreteMetaData = {
@@ -235,7 +234,12 @@ const ImageViewerWithMenu = ({
               </Select>
             </div>
           );
-          return select;
+          return (
+            <div key={thisDiscreteHeader}>
+              {select}
+              <br />
+            </div>
+          );
         },
       );
 
@@ -254,6 +258,8 @@ const ImageViewerWithMenu = ({
           setLocked={setValidTimeLocked}
         />,
       );
+
+      selects.push(<br />);
       selects.push(
         <HeaderLock
           key={'level'}
@@ -414,9 +420,11 @@ const ImageViewerWithMenu = ({
         />
         <div
           style={{
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: '1em',
             left: menuOpen ? '' : '-1000vw',
             position: 'absolute',
-            backgroundColor: '#555555',
             padding: '1em',
           }}
         >

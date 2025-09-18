@@ -4,12 +4,6 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../hooks';
-import {
-  selectVerticalLevel, // TEMP
-  selectDisplayTime,
-  selectDisplayTimes,
-  updateDisplayTime,
-} from '../mapping/mapSlice';
 import { Selector, Action } from '../App';
 
 interface Mark {
@@ -37,7 +31,6 @@ const MultiUnitScrollBar = <T, U>({
   const dispatch = useDispatch();
   const value: string | null = useSelector(selectValue);
   const values: string[] = useSelector(selectValues);
-  const verticalLevel = useSelector(selectVerticalLevel);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [content, setContent] = useState<React.ReactNode>([]);
   const [lastKey, setLastKey] = useState<string | null>(null);
@@ -50,7 +43,7 @@ const MultiUnitScrollBar = <T, U>({
     if (newMarks.length > 0)
       //dispatch(updateValue(newMarks[0].value));
       setMarks(newMarks);
-  }, [values, verticalLevel]);
+  }, [values, value]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -70,8 +63,8 @@ const MultiUnitScrollBar = <T, U>({
   // Handling key strokes
   useEffect(() => {
     if (lastKey == 'ArrowDown' || lastKey == 'ArrowUp') {
-      if (value) {
-        let index = values.indexOf(value);
+      let index: number = value ? values.indexOf(value) : 0;
+      if (index !== null) {
         if (index == -1) index += 1; // HACK
         const newIndex = lastKey == 'ArrowDown' ? index - 1 : index + 1;
         if (newIndex < 0 || newIndex == values.length) {
@@ -91,35 +84,35 @@ const MultiUnitScrollBar = <T, U>({
         min={0}
         max={values.length - 1}
         step={1}
-        value={value ? values.indexOf(value) : undefined}
+        track={false}
+        value={value ? values.indexOf(value) : 0}
         orientation={orientation}
         onMouseDown={(e) => {
           e.stopPropagation();
           e.preventDefault();
         }}
-        onChange={(e: Event, value: number | number[]) => {
-          if (typeof value === 'number') dispatch(updateValue(values[value]));
-        }}
         sx={{
           '& .MuiSlider-rail': {
-            //  color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            width: '.15em',
           },
           '& .MuiSlider-thumb': {
-            //color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            height: '.2em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-mark': {
-            //backgroundColor: '#a1a1a1', // Change mark color
-            //height: 4,
-            //width: 3,
-            //borderRadius: '50%',
+            color: '#f1f1f1',
+            width: '.3em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#f1f1f1', // Change label color
+            color: '#f0f0f0', // Change label color
           },
         }}
       />,
     );
-  }, [marks]);
+  }, [marks, value]);
 
   if (Object.keys(values).length === 0) {
     dispatch(updateValue(''));

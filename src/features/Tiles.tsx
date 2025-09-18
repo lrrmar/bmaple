@@ -24,9 +24,9 @@ const Tiles = () => {
   const tileConfigurations: TileConfigurations[] = [
     'single',
     'duo',
-    'trio',
-    'quad',
-    'bottom bar',
+    //    'trio',
+    //'quad',
+    //'bottom bar',
   ];
 
   const baseTile: React.CSSProperties = {
@@ -82,7 +82,14 @@ const Tiles = () => {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <div style={baseRow}>
         <div style={tileStyles[configuration + '0']}>
           <ImageViewerWithMenu
@@ -121,6 +128,12 @@ const Tiles = () => {
         <Select
           value={configuration}
           input={<OutlinedInput value={configuration} />}
+          style={{
+            backgroundColor: 'rgba(255,255,255,1)',
+            backdropFilter: 'blur(10px)',
+            margin: '0.5em',
+            borderRadius: '1em',
+          }}
           onChange={(e) => {
             const conf = e.target.value;
             if (isTileConfigurations(conf)) setConfiguration(conf);

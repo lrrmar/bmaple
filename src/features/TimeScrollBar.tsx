@@ -13,7 +13,7 @@ import {
 
 const getUTCString = (timeInt: number) => {
   const dt = new Date(timeInt);
-  return dt.toUTCString();
+  return dt.toUTCString().slice(0, -3) + 'UTC';
 };
 interface Mark {
   value: number;
@@ -22,7 +22,6 @@ interface Mark {
 const ScrollingScale = () => {
   const dispatch = useDispatch();
   const displayTime = useSelector(selectDisplayTime);
-  const displayTimes = useSelector(selectDisplayTimes);
   const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
   const [intersectionTimes, setIntersectionTimes] = useState<number[]>([]);
   const [upperLim, setUpperLim] = useState<number>(0);
@@ -42,7 +41,11 @@ const ScrollingScale = () => {
       minDateTime.setMinutes(0);
       minDateTime.setSeconds(0);
       setLowerLim(minDateTime.getTime());
-  
+      console.log(
+        Math.min(...displayTimesIntersection) -
+          new Date(Math.min(...displayTimesIntersection)).getTime(),
+      );
+
       // Get max time and ceil it to nearest hour
       const maxDateTime = new Date(Math.max(...displayTimesIntersection));
       if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
@@ -103,7 +106,9 @@ const ScrollingScale = () => {
     const tempMarks: Mark[] = [];
     let currentTimeInt = minDateTime.getTime();
     while (currentTimeInt <= maxDateTime.getTime()) {
-      const dt = new Date(currentTimeInt);
+      const dt = new Date(
+        currentTimeInt + new Date().getTimezoneOffset() * 60 * 1000,
+      );
       const hour = dt.getHours();
       const minute = dt.getMinutes();
       const day = dt.getDate();
@@ -158,8 +163,11 @@ const ScrollingScale = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      setLastKey(event.key);
-      setKeyPress(Date.now());
+      const throttle = 90; //ms
+      if (Date.now() - keyPress > throttle) {
+        setLastKey(event.key);
+        setKeyPress(Date.now());
+      }
     };
 
     // Add global keydown listener
@@ -169,7 +177,7 @@ const ScrollingScale = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [keyPress]);
 
   // Handling key strokes
   useEffect(() => {
@@ -187,12 +195,23 @@ const ScrollingScale = () => {
     }
   }, [keyPress]);
 
+  useEffect(() => {
+    const date = new Date(displayTime);
+  }, [displayTime]);
+
   if (Object.keys(intersectionTimes).length === 0) {
     return <div></div>;
   }
 
   return (
-    <div style={{ width: '80vw', padding: '0px 35px', color: '#f1f1f1' }}>
+    <div
+      style={{
+        width: '80vw',
+        padding: '0px 35px',
+        color: '#f1f1f1',
+        backgroundColor: '#222222',
+      }}
+    >
       <Slider
         defaultValue={0}
         min={lowerLim}
@@ -203,9 +222,6 @@ const ScrollingScale = () => {
         value={new Date(displayTime).getTime()}
         valueLabelDisplay={'on'}
         valueLabelFormat={getUTCString}
-        onChange={(e: Event, value: number | number[]) => {
-          if (typeof value === 'number') dispatch(updateDisplayTime(value));
-        }}
         onMouseDown={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -213,19 +229,21 @@ const ScrollingScale = () => {
         color={'info'}
         sx={{
           '& .MuiSlider-rail': {
-            //  color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            height: '.15em',
           },
           '& .MuiSlider-thumb': {
-            //color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            width: '.2em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-mark': {
-            //backgroundColor: '#a1a1a1', // Change mark color
-            //height: 4,
-            //width: 3,
-            //borderRadius: '50%',
+            color: '#f1f1f1',
+            height: '.3em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#000000', // Change label color
+            color: '#f0f0f0', // Change label color
           },
         }}
       />

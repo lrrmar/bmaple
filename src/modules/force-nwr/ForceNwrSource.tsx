@@ -10,7 +10,6 @@ import {
   selectDisplayTimesIntersection,
   selectVerticalLevel,
 } from '../../mapping/mapSlice';
-//import { updateVerticalLevels  } from '../../mapping/mapSlice';
 
 import {
   selectApiUrl,
@@ -165,7 +164,11 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           const levels = [...new Set(hashes.map((hash) => hash.level))];
           if (timeStrings && levels) {
             const times = timeStrings
-              .map((timeString) => new Date(timeString).getTime())
+              .map(
+                (timeString) =>
+                  new Date(timeString).getTime() -
+                  new Date().getTimezoneOffset() * 60 * 1000,
+              )
               .sort();
             if (times && levels) {
               dispatch(
@@ -321,7 +324,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           const thesePreloadIds = thesePreloadHashes.map(
             (hash: Hash) => hash.id,
           );
-          console.log(limiter);
           updatedTimeHashes[id] = thesePreloadIds.slice(0, limiter); // limited
         }
       }

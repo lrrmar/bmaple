@@ -14,6 +14,18 @@ export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
   return !!x && typeof x.ol_uid === 'string' && x.geometry === 'string';
 };
 
+const verticalLevelOrder = [
+  'max',
+  '2m',
+  'p925',
+  'p850',
+  'p700',
+  'p500',
+  'p300',
+  'p200',
+  'total',
+];
+
 interface InitialState {
   center: number[] | null;
   zoom: number | null;
@@ -204,8 +216,11 @@ export const selectOutlineContours = (state: RootState) =>
   state.map.outlineContours;
 export const selectVerticalLevel = (state: RootState) =>
   state.map.verticalLevel;
-export const selectVerticalLevels = (state: RootState) =>
-  state.map.verticalLevels;
+export const selectVerticalLevels = (state: RootState) => {
+  return verticalLevelOrder.filter((level) =>
+    state.map.verticalLevels.includes(level),
+  );
+};
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
 export const selectDisplayTimesIntersection = (state: RootState) => {
