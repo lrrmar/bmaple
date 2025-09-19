@@ -158,6 +158,7 @@ const ScrollingScale = () => {
       });
       setMarks(newMarks);
       setIntersectionTimes(times);
+      if (!displayTime) dispatch(updateDisplayTime(times[0]));
     }
   }, [displayTimesIntersection]);
 
@@ -194,10 +195,6 @@ const ScrollingScale = () => {
       }
     }
   }, [keyPress]);
-
-  useEffect(() => {
-    const date = new Date(displayTime);
-  }, [displayTime]);
 
   if (Object.keys(intersectionTimes).length === 0) {
     return <div></div>;
