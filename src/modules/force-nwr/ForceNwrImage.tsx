@@ -13,7 +13,7 @@ import {
 } from '../../hooks';
 
 import { ingest, Ingest, selectCache } from '../../mapping/cacheSlice';
-import { selectApiUrl, selectOpacity, increaseResourcesLoadingCount, decreaseResourcesLoadingCount } from './forceNwrSlice';
+import { selectApiUrl, selectOpacity } from './forceNwrSlice';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
@@ -52,10 +52,8 @@ const ForceNwrImage = ({ id, sourceIdentifier }: Props) => {
       };
       dispatch(ingest(toCache));
       hasFetched.current = true;
-      dispatch(decreaseResourcesLoadingCount())
     };
     if (!isFetching.current) {
-      dispatch(increaseResourcesLoadingCount());
       imgRef.current.src = apiUrl + '/resourceById/?id=' + id;
     }
   }, []);

@@ -42,11 +42,13 @@ const MultiUnitScrollBar = <T, U>({
     });
     if (newMarks.length > 0)
       setMarks(newMarks);
-  }, [values, value]);
+  }, [values]);
 
   useEffect(() => {
-    if (!value) dispatch(updateValue(values[0]));
-  }, [value])
+    if (value != null) {
+      if (!values.includes(value)) dispatch(updateValue(values[0]));
+    }
+  }, [values])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

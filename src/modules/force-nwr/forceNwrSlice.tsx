@@ -38,7 +38,6 @@ interface InitialState {
   selectedResources: {
     [key: number]: string | null;
   };
-  resourcesLoadingCount: number;
 }
 
 let GEOJSON_API_URL: string | undefined | null = null;
@@ -46,7 +45,7 @@ GEOJSON_API_URL = process.env.GEOJSON_API_URL;
 const apiUrl = GEOJSON_API_URL
   ? GEOJSON_API_URL
   : 'https://force.ncas.ac.uk/hash-table';
-//const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8989';
+//const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://localhost:8989';
 
 const initialState: InitialState = {
   selectedId: null,
@@ -64,7 +63,6 @@ const initialState: InitialState = {
   readableNames: null,
   setMapExtent: false,
   selectedResources: {},
-  resourcesLoadingCount: 0,
 };
 
 export const forceNwrSlice = createSlice({
@@ -133,12 +131,6 @@ export const forceNwrSlice = createSlice({
     ) => {
       state.continuousMetaDataLocks[locks.payload.id] = locks.payload.locks;
     },
-    increaseResourcesLoadingCount: (state) => {
-      state.resourcesLoadingCount += 1;
-    },
-    decreaseResourcesLoadingCount: (state) => {
-      state.resourcesLoadingCount -= 1;
-    },
   },
 });
 
@@ -157,8 +149,6 @@ export const {
   updateReadableNames,
   updateDiscreteMetaDataSelections,
   updateContinuousMetaDataLocks,
-  increaseResourcesLoadingCount,
-  decreaseResourcesLoadingCount
 } = forceNwrSlice.actions;
 
 export const selectSelectedId = (state: RootState) => state.forceNwr.selectedId;
@@ -182,6 +172,4 @@ export const selectContinuousMetaDataLocks = (state: RootState) =>
   state.forceNwr.continuousMetaDataLocks;
 export const selectSetMapExtent = (state: RootState) =>
   state.forceNwr.setMapExtent;
-export const selectLoadingResourcesCount = (state: RootState) =>
-  state.forceNwr.loadingResourcesCount;
 export default forceNwrSlice.reducer;

@@ -365,12 +365,11 @@ const ImageViewerWithMenu = ({
   }, [selection, displayTime, verticalLevel, currentHashes]);
    */
   useEffect(() => {
-    if (resourceId) {
-      setResourceLoaded(!!cache[resourceId]);
-    } else {
-      setResourceLoaded(false);
+    setResourceLoaded(false);
+    if (profileId) {
+      setResourceLoaded(!!cache[profileId]);
     }
-  }, [resourceId, cache]);
+  }, [profileId, cache]);
 
   useEffect(() => {
     const profileId = profileIds[id.toString()];
@@ -431,7 +430,9 @@ const ImageViewerWithMenu = ({
           {menus}
         </div>
         <CanvasImgViewPortPreloaded
-          id={profileId && !hidden ? 'img' + profileId : null}
+          profileId={
+            profileId && !hidden && resourceLoaded ? 'img' + profileId : null
+          }
           configChange={configChange}
         />
       </div>
