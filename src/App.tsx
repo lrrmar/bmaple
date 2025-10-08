@@ -21,7 +21,6 @@ import WaypointsMenu from './modules/waypoints/WaypointsMenu';
 import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
 import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
-import timeseriesReducer from './modules/timeseries/timeseriesSlice';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
 import Info from './modules/info/Info';
@@ -37,7 +36,6 @@ export const store = configureStore({
     cache: cacheReducer,
     geojsonField: geojsonFieldReducer,
     waypoint: waypointReducer,
-    timeseries: timeseriesReducer,
     trajectories: trajectoriesReducer,
   },
   middleware: (getDefaultMiddleware) =>
