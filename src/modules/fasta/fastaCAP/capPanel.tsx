@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import {
-  CacheElement,
-  selectCache,
-} from '../../../mapping/cacheSlice';
+import { CacheElement, selectCache } from '../../../mapping/cacheSlice';
 import './capPanel.css';
 import PopUp from '../../../features/PopUp';
 import { selectCountry, selectOluid, selectSeverity } from './capSlice';
@@ -12,7 +9,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { Feature } from 'ol';
 import { Geometry, Polygon, SimpleGeometry } from 'ol/geom';
 import { getUid } from 'ol/util';
-import BaseLayer from "ol/layer/Base";
+import BaseLayer from 'ol/layer/Base';
 import OpenLayersMap from '../../../mapping/OpenLayersMap';
 import { Coordinate } from 'ol/coordinate';
 import IconReference from '../../../features/FoldOutMenu/icons-reference';
@@ -83,7 +80,6 @@ const CapPanel = ({ id }: { id: string }) => {
     }
   };
 
-   
   // get updated cap list every time the cache is changed
   useEffect(() => {
     const filteredIds = Object.keys(allCache).filter((id) => {
@@ -110,49 +106,61 @@ const CapPanel = ({ id }: { id: string }) => {
     setCapList(filteredIds);
   }, [allCache, currentCountry, currentSeverity, currentOluid]);
 
-    return (
-        <>
-            {!openPopup ? (
-                <div className="scrollable" id={id}>
-                    <label className="h2" htmlFor="capList">CAP List: </label>
-                    <div id="capList">
-                        {capList.map((capId, i) => (
-                            <button
-                                className="button-cap"
-                                onClick={() => {
-                                    setOpenPopUp(true);
-                                    setCacheObj(allCache[capId]);
-                                }}
-                                key={i}
-                                value={capId}
-                            >
-                                <h1><IconReference name="moderate"/></h1>
-                                 <h2>{getEventByID(capId)}</h2> 
-                                <h3>{getCountryByID(capId)}</h3>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            ) : null}
-            <div className="div-info">
-                <PopUp showPopUp={openPopup} closePopUp={() => setOpenPopUp(false)}>
-                    
-                        <p>
-                            <i>Event</i> : {String(cacheObj?.event)} <br />
-                            <i>Severity</i>: {String(cacheObj?.severity)}<br />
-                            <i>Country</i>: {String(cacheObj?.country)}<br />
-                            <i>Start Date/Time</i>: {String(cacheObj?.start)}<br />
-                            <i>End Date/Time</i>: {String(cacheObj?.end)}<br />
-                            <a className='a-cap' href={getURL()}><i>Link to CAP</i></a><br />
-                        </p>
-                    
-                    <button onClick={() => centreScreenOnPolygon(String(cacheObj?.ol_uid))}>
-                        Find CAP!
-                    </button>
-                </PopUp>
-            </div>
-        </>
-    );
+  return (
+    <>
+      {!openPopup ? (
+        <div className="scrollable" id={id}>
+          <label className="h2" htmlFor="capList">
+            CAP List:{' '}
+          </label>
+          <div id="capList">
+            {capList.map((capId, i) => (
+              <button
+                className="button-cap"
+                onClick={() => {
+                  setOpenPopUp(true);
+                  setCacheObj(allCache[capId]);
+                }}
+                key={i}
+                value={capId}
+              >
+                <h1>
+                  <IconReference name="moderate" />
+                </h1>
+                <h2>{getEventByID(capId)}</h2>
+                <h3>{getCountryByID(capId)}</h3>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      <div className="div-info">
+        <PopUp showPopUp={openPopup} closePopUp={() => setOpenPopUp(false)}>
+          <p>
+            <i>Event</i> : {String(cacheObj?.event)} <br />
+            <i>Severity</i>: {String(cacheObj?.severity)}
+            <br />
+            <i>Country</i>: {String(cacheObj?.country)}
+            <br />
+            <i>Start Date/Time</i>: {String(cacheObj?.start)}
+            <br />
+            <i>End Date/Time</i>: {String(cacheObj?.end)}
+            <br />
+            <a className="a-cap" href={getURL()}>
+              <i>Link to CAP</i>
+            </a>
+            <br />
+          </p>
+
+          <button
+            onClick={() => centreScreenOnPolygon(String(cacheObj?.ol_uid))}
+          >
+            Find CAP!
+          </button>
+        </PopUp>
+      </div>
+    </>
+  );
 };
 
 export default CapPanel;
