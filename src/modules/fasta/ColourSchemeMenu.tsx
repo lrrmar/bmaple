@@ -36,9 +36,16 @@ import {
   selectColourPaletteId,
   selectOpacity,
 } from '../modules/fasta/geojsonFieldSlice';
+ 
 */
 
-const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
+interface Props {
+    name: string,
+    id: string,
+}
+
+
+const ColourSchemeMenu = (({ name, id }: Props) => {
   const dispatch = useDispatch();
   //const baseMaps: string[] = useSelector(selectBaseMaps);
   //const baseMapId: string = useSelector(selectBaseMapId);
@@ -49,14 +56,23 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    color: 'black',
+    paddingLeft: '10px',
   };
   const optionStyle: React.CSSProperties = {
     color: 'black',
     display: 'flex',
     flexDirection: 'row',
     fontSize: '10px',
-    justifyContent: 'right',
+    justifyContent: 'space-between',
   };
+
+  const timescrollBarStyle: React.CSSProperties = { 
+    color: 'black',
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+  }
 
   const countryList = useSelector(selectCountryList);
 
@@ -140,6 +156,7 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
           step="0.25"
           defaultValue="0.5"
           list="optionList"
+          style={timescrollBarStyle}
           onChange={(element) =>
             dispatch(updateDesiredTime(parseFloat(element.target.value)))
           }
@@ -188,5 +205,5 @@ const ColourSchemeMenu = (/*{ id }: { id: string }*/) => {
       </div>
     </div>
   );
-};
+});
 export default ColourSchemeMenu;

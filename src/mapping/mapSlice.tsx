@@ -75,12 +75,16 @@ export const mapSlice = createSlice({
     updateBaseMapId: (state, baseMapId: PayloadAction<string>) => {
       state.baseMapId = baseMapId.payload;
     },
+    updateMapZoom: (state, zoom: PayloadAction<number>) => {
+      state.zoom = zoom.payload;
+    }
   },
 });
 
 export const {
   //updateDataLevels,
   //updateColourPalette,
+  updateMapZoom,
   updateUnits,
   updateDisplayTime,
   updateVerticalLevel,

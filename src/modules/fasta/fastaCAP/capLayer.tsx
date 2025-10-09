@@ -119,8 +119,8 @@ const CapLayer = ({
           source: source,
           style: styles,
           visible: false,
-          zIndex: 100,
         });
+        layer.setZIndex(2);
         feature.set('layer_id', getUid(layer));
 
         const map = openLayersMap.map;

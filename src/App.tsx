@@ -34,6 +34,8 @@ import CapProfile from './modules/fasta/fastaCAP/capProfile';
 import CapPanel from './modules/fasta/fastaCAP/capPanel';
 import CollapseColourBar from './modules/fasta/fastaCAP/collapsibleMenu';
 
+import Zoom from './modules/fasta/mapZoomButtons';
+
 export const store = configureStore({
   reducer: {
     map: mapReducer,
@@ -72,35 +74,37 @@ const App = () => {
   return (
     <div className="App">
       <Map>
+        
         <Profiles>
+          <CapProfile />
           <FastaProfile />
           <WaypointProfile />
-          <CapProfile />
+          
         </Profiles>
-
         <Sources>
+          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-
-          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
+          
         </Sources>
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox style={floatingBoxStyle}>
-          <ColourSchemeMenu />
-          {/* <ProductSelector /> */}
-        </FloatingBox>
-        <FoldOutMenu align="left">
+        <FoldOutMenu align='right'>
+          <ColourSchemeMenu id="Options" name="settings" />
+        </FoldOutMenu>
+        <FoldOutMenu align='left' >
           {/* <CapKeyPanel id="Caps Key"/> */}
-          <CapPanel id="Caps" />
+          <CapPanel id="alerts" />
+          <CollapseColourBar id="CRR-Key" name="CRR" />
+          <CollapseColourBar id="CAP-Key" name="CAP" />
         </FoldOutMenu>
       </Map>
-
+      
       <FastaMainMenu>
-        <CollapseColourBar id="hello" />
+        <Zoom />
         <Slider />
       </FastaMainMenu>
     </div>
