@@ -77,7 +77,7 @@ export const mapSlice = createSlice({
     },
     updateMapZoom: (state, zoom: PayloadAction<number>) => {
       state.zoom = zoom.payload;
-    }
+    },
   },
 });
 

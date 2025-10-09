@@ -40,12 +40,11 @@ import {
 */
 
 interface Props {
-    name: string,
-    id: string,
+  name: string;
+  id: string;
 }
 
-
-const ColourSchemeMenu = (({ name, id }: Props) => {
+const ColourSchemeMenu = ({ name, id }: Props) => {
   const dispatch = useDispatch();
   //const baseMaps: string[] = useSelector(selectBaseMaps);
   //const baseMapId: string = useSelector(selectBaseMapId);
@@ -67,12 +66,12 @@ const ColourSchemeMenu = (({ name, id }: Props) => {
     justifyContent: 'space-between',
   };
 
-  const timescrollBarStyle: React.CSSProperties = { 
+  const timescrollBarStyle: React.CSSProperties = {
     color: 'black',
     display: 'flex',
     flexDirection: 'row',
     width: '100%',
-  }
+  };
 
   const countryList = useSelector(selectCountryList);
 
@@ -205,5 +204,5 @@ const ColourSchemeMenu = (({ name, id }: Props) => {
       </div>
     </div>
   );
-});
+};
 export default ColourSchemeMenu;

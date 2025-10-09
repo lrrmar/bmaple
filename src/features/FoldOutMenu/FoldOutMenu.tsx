@@ -59,7 +59,9 @@ export default function FoldOutMenu({
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
       />
-        <FoldOut align={align} currentFoldOutId={currentFoldOutId}>{currentFoldOut}</FoldOut>
+      <FoldOut align={align} currentFoldOutId={currentFoldOutId}>
+        {currentFoldOut}
+      </FoldOut>
     </div>
   );
 }
@@ -73,11 +75,11 @@ function FoldOut({
   currentFoldOutId: string | null;
   align: string;
 }) {
-  console.log(align, "ALIGN")
+  console.log(align, 'ALIGN');
   let className = 'FoldOut';
   if (currentFoldOutId === null) {
     className += ' closed';
-  } else if ( align === 'right') {
+  } else if (align === 'right') {
     className += ' right';
   }
   return <div className={className}>{children}</div>;
