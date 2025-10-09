@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 
 import mapReducer from './mapping/mapSlice';
-import cacheReducer from './mapping/cacheSlice';
+import cacheReducer, { update } from './mapping/cacheSlice';
+import capReducer from './modules/fasta/fastaCAP/capSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
@@ -13,19 +14,27 @@ import FastaProfile from './modules/fasta/FastaGraphic';
 import FastaSource from './modules/fasta/FastaSource';
 import FastaMainMenu from './modules/fasta/FastaMainMenu';
 import FastaSourceLayer from './modules/fasta/FastaSourceLayer';
+import CapLayer from './modules/fasta/fastaCAP/capLayer';
 import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import DarkBaseMap from './mapping/DarkBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import FloatingBox from './features/FloatingBox';
 import FoldOutMenu from './features/FoldOutMenu/FoldOutMenu';
+import TimeScrollBar from './features/TimeScrollBar';
 import ColourSchemeMenu from './modules/fasta/ColourSchemeMenu';
 import ProductSelector from './modules/fasta/ProductSelector';
+import CapWarningSource from './modules/fasta/fastaCAP/capWarningSource';
 
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 import LocationsList from './modules/fasta/LocationsList';
+import CapProfile from './modules/fasta/fastaCAP/capProfile';
+import CapPanel from './modules/fasta/fastaCAP/capPanel';
+import CollapseColourBar from './modules/fasta/fastaCAP/collapsibleMenu';
+
+import Zoom from './modules/fasta/mapZoomButtons';
 
 export const store = configureStore({
   reducer: {
@@ -33,6 +42,7 @@ export const store = configureStore({
     cache: cacheReducer,
     fasta: fastaReducer,
     waypoint: waypointReducer,
+    cap: capReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -65,32 +75,42 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
+          <CapProfile />
           <FastaProfile />
           <WaypointProfile />
         </Profiles>
         <Sources>
+          <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
         </Sources>
+
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FloatingBox style={floatingBoxStyle}>
-          <ProductSelector></ProductSelector>
-        </FloatingBox>
+
+        <FoldOutMenu align="right">
+          <ColourSchemeMenu id="Options" name="settings" />
+        </FoldOutMenu>
+
+        <FoldOutMenu align="left">
+          {/* <CapKeyPanel id="Caps Key"/> */}
+          <CapPanel id="alerts" />
+          <CollapseColourBar id="CRR-Key" name="CRR" />
+          <CollapseColourBar id="CAP-Key" name="CAP" />
+        </FoldOutMenu>
       </Map>
+
+      <Zoom />
+
       <FastaMainMenu>
         <Slider />
       </FastaMainMenu>
     </div>
   );
 };
-
-//<FoldOutMenu align={'left'}>
-//<ColourSchemeMenu id={'style'} />
-//</FoldOutMenu>
 
 export default App;
 export type AppStore = typeof store;

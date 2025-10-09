@@ -1,0 +1,65 @@
+.box {
+    float: left;
+    height: 1100000px;
+    width: 50px;
+    margin-bottom: 15px;
+    border: 1px solid black;
+    clear: both;
+}
+
+
+.green {}
+
+
+.scrollable {
+    padding: 0 5%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.button-cap {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition-duration: 4ms;
+    text-wrap: balance;
+}
+
+.button-cap {
+    flex-direction: column;
+    border-radius: 4px;
+    width: 100%;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    padding-left: 5%;
+    padding-right: 5%;
+    transition-duration: 4ms;
+    text-wrap: balance;
+}
+
+.button-cap:hover {
+    box-shadow: 0 0 12px rgba(33, 33, 33, 0.5);
+    background-color: rgb(207, 198, 198);
+    /* color: beige; */
+}
+
+.div-info {
+    width: 95%;
+    background-color: rgb(207, 198, 198);
+    color: black;
+    text-wrap: wrap;
+}
+
+.a-cap {
+    color: brown;
+}
+
+.h2 {
+    color: black;
+}

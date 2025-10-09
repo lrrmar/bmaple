@@ -59,7 +59,9 @@ export default function FoldOutMenu({
         currentFoldOutId={currentFoldOutId}
         setCurrentFoldOutId={setCurrentFoldOutId}
       />
-      <FoldOut currentFoldOutId={currentFoldOutId}>{currentFoldOut}</FoldOut>
+      <FoldOut align={align} currentFoldOutId={currentFoldOutId}>
+        {currentFoldOut}
+      </FoldOut>
     </div>
   );
 }
@@ -67,13 +69,18 @@ export default function FoldOutMenu({
 function FoldOut({
   children,
   currentFoldOutId,
+  align,
 }: {
   children: React.ReactNode;
   currentFoldOutId: string | null;
+  align: string;
 }) {
+  console.log(align, 'ALIGN');
   let className = 'FoldOut';
   if (currentFoldOutId === null) {
     className += ' closed';
+  } else if (align === 'right') {
+    className += ' right';
   }
   return <div className={className}>{children}</div>;
 }

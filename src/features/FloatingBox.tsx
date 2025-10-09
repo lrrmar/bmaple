@@ -32,7 +32,6 @@ const FloatingBox = (props: Props) => {
     ...props.style,
   };
 
-  console.log(style);
   return (
     <div style={style}>
       {!!minimise && (
