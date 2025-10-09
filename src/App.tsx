@@ -74,37 +74,38 @@ const App = () => {
   return (
     <div className="App">
       <Map>
-        
         <Profiles>
           <CapProfile />
           <FastaProfile />
           <WaypointProfile />
-          
         </Profiles>
         <Sources>
           <CapWarningSource cache={{}} sourceIdentifier={'cap'} />
           <FastaSource cache={{}} sourceIdentifier={'fasta'} />
           <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
-          
         </Sources>
+
         <BaseMaps>
           <DarkBaseMap id={'dark'} />
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
-        <FoldOutMenu align='right'>
+
+        <FoldOutMenu align="right">
           <ColourSchemeMenu id="Options" name="settings" />
         </FoldOutMenu>
-        <FoldOutMenu align='left' >
+
+        <FoldOutMenu align="left">
           {/* <CapKeyPanel id="Caps Key"/> */}
           <CapPanel id="alerts" />
           <CollapseColourBar id="CRR-Key" name="CRR" />
           <CollapseColourBar id="CAP-Key" name="CAP" />
         </FoldOutMenu>
       </Map>
-      
+
+      <Zoom />
+
       <FastaMainMenu>
-        <Zoom />
         <Slider />
       </FastaMainMenu>
     </div>
