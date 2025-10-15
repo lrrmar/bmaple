@@ -1,6 +1,6 @@
 {
-  "short_name": "FORCE Forecast",
-  "name": "FORCE Forecast",
+  "short_name": "FORCE Flight Planner",
+  "name": "FORCE Flight Planner",
   "icons": [
     {
       "src": "cropped-ncas-192x192.png",
