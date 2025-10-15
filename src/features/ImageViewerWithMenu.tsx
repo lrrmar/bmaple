@@ -205,7 +205,7 @@ const ImageViewerWithMenu = ({
           const select = (
             <div key={thisDiscreteHeader}>
               <InputLabel
-                style={{ color: '#f1f1f1' }}
+                style={{ color: '#0f0f0f' }}
                 id={`${thisDiscreteHeader} label`}
               >
                 {readableNames && readableNames[thisDiscreteHeader]

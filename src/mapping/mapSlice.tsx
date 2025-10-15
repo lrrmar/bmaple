@@ -17,6 +17,7 @@ export const isFeatureAtClick = (x: any): x is FeatureAtClick => {
 const verticalLevelOrder = [
   'max',
   '2m',
+  '10m',
   'p925',
   'p850',
   'p700',
@@ -123,6 +124,7 @@ export const mapSlice = createSlice({
     },
     updateVerticalLevels: (state, verticalLevels: PayloadAction<string[]>) => {
       state.verticalLevels = verticalLevels.payload;
+      if (state.verticalLevel == "") state.verticalLevel = verticalLevels.payload[0];
     },
     updateVerticalLevelUnits: (
       state,

@@ -41,7 +41,6 @@ const MultiUnitScrollBar = <T, U>({
       return { value: i, label: `${val}` }; //`${val}${units}` <- swap back to this eventually
     });
     if (newMarks.length > 0)
-      //dispatch(updateValue(newMarks[0].value));
       setMarks(newMarks);
   }, [values, value]);
 

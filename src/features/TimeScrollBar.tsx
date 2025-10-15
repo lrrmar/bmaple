@@ -41,11 +41,6 @@ const ScrollingScale = () => {
       minDateTime.setMinutes(0);
       minDateTime.setSeconds(0);
       setLowerLim(minDateTime.getTime());
-      console.log(
-        Math.min(...displayTimesIntersection) -
-          new Date(Math.min(...displayTimesIntersection)).getTime(),
-      );
-
       // Get max time and ceil it to nearest hour
       const maxDateTime = new Date(Math.max(...displayTimesIntersection));
       if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
@@ -119,7 +114,7 @@ const ScrollingScale = () => {
         return num < 10 ? `0${num}` : `${num}`;
       };
       const label =
-        hour === 0
+        hour === 0 || currentTimeInt === minDateTime.getTime()
           ? `${zf(month)}-${zf(day)}\n${zf(hour)}:${zf(minute)}`
           : `${zf(hour)}:${zf(minute)}`;
       tempMarks.push({
@@ -134,7 +129,7 @@ const ScrollingScale = () => {
   useEffect(() => {
     const times = displayTimesIntersection;
     if (times) {
-      setLowerLim(Math.min(...times));
+      /*setLowerLim(Math.min(...times));
       setUpperLim(Math.max(...times));
       const newMarks = times.map((timeInt) => {
         const dt = new Date(timeInt);
@@ -156,15 +151,16 @@ const ScrollingScale = () => {
           label: label,
         };
       });
-      setMarks(newMarks);
+      setMarks(newMarks);*/
       setIntersectionTimes(times);
+      console.log(!displayTime);
       if (!displayTime) dispatch(updateDisplayTime(times[0]));
     }
   }, [displayTimesIntersection]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const throttle = 90; //ms
+      const throttle = 200; //ms
       if (Date.now() - keyPress > throttle) {
         setLastKey(event.key);
         setKeyPress(Date.now());

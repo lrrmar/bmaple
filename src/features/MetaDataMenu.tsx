@@ -118,8 +118,8 @@ const MetaDataMenu = ({ apiUrl }: { apiUrl: string }) => {
         });
         const select = (
           <div>
-            <InputLabel id={`${thisHeader} label`} style={{ color: 'white' }}>
-              {thisHeader}
+            <InputLabel id={`${thisHeader} label`} style={{ color: '#000000' }}>
+              {thisHeader + '123'}
             </InputLabel>
             <Select
               labelId={`${thisHeader} label`}
@@ -127,7 +127,7 @@ const MetaDataMenu = ({ apiUrl }: { apiUrl: string }) => {
               renderValue={(val: string) => {
                 return val;
               }}
-              style={{ color: 'white' }}
+              style={{ color: '#000000' }}
               onChange={(e) => {
                 if (typeof e.target.value === 'number') {
                   const newSelection: DiscreteMetaData = {
