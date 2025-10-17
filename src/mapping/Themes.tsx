@@ -37,7 +37,6 @@ const Themes = ({ children }: Props) => {
   }, []);
 
   useEffect(() => {
-    console.log(themeId);
     React.Children.forEach(children, (el) => {
       if (React.isValidElement<{ id: string }>(el)) {
         if (el.props.id === themeId) setSelectedTheme(el);
