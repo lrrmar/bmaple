@@ -42,57 +42,6 @@ const ForceNwrLayer = ({ id, sourceIdentifier }: Props) => {
   const [layerData, setLayerData] = useState<Blob | null>(null);
   const apiUrl = useSelector(selectApiUrl);
 
-  const fetchResourceInfo = async () => {
-    const response = await fetch(`${apiUrl}/resourceInfoById/?id=${id}`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-    const json = await response.json();
-    setImageExtent(json.extent);
-  };
-  useEffect(() => {
-    // On initial render request information necessary for rendering
-    fetchResourceInfo();
-  }, []);
-
-  useEffect(() => {
-    if (!imageExtent) {
-      return;
-    }
-    if (!map) {
-      return;
-    }
-
-    /*if (hasFetched.current) {
-      dispatch(updateProfileId(id));
-      return;
-    }*/
-    const tempImageExtent = [-10.7, 47.5, 2.1, 60.85];
-    const imageExtentInLambert = transformExtent(
-      tempImageExtent,
-      'EPSG:4326',
-      'force_nwr_projection',
-    );
-    const imageExtentInMap = transformExtent(
-      imageExtentInLambert,
-      'force_nwr_projection',
-      'EPSG:3857',
-    );
-    const source = new ImageStatic({
-      url: `${apiUrl}/resourceById/?id=${id}`,
-      imageExtent: imageExtentInMap,
-      projection: 'EPSG:3857',
-    });
-
-    // Generate OpenLayers VectorLayer from the VectorSource
-    const layer = new ImageLayer({
-      source: source,
-      zIndex: 20,
-      opacity: 0.0,
-    });
-
     // Add the VectorLayer to the map
     const add = map.addLayer(layer);
 

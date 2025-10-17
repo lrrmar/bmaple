@@ -379,6 +379,20 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [profileIds]);
 
   useEffect(() => {
+    const filteredIds = Object.keys(cache).filter((id) => {
+      const element = cache[id];
+      const source = element.source;
+      return source === sourceIdentifier;
+    });
+    const components = filteredIds.map((id) => (
+      <FwsTileLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
+    ));
+   
+    // setLayers with these new components
+    setLayers(components);
+  }, [cache]);
+
+  useEffect(() => {
     const cache 
     const components = loadedResources.map((id) => (
       <ForceNwrImage key={id} id={id} sourceIdentifier={sourceIdentifier} />
