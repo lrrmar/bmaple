@@ -135,7 +135,7 @@ const Map = ({ children }: Props) => {
   return (
     <div
       style={{
-        backgroundImage: "url('./blencathra.jpg')",
+        backgroundImage: `url('${process.env.PUBLIC_URL}/blencathra.jpg')`,
         backgroundSize: 'cover',
         width: '100vw',
         height: '100vh',
