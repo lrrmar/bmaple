@@ -13,11 +13,7 @@ import {
   FeatureAtClick,
 } from '../../mapping/mapSlice';
 
-import { selectVerticalLevel } from '../force-geojson-field/geojsonFieldSlice';
-import { fromLonLat } from 'ol/proj';
-import Feature from 'ol/Feature';
-import Geometry from 'ol/geom/Geometry';
-import OpenLayersMap from '../../mapping/OpenLayersMap';
+import { selectVerticalLevel } from '../../mapping/mapSlice';
 import WaypointSourceLayer from './WaypointSourceLayer';
 
 import { selectMode } from './waypointSlice';

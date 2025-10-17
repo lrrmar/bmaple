@@ -31,7 +31,7 @@ import {
   selectHighlightedWaypoints,
 } from './waypointSlice';
 
-import { selectVerticalLevelUnits } from '../force-geojson-field/geojsonFieldSlice';
+import { selectVerticalLevelUnits } from '../../mapping/mapSlice';
 
 export const CustomLabelledInput = ({
   id,

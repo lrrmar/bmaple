@@ -7,13 +7,13 @@ import {
 import {
   selectDisplayTime,
   selectDisplayTimes,
+  selectDisplayTimesIntersection,
   updateDisplayTime,
-  updateDisplayTimes,
 } from '../mapping/mapSlice';
 
 const getUTCString = (timeInt: number) => {
   const dt = new Date(timeInt);
-  return dt.toUTCString();
+  return dt.toUTCString().slice(0, -3) + 'UTC';
 };
 interface Mark {
   value: number;
@@ -22,65 +22,38 @@ interface Mark {
 const ScrollingScale = () => {
   const dispatch = useDispatch();
   const displayTime = useSelector(selectDisplayTime);
-  const displayTimes = useSelector(selectDisplayTimes);
+  const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
+  const [intersectionTimes, setIntersectionTimes] = useState<number[]>([]);
   const [upperLim, setUpperLim] = useState<number>(0);
   const [lowerLim, setLowerLim] = useState<number>(1);
-  const [dataIncrement, setDataIncrement] = useState<number>(15 * 60 * 1000);
+  const [dataIncrement, setDataIncrement] = useState<number>(60 * 60 * 1000);
   const [tickIncrement, setTickIncrement] = useState<number>(0);
   const [marks, setMarks] = useState<Mark[]>([]);
   // TODO: update based on size allocated to slider...
   const [optimalTickCount, setOptimalTickCount] = useState<number>(10);
-
-  const sources = Object.keys(displayTimes);
-  let allTimeInts: number[] = [];
-  Object.values(displayTimes).forEach((array) => {
-    allTimeInts = [...allTimeInts, ...array];
-  });
+  const [lastKey, setLastKey] = useState<string | null>(null);
+  const [keyPress, setKeyPress] = useState<number>(0);
 
   useEffect(() => {
-    // On render, set automatic display times
-    const now = new Date(Date.now());
-    const minDate = new Date();
-    minDate.setFullYear(now.getFullYear());
-    minDate.setMonth(now.getMonth());
-    minDate.setDate(now.getDate());
-    minDate.setUTCHours(6);
-    minDate.setMinutes(0);
-    minDate.setSeconds(0);
-    minDate.setMilliseconds(0);
-    const maxDate = new Date(minDate);
-    maxDate.setUTCHours(18);
-    console.log(minDate, maxDate);
-    const dateArray = [minDate];
-    while (dateArray[dateArray.length - 1].getTime() < maxDate.getTime()) {
-      const newDate = new Date(
-        dateArray[dateArray.length - 1].getTime() + 15 * 60000,
-      );
-      dateArray.push(newDate);
+    if (displayTimesIntersection) {
+      // Get min time and floor it to nearest hour
+      const minDateTime = new Date(Math.min(...displayTimesIntersection));
+      minDateTime.setMinutes(0);
+      minDateTime.setSeconds(0);
+      setLowerLim(minDateTime.getTime());
+      // Get max time and ceil it to nearest hour
+      const maxDateTime = new Date(Math.max(...displayTimesIntersection));
+      if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
+        maxDateTime.setHours(maxDateTime.getHours() + 1);
+      }
+      maxDateTime.setMinutes(0);
+      maxDateTime.setSeconds(0);
+      setUpperLim(maxDateTime.getTime());
     }
-    const times = dateArray.map((date) => date.getTime());
-    dispatch(updateDisplayTimes({ source: 'timescroll', times: times }));
-    dispatch(updateDisplayTime(times[0]));
-  }, []);
+  }, [displayTimesIntersection]);
 
   useEffect(() => {
-    // Get min time and floor it to nearest hour
-    const minDateTime = new Date(Math.min(...allTimeInts));
-    minDateTime.setMinutes(0);
-    minDateTime.setSeconds(0);
-    setLowerLim(minDateTime.getTime());
-
-    // Get max time and ceil it to nearest hour
-    const maxDateTime = new Date(Math.max(...allTimeInts));
-    if (maxDateTime.getMinutes() != 0 || maxDateTime.getSeconds() != 0) {
-      maxDateTime.setUTCHours(maxDateTime.getUTCHours() + 1);
-    }
-    maxDateTime.setMinutes(0);
-    maxDateTime.setSeconds(0);
-    setUpperLim(maxDateTime.getTime());
-  }, [displayTimes]);
-
-  useEffect(() => {
+    //if (displayTimes) return;
     // Find increment based on different between lower and upper
     // lims of scroll bar
 
@@ -128,17 +101,20 @@ const ScrollingScale = () => {
     const tempMarks: Mark[] = [];
     let currentTimeInt = minDateTime.getTime();
     while (currentTimeInt <= maxDateTime.getTime()) {
-      const dt = new Date(currentTimeInt);
-      const hour = dt.getUTCHours();
+      const dt = new Date(
+        currentTimeInt + new Date().getTimezoneOffset() * 60 * 1000,
+      );
+      const hour = dt.getHours();
       const minute = dt.getMinutes();
       const day = dt.getDate();
       const month = dt.getMonth() + 1;
+
       const zf = (num: number) => {
         // zero formatter
         return num < 10 ? `0${num}` : `${num}`;
       };
       const label =
-        hour === 0
+        hour === 0 || currentTimeInt === minDateTime.getTime()
           ? `${zf(month)}-${zf(day)}\n${zf(hour)}:${zf(minute)}`
           : `${zf(hour)}:${zf(minute)}`;
       tempMarks.push({
@@ -150,12 +126,85 @@ const ScrollingScale = () => {
     }
   }, [lowerLim, upperLim]);
 
-  if (Object.keys(displayTimes).length === 0) {
+  useEffect(() => {
+    const times = displayTimesIntersection;
+    if (times) {
+      /*setLowerLim(Math.min(...times));
+      setUpperLim(Math.max(...times));
+      const newMarks = times.map((timeInt) => {
+        const dt = new Date(timeInt);
+        const hour = dt.getUTCHours();
+        const minute = dt.getUTCMinutes();
+        const day = dt.getUTCDate();
+        const month = dt.getUTCMonth() + 1;
+
+        const zf = (num: number) => {
+          // zero formatter
+          return num < 10 ? `0${num}` : `${num}`;
+        };
+        const label =
+          hour === 0
+            ? `${zf(month)}-${zf(day)}\n${zf(hour)}:${zf(minute)}`
+            : `${zf(hour)}:${zf(minute)}`;
+        return {
+          value: timeInt,
+          label: label,
+        };
+      });
+      setMarks(newMarks);*/
+      setIntersectionTimes(times);
+      console.log(!displayTime);
+      if (!displayTime) dispatch(updateDisplayTime(times[0]));
+    }
+  }, [displayTimesIntersection]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const throttle = 200; //ms
+      if (Date.now() - keyPress > throttle) {
+        setLastKey(event.key);
+        setKeyPress(Date.now());
+      }
+    };
+
+    // Add global keydown listener
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [keyPress]);
+
+  // Handling key strokes
+  useEffect(() => {
+    if (lastKey == 'ArrowLeft' || lastKey == 'ArrowRight') {
+      let index = intersectionTimes.indexOf(displayTime);
+      if (index !== null) {
+        if (index == -1) index = 0; // HACK
+        const newIndex = lastKey == 'ArrowLeft' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex == intersectionTimes.length) {
+          return;
+        } else {
+          dispatch(updateDisplayTime(intersectionTimes[newIndex]));
+        }
+      }
+    }
+  }, [keyPress]);
+
+  if (Object.keys(intersectionTimes).length === 0) {
     return <div></div>;
   }
 
   return (
-    <div style={{ width: '80vw', padding: '0px 35px', color: '#f1f1f1' }}>
+    <div
+      style={{
+        width: '80vw',
+        padding: '0px 35px',
+        color: '#f1f1f1',
+        backgroundColor: '#222222',
+      }}
+    >
       <Slider
         defaultValue={0}
         min={lowerLim}
@@ -164,30 +213,30 @@ const ScrollingScale = () => {
         track={false}
         marks={marks}
         value={new Date(displayTime).getTime()}
-        valueLabelDisplay={'auto'}
+        valueLabelDisplay={'on'}
         valueLabelFormat={getUTCString}
-        onChange={(e: Event, value: number | number[]) => {
-          if (typeof value === 'number') dispatch(updateDisplayTime(value));
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
         }}
         color={'info'}
         sx={{
           '& .MuiSlider-rail': {
-            //  color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            height: '.15em',
           },
           '& .MuiSlider-thumb': {
-            //color: '#f1f1f1', // Change mark color
+            color: '#f1f1f1',
+            width: '.2em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-mark': {
-            //backgroundColor: '#a1a1a1', // Change mark color
-            //height: 4,
-            //width: 3,
-            //borderRadius: '50%',
+            color: '#f1f1f1',
+            height: '.3em',
+            borderRadius: '10%',
           },
           '& .MuiSlider-markLabel': {
-            color: '#f1f1f1', // Change label color
-          },
-          '& .MuiSlider-text': {
-            color: '#f1f1f1', // Change label color
+            color: '#f0f0f0', // Change label color
           },
         }}
       />

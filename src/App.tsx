@@ -1,6 +1,10 @@
 import React, { useEffect } from 'react';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
-import mapReducer from './mapping/mapSlice';
+import mapReducer,{
+  selectVerticalLevel,
+  selectVerticalLevels,
+  updateVerticalLevel,
+}from './mapping/mapSlice';
 import { Action } from 'redux';
 import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
@@ -10,11 +14,6 @@ import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
-import geojsonFieldReducer, {
-  selectVerticalLevels,
-  selectVerticalLevelUnits,
-  updateVerticalLevel,
-} from './modules/force-geojson-field/geojsonFieldSlice';
 import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointsSource from './modules/waypoints/WaypointSource';
 import WaypointsMenu from './modules/waypoints/WaypointsMenu';
@@ -23,20 +22,23 @@ import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
 import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
 import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
+import fwsTileReducer from './modules/fws-tiles/fwsTileSlice';
+import FwsTileSource from './modules/fws-tiles/FwsTileSource';
 import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
-import ScrollBar from './features/ScrollBar';
+import MultiUnitScrollBar from './features/MultiUnitScrollBar';
+import MetaDataMenu from './features/MetaDataMenu';
 import './App.css';
 
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
-    geojsonField: geojsonFieldReducer,
     waypoint: waypointReducer,
     trajectories: trajectoriesReducer,
+    fwsTile: fwsTileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -60,6 +62,7 @@ const App = () => {
         <Sources>
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
           <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
+          <FwsTileSource sourceIdentifier={'tiles'} />
         </Sources>
         <BaseMaps>
           <LightBaseMap id={'light'} />
@@ -70,9 +73,9 @@ const App = () => {
         <TimeScrollBar />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
-        <ScrollBar
+        <MultiUnitScrollBar
+          selectValue={selectVerticalLevel}
           selectValues={selectVerticalLevels}
-          selectUnits={selectVerticalLevelUnits}
           updateValue={updateVerticalLevel}
           orientation={'vertical'}
         />
@@ -86,6 +89,9 @@ const App = () => {
         </FoldOutItem>
         <FoldOutItem id={'Trajectories'} icon={'share alternate'}>
           <TrajectoriesMenu />
+        </FoldOutItem>
+        <FoldOutItem id={'Data'} icon={'pencil'}>
+          <MetaDataMenu apiUrl={'http://localhost:8989'}/>
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>

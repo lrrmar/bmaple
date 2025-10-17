@@ -18,8 +18,7 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-import { selectDisplayTime } from '../../mapping/mapSlice';
-import { selectVerticalLevel } from '../force-geojson-field/geojsonFieldSlice';
+import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
 import { selectHighlightedWaypoints } from './waypointSlice';
 
 interface Waypoint extends Entry {

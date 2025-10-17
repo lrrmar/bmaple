@@ -24,10 +24,10 @@ import {
   updateBackendDiscreteMetaData,
   updateReadableNames,
   DiscreteMetaData,
-} from './forceNwrSlice';
+} from './fwsTileSlice';
 import { selectCache, request } from '../../mapping/cacheSlice';
 
-import ForceNwrImage from './ForceNwrImage';
+import FwsTileLayer from './FwsTileLayer';
 
 interface ContinuousMetaData {
   valid_time: string[];
@@ -234,7 +234,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     cache,
   ]);
 
-  {/*useEffect(() => {
+  /*useEffect(() => {
     // Preload all along vertical axis
     const updatedLevelHashes: { [key: string]: string[] } = {};
     Object.keys(discreteMetaDataSelections).forEach((id) => {
@@ -357,13 +357,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [profileIds, preloadIds]);*/
 
   useEffect(() => {
-    const components = loadedResources.map((id) => (
-      <ForceNwrImage key={id} id={id} sourceIdentifier={sourceIdentifier} />
-    ));
-    setLayers(components);
-  }, [loadedResources]);
-
-  useEffect(() => {
     if (profileIds) {
       Object.keys(profileIds).forEach((id) => {
         const cacheElement = cache[id];
@@ -389,14 +382,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     ));
    
     // setLayers with these new components
-    setLayers(components);
-  }, [cache]);
-
-  useEffect(() => {
-    const cache 
-    const components = loadedResources.map((id) => (
-      <ForceNwrImage key={id} id={id} sourceIdentifier={sourceIdentifier} />
-    ));
     setLayers(components);
   }, [cache]);
 
