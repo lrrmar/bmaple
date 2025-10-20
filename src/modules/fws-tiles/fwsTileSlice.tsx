@@ -1,7 +1,7 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
 
-export type DiscreteHeader = 'domain' | 'field' | 'start_time';
+export type DiscreteHeader = 'domain' | 'field';// | 'start_time';
 export interface BackendDiscreteMetaData {
   headers: DiscreteHeader[];
   values: { [key in DiscreteHeader]: string[] };
@@ -11,7 +11,7 @@ export interface DiscreteMetaData {
   [key: string]: string | null;
   domain: string | null;
   field: string | null;
-  start_time: string | null;
+  //start_time: string | null;
 }
 
 export interface ContinuousMetaData {

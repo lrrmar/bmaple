@@ -41,7 +41,7 @@ const FwsTileLayer = ({ id, sourceIdentifier }: Props) => {
       return;
     }
     const fetchTileUrl = async (id: string) => {
-      const response = await fetch(`${apiUrl}/resourceById/${id}`, {
+      const response = await fetch(`${apiUrl}/resourceById/?id=${id}`, {
         method: 'GET',
         headers: {
           Accept: 'application/json',
@@ -71,9 +71,9 @@ const FwsTileLayer = ({ id, sourceIdentifier }: Props) => {
           url: tileUrl,
         }),
         visible: true,
-        style: function (feature, resolution) {
+        /*style: function (feature, resolution) {
           return [];
-        },
+        },*/
       });
 
       vtLayer.setZIndex(6);

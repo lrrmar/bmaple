@@ -31,7 +31,7 @@ import FwsTileLayer from './FwsTileLayer';
 
 interface ContinuousMetaData {
   valid_time: string[];
-  start_time: string[];
+  //start_time: string[];
   level: string[];
 }
 
@@ -41,14 +41,14 @@ interface Hash {
   domain: string;
   field: string;
   valid_time: string;
-  start_time: string;
+  //start_time: string;
   level: string;
 }
 interface Query {
   domain: string | null;
   field: string | null;
   valid_time: string | null;
-  start_time: string | null;
+  //start_time: string | null;
   level: string | null;
 }
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
@@ -125,7 +125,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         body: JSON.stringify({
           field: selection.field,
           domain: selection.domain,
-          start_time: selection.start_time,
+          //start_time: selection.start_time,
         }),
       });
       const json = await response.json();
@@ -358,15 +358,17 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
 
   useEffect(() => {
     if (profileIds) {
-      Object.keys(profileIds).forEach((id) => {
-        const cacheElement = cache[id];
-        if (!cacheElement)
-          dispatch(
-            request({
-              id: id,
-              source: sourceIdentifier,
-            }),
-          );
+      Object.values(profileIds).forEach((id) => {
+        if (id) {
+          const cacheElement = cache[id];
+          if (!cacheElement)
+            dispatch(
+              request({
+                id: id,
+                source: sourceIdentifier,
+              }),
+            );
+        };
       });
     }
   }, [profileIds]);

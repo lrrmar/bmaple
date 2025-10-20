@@ -24,12 +24,13 @@ import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerti
 import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
 import fwsTileReducer from './modules/fws-tiles/fwsTileSlice';
 import FwsTileSource from './modules/fws-tiles/FwsTileSource';
+import FwsTileProfile from './modules/fws-tiles/FwsTileProfile';
 import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
-import MetaDataMenu from './features/MetaDataMenu';
+import DiscreteMetaDataMenu from './features/DiscreteMetaDataMenu';
 import './App.css';
 
 export const store = configureStore({
@@ -58,6 +59,7 @@ const App = () => {
         <Profiles>
           <TimeVerticalSensitiveWaypointsProfile />
           <TimeVerticalSensitiveTrajectoryProfile />
+          <FwsTileProfile />
         </Profiles>
         <Sources>
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
@@ -91,7 +93,7 @@ const App = () => {
           <TrajectoriesMenu />
         </FoldOutItem>
         <FoldOutItem id={'Data'} icon={'pencil'}>
-          <MetaDataMenu apiUrl={'http://localhost:8989'}/>
+          <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'}/>
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>
