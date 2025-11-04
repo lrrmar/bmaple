@@ -9,8 +9,10 @@ interface InitialState {
   token: string;
   selectedCrrId: string | null;
   selectedRdtId: string | null;
+  selectedLiId: string | null;
   profileCrrId: string | null;
   profileRdtId: string | null;
+  profileLiId: string | null;
   hashTables: HashTable[];
   latestTimeslot: number | null; // latest as a unix timestamp
   fastaProducts: FastaProduct[];
@@ -32,8 +34,10 @@ const initialState: InitialState = {
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedCrrId: null,
   selectedRdtId: null,
+  selectedLiId: null,
   profileCrrId: null,
   profileRdtId: null,
+  profileLiId: null,
   hashTables: [],
   latestTimeslot: null,
   fastaProducts: [
@@ -65,11 +69,17 @@ export const fastaSlice = createSlice({
     updateSelectedRdtId: (state, id: PayloadAction<string | null>) => {
       state.selectedRdtId = id.payload;
     },
+    updateSelectedLightningId: (state, id: PayloadAction<string | null>) => {
+      state.selectedLiId = id.payload;
+    },
     updateProfileCrrId: (state, id: PayloadAction<string | null>) => {
       state.profileCrrId = id.payload;
     },
     updateProfileRdtId: (state, id: PayloadAction<string | null>) => {
       state.profileRdtId = id.payload;
+    },
+    updateProfileLightningId: (state, id: PayloadAction<string | null>) => {
+      state.profileLiId = id.payload;
     },
     updateHashTables: (state, id: PayloadAction<HashTable[]>) => {
       state.hashTables = id.payload;
@@ -103,8 +113,10 @@ export const {
   updateOpacityCRR,
   updateSelectedCrrId,
   updateSelectedRdtId,
+  updateSelectedLightningId,
   updateProfileCrrId,
   updateProfileRdtId,
+  updateProfileLightningId,
   updateHashTables,
   updateLatestTimeslot,
   updateFastaProducts,
@@ -119,10 +131,14 @@ export const selectSelectedCrrId = (state: RootState) =>
   state.fasta.selectedCrrId;
 export const selectSelectedRdtId = (state: RootState) =>
   state.fasta.selectedRdtId;
+export const selectSelectedLightningId = (state: RootState) =>
+  state.fasta.selectedLiId;
 export const selectProfileCrrId = (state: RootState) =>
   state.fasta.profileCrrId;
 export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
+export const selectProfileLightningId = (state: RootState) =>
+  state.fasta.profileLiId;
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
 export const selectLatestTimeslot = (state: RootState) =>
   state.fasta.latestTimeslot;

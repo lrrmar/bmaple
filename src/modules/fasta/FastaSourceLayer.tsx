@@ -8,14 +8,7 @@ import {
   useAppSelector as useSelector,
 } from '../../hooks';
 import { selectCache, ingest, Ingest } from '../../mapping/cacheSlice';
-import {
-  selectBaseUrl,
-  selectToken,
-  updateProfileCrrId,
-  updateProfileRdtId,
-  selectSelectedCrrId,
-  selectSelectedRdtId,
-} from './fastaSlice';
+import { selectBaseUrl, selectToken } from './fastaSlice';
 import openLayersMap from '../../mapping/OpenLayersMap';
 import FastaHashTablesServer from './FastaHashTables';
 
@@ -57,8 +50,13 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
     console.log('FASTASourceLayer creating VectorTileLayer id:' + id);
 
     let maxZoom = 4;
+    let zIndex = 6;
     if (id.startsWith('rdt')) {
       maxZoom = 3;
+      zIndex = 10;
+    } else if (id.startsWith('li')) {
+      maxZoom = 3;
+      zIndex = 20;
     }
 
     const vtLayer = new VectorTileLayer({
@@ -73,7 +71,7 @@ const FastaSourceLayer = ({ id, sourceIdentifier }: Props) => {
       },
     });
 
-    vtLayer.setZIndex(6);
+    vtLayer.setZIndex(zIndex);
     const map = openLayersMap.map;
     map.addLayer(vtLayer);
 

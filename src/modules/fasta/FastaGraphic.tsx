@@ -12,6 +12,7 @@ import { get } from 'ol/proj';
 import {
   selectProfileCrrId,
   selectProfileRdtId,
+  selectProfileLightningId,
   selectFastaProducts,
   selectCrrVisible,
   selectRdtVisible,
@@ -32,13 +33,14 @@ import {
 import openLayersMap from '../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
 import Style, { StyleLike } from 'ol/style/Style.js';
-import Fill from 'ol/style/Fill';
 import { FeatureLike } from 'ol/Feature';
 import { FlatStyleLike } from 'ol/style/flat';
-import Stroke from 'ol/style/Stroke';
 import VectorLayer from 'ol/layer/Vector';
 import missingDataImage from './no_satellites_64.png';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
+import lightningImage from './images/lightning_bolt_32_white.png';
+import { Fill, Stroke } from 'ol/style';
+import { ColorLike } from 'ol/colorlike';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -94,9 +96,12 @@ const Graphics = () => {
   const map = openLayersMap.map;
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
+  const liLayerId = useSelector(selectProfileLightningId);
+
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string | null>(null);
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string | null>(null);
+  const [currentOlUidLi, setCurrentOlUidLi] = useState<string | null>(null);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
   const opacityCRR = useSelector(selectOpacityCRR);
@@ -223,6 +228,193 @@ const Graphics = () => {
     return styleFunction;
   }
 
+  // For Fill Pattern caching
+
+  interface PatternInfo {
+    pattern: CanvasPattern | null;
+    ready: boolean;
+  }
+
+  interface PatternConfig {
+    imageUrl: string;
+    scale?: number;
+    fallbackColor?: string;
+  }
+
+  class ImagePatternManager {
+    private patternCache: Map<string, PatternInfo>;
+
+    constructor() {
+      this.patternCache = new Map();
+    }
+
+    public loadImagePattern(imageUrl: string, scale = 1): PatternInfo {
+      const cacheKey = `${imageUrl}_${scale}`;
+      const cached = this.patternCache.get(cacheKey);
+      if (cached) {
+        return cached;
+      }
+
+      const patternInfo: PatternInfo = {
+        pattern: null,
+        ready: false,
+      };
+      this.patternCache.set(cacheKey, patternInfo);
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = imageUrl;
+
+      img.onload = (): void => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        if (!ctx) {
+          console.error('Failed to get canvas context');
+          patternInfo.ready = true;
+          return;
+        }
+
+        canvas.width = img.naturalWidth * scale;
+        canvas.height = img.naturalHeight * scale;
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const pattern = ctx.createPattern(canvas, 'repeat');
+
+        if (pattern) {
+          patternInfo.pattern = pattern;
+        }
+        patternInfo.ready = true;
+      };
+
+      img.onerror = (): void => {
+        console.error(`Failed to load pattern image: ${imageUrl}`);
+        patternInfo.ready = true;
+      };
+
+      return patternInfo;
+    }
+
+    public createPatternStyleFunction(theme: string) {
+      const patternInfo = this.loadImagePattern(lightningImage);
+
+      return (feature: FeatureLike): Style => {
+        if (patternInfo.ready && patternInfo.pattern) {
+          return new Style({
+            fill: new Fill({
+              color: patternInfo.pattern as ColorLike,
+            }),
+            stroke: new Stroke({
+              color: '#333333',
+              width: 1,
+            }),
+          });
+        } else {
+          return new Style({
+            fill: new Fill({
+              color: 'rgba(200, 200, 200, 0.5)',
+            }),
+            stroke: new Stroke({
+              color: '#333333',
+              width: 1,
+            }),
+          });
+        }
+      };
+    }
+
+    public preloadPatterns(patternConfigs: PatternConfig[]): void {
+      patternConfigs.forEach((config) => {
+        this.loadImagePattern(config.imageUrl, config.scale || 1);
+      });
+    }
+
+    public isPatternReady(imageUrl: string, scale = 1): boolean {
+      const cacheKey = `${imageUrl}_${scale}`;
+      const patternInfo = this.patternCache.get(cacheKey);
+      return patternInfo ? patternInfo.ready : false;
+    }
+
+    public clearCache(): void {
+      this.patternCache.clear();
+    }
+
+    public getCacheSize(): number {
+      return this.patternCache.size;
+    }
+  }
+
+  function createLightningStyleFunction2(theme: string) {
+    //const hexColour = styles[theme][10];
+    let pattern: CanvasPattern | null = null;
+    let patternReady = false;
+
+    // Preload the image and create pattern
+    const img = new Image();
+    img.src = lightningImage;
+    img.onload = () => {
+      pattern = createPatternFromImage(img);
+      patternReady = true;
+    };
+
+    // Function to create pattern from loaded image
+    const createPatternFromImage = (image: HTMLImageElement) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Use the image's natural dimensions
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      if (ctx == null) {
+        return null;
+      }
+      ctx.drawImage(image, 0, 0);
+      return ctx.createPattern(canvas, 'repeat');
+    };
+
+    // Return style function
+    return (feature: FeatureLike) => {
+      if (patternReady) {
+        return new Style({
+          fill: new Fill({
+            color: pattern,
+          }),
+          stroke: new Stroke({
+            color: '#333333',
+            width: 1,
+          }),
+        });
+      } else {
+        // Fallback style while image loads
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(200, 200, 200, 0.5)',
+          }),
+          stroke: new Stroke({
+            color: '#333333',
+            width: 1,
+          }),
+        });
+      }
+    };
+  }
+
+  /*
+    const styleFunction = (feature: FeatureLike) => {
+      const patternImage = new Image();
+
+      const hexColour = '#332288';
+      const fillStyleX = new Style({
+        //fill: new Fill({ color: '#cccccc' }),
+        fill: new Fill({ pattern: patternImage }),
+      });
+      return [fillStyleX];
+    };
+*/
+
+  //    return styleFunction;
+  //  }
+
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
@@ -309,44 +501,89 @@ const Graphics = () => {
     setCurrentOlUidRdt(newOlUidRdt);
   }, [rdtLayerId, products, currentCrrStyle]);
 
+  useEffect(() => {
+    /* get OL vector layers using layer cache and set / remove styling
+     * for new and old layers
+     */
+
+    console.log('FastaGraphic liLayerId: ' + liLayerId);
+
+    const patternManager = new ImagePatternManager();
+
+    //const liStyle = createLightningStyleFunction(currentCrrStyle);
+    const liStyle = patternManager.createPatternStyleFunction(lightningImage);
+
+    let newOlUidLi: string | null = null;
+
+    let layer: Entry | null = null;
+    if (liLayerId) {
+      const layerId = liLayerId;
+      layer = layerCache[liLayerId] as Entry;
+    }
+    if (layer) {
+      console.log('Got the layer');
+      newOlUidLi = layer.ol_uid;
+    }
+
+    const oldLayer = getLayer(currentOlUidLi);
+    const newLayer = getLayer(newOlUidLi);
+
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      oldLayer.setStyle(invisibleStyle);
+    }
+
+    if (newLayer) {
+      console.log('Got newLayer');
+
+      //  if (rdtIsVisible) {
+      newLayer.setVisible(true);
+      newLayer.setStyle(liStyle);
+      //  } else {
+      //    newLayer.setVisible(false);
+      //    newLayer.setStyle(invisibleStyle);
+      //  }
+    }
+
+    newLayer?.setZIndex(5);
+    setCurrentOlUidLi(newOlUidLi);
+  }, [liLayerId, products, currentCrrStyle]);
+
   // set opacity
   useEffect(() => {
     let olLayer: VectorLayer<Feature> | undefined;
     const mapUtils = new OpenLayersMap();
     products.forEach((p) => {
       let id: string | null;
+      let opacity: number;
+
       if (p.name === 'CRR') {
         id = crrLayerId;
-        if (id) {
-          const layer = layerCache[id];
-          if (layer && isEntry(layer)) {
-            const ol_uid = layer.ol_uid;
-            if (ol_uid) {
-              olLayer = mapUtils.getLayerByUid(ol_uid);
-            }
-            if (olLayer) {
-              olLayer.setZIndex(5);
-              olLayer.setOpacity(opacityCRR);
-            }
-          }
-        }
+        opacity = opacityCRR;
       } else if (p.name === 'RDT') {
         id = rdtLayerId;
-        if (id) {
-          const layer = layerCache[id];
-          if (layer && isEntry(layer)) {
-            const ol_uid = layer.ol_uid;
-            if (ol_uid) {
-              olLayer = mapUtils.getLayerByUid(ol_uid);
-            }
-            if (olLayer) {
-              olLayer.setZIndex(5);
-              olLayer.setOpacity(opacityRDT);
-            }
-          }
-        }
+        opacity = opacityRDT;
+      } else if (p.name === 'LI') {
+        id = null;
+        //id = rdtLayerId;
+        //opacity = opacityRDT;
+        opacity = 1.0;
       } else {
         return;
+      }
+
+      if (id) {
+        const layer = layerCache[id];
+        if (layer && isEntry(layer)) {
+          const ol_uid = layer.ol_uid;
+          if (ol_uid) {
+            olLayer = mapUtils.getLayerByUid(ol_uid);
+          }
+          if (olLayer) {
+            olLayer.setZIndex(5);
+            olLayer.setOpacity(opacity);
+          }
+        }
       }
     });
   }, [crrLayerId, rdtLayerId, opacityCRR, opacityRDT]);

@@ -7,6 +7,7 @@ import {
   selectLatestTimeslot,
   updateSelectedCrrId,
   updateSelectedRdtId,
+  updateSelectedLightningId,
   selectCrrVisible,
   selectRdtVisible,
 } from './fastaSlice';
@@ -166,6 +167,43 @@ const Slider = () => {
           setUserMessageRdt('RDT: forecasts are not displayed for RDT');
         }
         dispatch(updateSelectedRdtId(null));
+      }
+
+      // Find the LI hash with matching effective_ts
+      console.log('Looking for LI...');
+
+      const liLayerHash = fastaHashes.find((hash: HashTable) => {
+        return hash.name === 'li' && hash.effective_ts === selectedTimeslot;
+      });
+
+      if (liLayerHash) {
+        console.log('LI FOUND');
+
+        if (liLayerHash.is_available) {
+          const url = fastaHashTableToUrl(liLayerHash);
+          console.log('LI AVAILABLE');
+          console.log(url);
+          const newLiLayerHash = { apiRequest: url };
+          dispatch(updateSelectedLightningId(newLiLayerHash.apiRequest));
+          //setUserMessageRdt(undefined);
+        } else {
+          setUserMessageRdt(
+            'LI: data not available for ' +
+              timeDisplayString(liLayerHash.effective_ts) +
+              ' slot',
+          );
+          dispatch(updateSelectedLightningId(null));
+        }
+      } else {
+        /*
+        // No forecasts for LI
+        if (selectedTimeslot > fastaLatestTimeslot) {
+          setUserMessageRdt('RDT: data not available');
+        } else {
+          setUserMessageRdt('RDT: forecasts are not displayed for RDT');
+        }
+          */
+        dispatch(updateSelectedLightningId(null));
       }
     }
   }, [selectedTimeslot, fastaHashes]);
