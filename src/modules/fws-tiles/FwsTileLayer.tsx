@@ -40,64 +40,44 @@ const FwsTileLayer = ({ id, sourceIdentifier }: Props) => {
     if (hasFetched.current) {
       return;
     }
-    const fetchTileUrl = async (id: string) => {
-      const response = await fetch(`${apiUrl}/resourceById/?id=${id}`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      });
-      const json = await response.json();
-      setTileUrl(json)
-    }
-    fetchTileUrl(id);
-  },[])
-
-  useEffect(() => {
-    /* create OL vector layer and add to map, then cache the layer and update
-     * pointer to fastaGraphicProfile
-     */
-    if (hasFetched.current) {
-      return;
-    }
     if (layerCache[id]['source'] !== sourceIdentifier) {
       return;
     }
-    if (tileUrl) {
-      hasFetched.current = true;
-      const vtLayer = new VectorTileLayer({
-        source: new VectorTileSource({
-          format: new MVT(),
-          url: tileUrl,
-        }),
-        visible: true,
-        /*style: function (feature, resolution) {
-          return [];
-        },*/
-      });
+    hasFetched.current = true;
+    const vtLayer = new VectorTileLayer({
+      source: new VectorTileSource({
+        format: new MVT(),
+        url: `${apiUrl}/${id}/{z}/{x}/{y}.pbf`,
+        minZoom: 0,
+        maxZoom: 4,
+      }),
+      visible: true,
+      /*style: function (feature, resolution) {
+        return [];
+      },*/
+    });
 
-      vtLayer.setZIndex(6);
-      const map = OpenLayersMap.map;
-      map.addLayer(vtLayer);
+    vtLayer.setZIndex(6);
+    const map = OpenLayersMap.map;
+    map.addLayer(vtLayer);
 
-      const toCache: Ingest = {
-        id: id,
-        source: sourceIdentifier,
-        ol_uid: getUid(vtLayer),
-      };
+    const toCache: Ingest = {
+      id: id,
+      source: sourceIdentifier,
+      ol_uid: getUid(vtLayer),
+    };
 
-      //dispatch(cacheLayer(toCache));
-      dispatch(ingest(toCache));
+    //dispatch(cacheLayer(toCache));
+    dispatch(ingest(toCache));
 
-      //console.log("Added Ingest to cache: " + id + " : " + toCache.ol_uid);
+    //console.log("Added Ingest to cache: " + id + " : " + toCache.ol_uid);
 
-      setTimeout(() => {
-        vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
-      }, 3000);
-    }
-  
-      //}); // once
-  }, [tileUrl]);
+    setTimeout(() => {
+      vtLayer.setExtent(undefined); // Reset to allow loading dynamically later
+    }, 3000);
+
+    //}); // once
+  }, []);
 
   return null;
 };

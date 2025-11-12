@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
-import mapReducer,{
+import mapReducer, {
   selectVerticalLevel,
   selectVerticalLevels,
   updateVerticalLevel,
-}from './mapping/mapSlice';
+} from './mapping/mapSlice';
 import { Action } from 'redux';
 import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
@@ -93,7 +93,7 @@ const App = () => {
           <TrajectoriesMenu />
         </FoldOutItem>
         <FoldOutItem id={'Data'} icon={'pencil'}>
-          <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'}/>
+          <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'} />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>

@@ -31,7 +31,7 @@ import FwsTileLayer from './FwsTileLayer';
 
 interface ContinuousMetaData {
   valid_time: string[];
-  //start_time: string[];
+  start_time: string[];
   level: string[];
 }
 
@@ -41,14 +41,14 @@ interface Hash {
   domain: string;
   field: string;
   valid_time: string;
-  //start_time: string;
+  start_time: string;
   level: string;
 }
 interface Query {
   domain: string | null;
   field: string | null;
   valid_time: string | null;
-  //start_time: string | null;
+  start_time: string | null;
   level: string | null;
 }
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
@@ -125,7 +125,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         body: JSON.stringify({
           field: selection.field,
           domain: selection.domain,
-          //start_time: selection.start_time,
+          start_time: selection.start_time,
         }),
       });
       const json = await response.json();
@@ -293,8 +293,8 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
          * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
          */
 
-        // Filter hashes that have a time outside of display times
-    /*       thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
+  // Filter hashes that have a time outside of display times
+  /*       thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
           displayTimes.includes(new Date(hash.valid_time).getTime()),
         );
 
@@ -331,7 +331,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [discreteMetaDataSelections, displayTime, currentHashes]);
 */
 
-    /*  useEffect(() => {
+  /*  useEffect(() => {
     const resourceIds: string[] = Object.values(profileIds).filter(
       (e): e is Exclude<typeof e, null> => e !== null,
     ); // not null
@@ -368,7 +368,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 source: sourceIdentifier,
               }),
             );
-        };
+        }
       });
     }
   }, [profileIds]);
@@ -382,7 +382,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     const components = filteredIds.map((id) => (
       <FwsTileLayer key={id} id={id} sourceIdentifier={sourceIdentifier} />
     ));
-   
+
     // setLayers with these new components
     setLayers(components);
   }, [cache]);

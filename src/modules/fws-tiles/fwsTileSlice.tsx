@@ -1,7 +1,7 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
 
-export type DiscreteHeader = 'domain' | 'field';// | 'start_time';
+export type DiscreteHeader = 'domain' | 'field' | 'start_time';
 export interface BackendDiscreteMetaData {
   headers: DiscreteHeader[];
   values: { [key in DiscreteHeader]: string[] };
@@ -11,7 +11,7 @@ export interface DiscreteMetaData {
   [key: string]: string | null;
   domain: string | null;
   field: string | null;
-  //start_time: string | null;
+  start_time: string | null;
 }
 
 export interface ContinuousMetaData {
@@ -42,9 +42,7 @@ interface InitialState {
 
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
-const apiUrl = GEOJSON_API_URL
-  ? GEOJSON_API_URL
-  : 'http://localhost:8989';
+const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8989';
 /*const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://localhost:8989';*/
 
 const initialState: InitialState = {

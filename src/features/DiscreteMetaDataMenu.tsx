@@ -29,7 +29,7 @@ import {
   selectProfileIds,
 } from '../modules/fws-tiles/fwsTileSlice';
 
-type DiscreteHeader = 'domain' | 'field';// | 'start_time';
+type DiscreteHeader = 'domain' | 'field' | 'start_time';
 type ContinuousHeader = 'valid_time' | 'level';
 interface MetaData {
   headers: DiscreteHeader[];
@@ -42,7 +42,7 @@ interface Hash {
   domain: string;
   field: string;
   valid_time: string;
-  //start_time: string;
+  start_time: string;
   level: string;
 }
 
@@ -54,7 +54,7 @@ interface Query {
   domain: string | null;
   field: string | null;
   valid_time: string | null;
-  //start_time: string | null;
+  start_time: string | null;
   level: string | null;
 }
 
@@ -96,7 +96,7 @@ const DiscreteMetaDataMenu = ({
   const [selection, setSelection] = useState<DiscreteMetaData | null>({
     domain: null,
     field: null,
-    //start_time: null,
+    start_time: null,
   });
   const selectionRef = useRef<DiscreteMetaData | null>(null);
   const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);

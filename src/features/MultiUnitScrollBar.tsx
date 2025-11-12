@@ -40,8 +40,7 @@ const MultiUnitScrollBar = <T, U>({
     const newMarks: Mark[] = values.map((val, i) => {
       return { value: i, label: `${val}` }; //`${val}${units}` <- swap back to this eventually
     });
-    if (newMarks.length > 0)
-      setMarks(newMarks);
+    if (newMarks.length > 0) setMarks(newMarks);
   }, [values, value]);
 
   useEffect(() => {
