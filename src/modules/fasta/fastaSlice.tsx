@@ -20,6 +20,7 @@ interface InitialState {
   mzFlag: boolean;
   opacityCRR: number;
   opacityRDT: number;
+  opacityLightning: number;
   crrChosenStyle: string;
 }
 
@@ -51,11 +52,17 @@ const initialState: InitialState = {
       name: 'RDT',
       visible: true,
     },
+    {
+      order: 2,
+      name: 'LI',
+      visible: true,
+    },
   ],
   zmFlag: false,
   mzFlag: false,
   opacityCRR: 1,
   opacityRDT: 1,
+  opacityLightning: 1,
   crrChosenStyle: 'rainbow',
 };
 
@@ -102,6 +109,9 @@ export const fastaSlice = createSlice({
     updateOpacityRDT: (state, opacityLevel: PayloadAction<number>) => {
       state.opacityRDT = opacityLevel.payload;
     },
+    updateOpacityLightning: (state, opacityLevel: PayloadAction<number>) => {
+      state.opacityLightning = opacityLevel.payload;
+    },
     updateCrrChosenStyle: (state, newStyle: PayloadAction<string>) => {
       state.crrChosenStyle = newStyle.payload;
     },
@@ -111,6 +121,7 @@ export const fastaSlice = createSlice({
 export const {
   updateOpacityRDT,
   updateOpacityCRR,
+  updateOpacityLightning,
   updateSelectedCrrId,
   updateSelectedRdtId,
   updateSelectedLightningId,
@@ -154,6 +165,8 @@ export const selectOpacityCRR = (state: RootState) => state.fasta.opacityCRR;
 export const selectCrrChosenStyle = (state: RootState) =>
   state.fasta.crrChosenStyle;
 export const selectOpacityRDT = (state: RootState) => state.fasta.opacityRDT;
+export const selectOpacityLightning = (state: RootState) =>
+  state.fasta.opacityLightning;
 
 const isProductVisible = (state: RootState, productName: string) => {
   const idxProduct = state.fasta.fastaProducts.findIndex(

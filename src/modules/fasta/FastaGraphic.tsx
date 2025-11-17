@@ -19,6 +19,7 @@ import {
   FastaProduct,
   selectOpacityCRR,
   selectOpacityRDT,
+  selectOpacityLightning,
   selectCrrChosenStyle,
 } from './fastaSlice';
 import {
@@ -96,7 +97,7 @@ const Graphics = () => {
   const map = openLayersMap.map;
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
-  const liLayerId = useSelector(selectProfileLightningId);
+  const lightningLayerId = useSelector(selectProfileLightningId);
 
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string | null>(null);
@@ -106,6 +107,7 @@ const Graphics = () => {
   const rdtIsVisible = useSelector(selectRdtVisible);
   const opacityCRR = useSelector(selectOpacityCRR);
   const opacityRDT = useSelector(selectOpacityRDT);
+  const opacityLightning = useSelector(selectOpacityLightning);
   const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
   const currentCrrStyle = useSelector(selectCrrChosenStyle);
@@ -304,8 +306,9 @@ const Graphics = () => {
             fill: new Fill({
               color: patternInfo.pattern as ColorLike,
             }),
+            // IF border required:
             stroke: new Stroke({
-              color: '#333333',
+              color: '#FFFFFF',
               width: 1,
             }),
           });
@@ -315,7 +318,7 @@ const Graphics = () => {
               color: 'rgba(200, 200, 200, 0.5)',
             }),
             stroke: new Stroke({
-              color: '#333333',
+              color: '#FFFFFF',
               width: 1,
             }),
           });
@@ -506,7 +509,7 @@ const Graphics = () => {
      * for new and old layers
      */
 
-    console.log('FastaGraphic liLayerId: ' + liLayerId);
+    console.log('FastaGraphic liLayerId: ' + lightningLayerId);
 
     const patternManager = new ImagePatternManager();
 
@@ -516,9 +519,9 @@ const Graphics = () => {
     let newOlUidLi: string | null = null;
 
     let layer: Entry | null = null;
-    if (liLayerId) {
-      const layerId = liLayerId;
-      layer = layerCache[liLayerId] as Entry;
+    if (lightningLayerId) {
+      const layerId = lightningLayerId;
+      layer = layerCache[lightningLayerId] as Entry;
     }
     if (layer) {
       console.log('Got the layer');
@@ -547,7 +550,7 @@ const Graphics = () => {
 
     newLayer?.setZIndex(5);
     setCurrentOlUidLi(newOlUidLi);
-  }, [liLayerId, products, currentCrrStyle]);
+  }, [lightningLayerId, products, currentCrrStyle]);
 
   // set opacity
   useEffect(() => {
@@ -557,6 +560,8 @@ const Graphics = () => {
       let id: string | null;
       let opacity: number;
 
+      console.log('SET OPACITY ' + p.name);
+
       if (p.name === 'CRR') {
         id = crrLayerId;
         opacity = opacityCRR;
@@ -564,10 +569,9 @@ const Graphics = () => {
         id = rdtLayerId;
         opacity = opacityRDT;
       } else if (p.name === 'LI') {
-        id = null;
-        //id = rdtLayerId;
-        //opacity = opacityRDT;
-        opacity = 1.0;
+        console.log('SET LIGHT OPACITY TO: ' + opacityLightning);
+        id = lightningLayerId;
+        opacity = opacityLightning;
       } else {
         return;
       }
@@ -586,7 +590,14 @@ const Graphics = () => {
         }
       }
     });
-  }, [crrLayerId, rdtLayerId, opacityCRR, opacityRDT]);
+  }, [
+    crrLayerId,
+    rdtLayerId,
+    lightningLayerId,
+    opacityCRR,
+    opacityRDT,
+    opacityLightning,
+  ]);
 
   return <div className="FastaGraphics"></div>;
 };
