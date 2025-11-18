@@ -10,6 +10,7 @@ import {
   updateSelectedLightningId,
   selectCrrVisible,
   selectRdtVisible,
+  selectLiVisible,
 } from './fastaSlice';
 import type { HashTable } from './FastaHashTables';
 import {
@@ -45,9 +46,11 @@ const Slider = () => {
   >();
   const [userMessageCrr, setUserMessageCrr] = useState<string | undefined>();
   const [userMessageRdt, setUserMessageRdt] = useState<string | undefined>();
+  const [userMessageLi, setUserMessageLi] = useState<string | undefined>();
 
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
+  const liIsVisible = useSelector(selectLiVisible);
 
   const [animate, setAnimate] = useState(false);
   const [pulse, setPulse] = useState(0);
@@ -161,33 +164,25 @@ const Slider = () => {
         }
       } else {
         // No forecasts for RDT
-        if (selectedTimeslot > fastaLatestTimeslot) {
+        if (selectedTimeslot <= fastaLatestTimeslot) {
           setUserMessageRdt('RDT: data not available');
-        } else {
-          setUserMessageRdt('RDT: forecasts are not displayed for RDT');
         }
         dispatch(updateSelectedRdtId(null));
       }
 
       // Find the LI hash with matching effective_ts
-      console.log('Looking for LI...');
-
       const liLayerHash = fastaHashes.find((hash: HashTable) => {
         return hash.name === 'li' && hash.effective_ts === selectedTimeslot;
       });
 
       if (liLayerHash) {
-        console.log('LI FOUND');
-
         if (liLayerHash.is_available) {
           const url = fastaHashTableToUrl(liLayerHash);
-          console.log('LI AVAILABLE');
-          console.log(url);
           const newLiLayerHash = { apiRequest: url };
           dispatch(updateSelectedLightningId(newLiLayerHash.apiRequest));
-          //setUserMessageRdt(undefined);
+          setUserMessageLi(undefined);
         } else {
-          setUserMessageRdt(
+          setUserMessageLi(
             'LI: data not available for ' +
               timeDisplayString(liLayerHash.effective_ts) +
               ' slot',
@@ -195,15 +190,16 @@ const Slider = () => {
           dispatch(updateSelectedLightningId(null));
         }
       } else {
-        /*
         // No forecasts for LI
-        if (selectedTimeslot > fastaLatestTimeslot) {
-          setUserMessageRdt('RDT: data not available');
-        } else {
-          setUserMessageRdt('RDT: forecasts are not displayed for RDT');
+        if (selectedTimeslot <= fastaLatestTimeslot) {
+          setUserMessageLi('LI: data not available');
         }
-          */
         dispatch(updateSelectedLightningId(null));
+      }
+
+      if (selectedTimeslot > fastaLatestTimeslot) {
+        setUserMessageRdt('Forecasts are not displayed for RDT and lightning');
+        setUserMessageLi(undefined);
       }
     }
   }, [selectedTimeslot, fastaHashes]);
@@ -292,6 +288,9 @@ const Slider = () => {
         )}
         {rdtIsVisible && userMessageRdt && (
           <div className="slider-message-label">{userMessageRdt}</div>
+        )}
+        {liIsVisible && userMessageLi && (
+          <div className="slider-message-label">{userMessageLi}</div>
         )}
       </div>
       <div className="slider">

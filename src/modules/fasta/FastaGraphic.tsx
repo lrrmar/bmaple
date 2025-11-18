@@ -42,6 +42,7 @@ import OpenLayersMap from '../../mapping/OpenLayersMap';
 import lightningImage from './images/lightning_bolt_32_white.png';
 import { Fill, Stroke } from 'ol/style';
 import { ColorLike } from 'ol/colorlike';
+import imagePatternManager from './ImagePatternManager';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -230,194 +231,6 @@ const Graphics = () => {
     return styleFunction;
   }
 
-  // For Fill Pattern caching
-
-  interface PatternInfo {
-    pattern: CanvasPattern | null;
-    ready: boolean;
-  }
-
-  interface PatternConfig {
-    imageUrl: string;
-    scale?: number;
-    fallbackColor?: string;
-  }
-
-  class ImagePatternManager {
-    private patternCache: Map<string, PatternInfo>;
-
-    constructor() {
-      this.patternCache = new Map();
-    }
-
-    public loadImagePattern(imageUrl: string, scale = 1): PatternInfo {
-      const cacheKey = `${imageUrl}_${scale}`;
-      const cached = this.patternCache.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-
-      const patternInfo: PatternInfo = {
-        pattern: null,
-        ready: false,
-      };
-      this.patternCache.set(cacheKey, patternInfo);
-
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = imageUrl;
-
-      img.onload = (): void => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        if (!ctx) {
-          console.error('Failed to get canvas context');
-          patternInfo.ready = true;
-          return;
-        }
-
-        canvas.width = img.naturalWidth * scale;
-        canvas.height = img.naturalHeight * scale;
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const pattern = ctx.createPattern(canvas, 'repeat');
-
-        if (pattern) {
-          patternInfo.pattern = pattern;
-        }
-        patternInfo.ready = true;
-      };
-
-      img.onerror = (): void => {
-        console.error(`Failed to load pattern image: ${imageUrl}`);
-        patternInfo.ready = true;
-      };
-
-      return patternInfo;
-    }
-
-    public createPatternStyleFunction(theme: string) {
-      const patternInfo = this.loadImagePattern(lightningImage);
-
-      return (feature: FeatureLike): Style => {
-        if (patternInfo.ready && patternInfo.pattern) {
-          return new Style({
-            fill: new Fill({
-              color: patternInfo.pattern as ColorLike,
-            }),
-            // IF border required:
-            stroke: new Stroke({
-              color: '#FFFFFF',
-              width: 1,
-            }),
-          });
-        } else {
-          return new Style({
-            fill: new Fill({
-              color: 'rgba(200, 200, 200, 0.5)',
-            }),
-            stroke: new Stroke({
-              color: '#FFFFFF',
-              width: 1,
-            }),
-          });
-        }
-      };
-    }
-
-    public preloadPatterns(patternConfigs: PatternConfig[]): void {
-      patternConfigs.forEach((config) => {
-        this.loadImagePattern(config.imageUrl, config.scale || 1);
-      });
-    }
-
-    public isPatternReady(imageUrl: string, scale = 1): boolean {
-      const cacheKey = `${imageUrl}_${scale}`;
-      const patternInfo = this.patternCache.get(cacheKey);
-      return patternInfo ? patternInfo.ready : false;
-    }
-
-    public clearCache(): void {
-      this.patternCache.clear();
-    }
-
-    public getCacheSize(): number {
-      return this.patternCache.size;
-    }
-  }
-
-  function createLightningStyleFunction2(theme: string) {
-    //const hexColour = styles[theme][10];
-    let pattern: CanvasPattern | null = null;
-    let patternReady = false;
-
-    // Preload the image and create pattern
-    const img = new Image();
-    img.src = lightningImage;
-    img.onload = () => {
-      pattern = createPatternFromImage(img);
-      patternReady = true;
-    };
-
-    // Function to create pattern from loaded image
-    const createPatternFromImage = (image: HTMLImageElement) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      // Use the image's natural dimensions
-      canvas.width = image.naturalWidth;
-      canvas.height = image.naturalHeight;
-      if (ctx == null) {
-        return null;
-      }
-      ctx.drawImage(image, 0, 0);
-      return ctx.createPattern(canvas, 'repeat');
-    };
-
-    // Return style function
-    return (feature: FeatureLike) => {
-      if (patternReady) {
-        return new Style({
-          fill: new Fill({
-            color: pattern,
-          }),
-          stroke: new Stroke({
-            color: '#333333',
-            width: 1,
-          }),
-        });
-      } else {
-        // Fallback style while image loads
-        return new Style({
-          fill: new Fill({
-            color: 'rgba(200, 200, 200, 0.5)',
-          }),
-          stroke: new Stroke({
-            color: '#333333',
-            width: 1,
-          }),
-        });
-      }
-    };
-  }
-
-  /*
-    const styleFunction = (feature: FeatureLike) => {
-      const patternImage = new Image();
-
-      const hexColour = '#332288';
-      const fillStyleX = new Style({
-        //fill: new Fill({ color: '#cccccc' }),
-        fill: new Fill({ pattern: patternImage }),
-      });
-      return [fillStyleX];
-    };
-*/
-
-  //    return styleFunction;
-  //  }
-
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
@@ -505,16 +318,52 @@ const Graphics = () => {
   }, [rdtLayerId, products, currentCrrStyle]);
 
   useEffect(() => {
+    // Pre-load pattern on component mount
+    const patternInfo = imagePatternManager.loadImagePattern(
+      lightningImage,
+      'lightning_bolt_white',
+    );
+  }, []);
+
+  function createLightningPatternStyleFunction(theme: string) {
+    // Retreive pattern
+    const patternInfo = imagePatternManager.loadImagePattern(
+      lightningImage,
+      'lightning_bolt_white',
+    );
+
+    return (feature: FeatureLike): Style => {
+      if (patternInfo.ready && patternInfo.pattern) {
+        return new Style({
+          fill: new Fill({
+            color: patternInfo.pattern as ColorLike,
+          }),
+          // IF border required:
+          //stroke: new Stroke({
+          //  color: '#FFFFFF',
+          //  width: 1,
+          //}),
+        });
+      } else {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(200, 200, 200, 0.5)',
+          }),
+          stroke: new Stroke({
+            color: '#FFFFFF',
+            width: 1,
+          }),
+        });
+      }
+    };
+  }
+
+  useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
      * for new and old layers
      */
 
-    console.log('FastaGraphic liLayerId: ' + lightningLayerId);
-
-    const patternManager = new ImagePatternManager();
-
-    //const liStyle = createLightningStyleFunction(currentCrrStyle);
-    const liStyle = patternManager.createPatternStyleFunction(lightningImage);
+    const liStyle = createLightningPatternStyleFunction(lightningImage);
 
     let newOlUidLi: string | null = null;
 
@@ -560,8 +409,6 @@ const Graphics = () => {
       let id: string | null;
       let opacity: number;
 
-      console.log('SET OPACITY ' + p.name);
-
       if (p.name === 'CRR') {
         id = crrLayerId;
         opacity = opacityCRR;
@@ -569,7 +416,6 @@ const Graphics = () => {
         id = rdtLayerId;
         opacity = opacityRDT;
       } else if (p.name === 'LI') {
-        console.log('SET LIGHT OPACITY TO: ' + opacityLightning);
         id = lightningLayerId;
         opacity = opacityLightning;
       } else {

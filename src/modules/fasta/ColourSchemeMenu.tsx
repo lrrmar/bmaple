@@ -149,14 +149,14 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
         </select>
       </div>
       <div>
-        <label htmlFor="baseMap">BaseMap: </label>
+        <label htmlFor="baseMap">Base Map: </label>
         <select
           id="baseMap"
           onChange={(event) => dispatch(updateBaseMapId(event.target.value))}
         >
+          <option value="OSM">OSM</option>
           <option value="light">Light</option>
           <option value="dark">Dark</option>
-          <option value="OSM">OSM</option>
         </select>
       </div>
       <br />

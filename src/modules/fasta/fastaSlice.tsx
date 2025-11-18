@@ -159,6 +159,7 @@ export const selectCrrVisible = (state: RootState) =>
   isProductVisible(state, 'CRR');
 export const selectRdtVisible = (state: RootState) =>
   isProductVisible(state, 'RDT');
+export const selectLiVisible = (state: RootState) => true; //isProductVisible(state, 'RDT');
 export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
 export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
 export const selectOpacityCRR = (state: RootState) => state.fasta.opacityCRR;
