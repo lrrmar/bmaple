@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Icon } from 'semantic-ui-react';
+import Slider from '@mui/material/Slider'
 import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
@@ -27,6 +28,8 @@ import {
   updateDiscreteMetaDataSelections,
   updateSelectedResources,
   selectProfileIds,
+  updateOpacity,
+  selectOpacity,
 } from '../modules/fws-tiles/fwsTileSlice';
 
 type DiscreteHeader = 'domain' | 'field' | 'start_time';
@@ -107,11 +110,13 @@ const DiscreteMetaDataMenu = ({
   const [currentHashes, setCurrentHashes] = useState<Hash[]>([]);
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  console.log('rendering');
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
     // selectionRef i.e. due to a change in tiling
     if (selectionRef.current) {
+      console.log(selectionRef.current);
       setSelection(selectionRef.current);
     }
   }, []);
@@ -119,6 +124,7 @@ const DiscreteMetaDataMenu = ({
   useEffect(() => {
     // After any selection change, store a copy in selectionRef
     if (selection) selectionRef.current = selection;
+    console.log(selection);
   }, [selection]);
 
   useEffect(() => {
@@ -196,7 +202,7 @@ const DiscreteMetaDataMenu = ({
           const select = (
             <div key={thisDiscreteHeader}>
               <InputLabel
-                style={{ color: '#0f0f0f' }}
+                style={{ color: '#ffffff', width: '100%', textAlign: 'left' }}
                 id={`${thisDiscreteHeader} label`}
               >
                 {readableNames && readableNames[thisDiscreteHeader]
@@ -209,6 +215,7 @@ const DiscreteMetaDataMenu = ({
                 renderValue={(val: string) => {
                   return val;
                 }}
+                style={{width: '100%', backgroundColor: '#ffffff'}}
                 onChange={(e) => {
                   if (typeof e.target.value === 'number') {
                     const newSelection: DiscreteMetaData = {
@@ -277,6 +284,7 @@ const DiscreteMetaDataMenu = ({
   ]);
 
   useEffect(() => {
+    console.log('dispatching');
     dispatch(
       updateDiscreteMetaDataSelections({
         id: id.toString(),
@@ -372,15 +380,22 @@ const DiscreteMetaDataMenu = ({
   return (
     <div
       style={{
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        backdropFilter: 'blur(10px)',
+        backgroundColor: 'rgba(255,255,255,0)',
         borderRadius: '1em',
-        //left: menuOpen ? '' : '-1000vw',
-        position: 'absolute',
+        color: '#ffffff',
         padding: '1em',
       }}
     >
       {menus}
+      <Slider
+        min={0} 
+        max={1} 
+        step={0.02}
+        onChange={(e: Event, value: number | number[] ) => {
+          if (typeof value === 'number') dispatch(updateOpacity(value));
+        }}
+
+      />
     </div>
   );
 };

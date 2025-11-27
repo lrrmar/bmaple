@@ -42,7 +42,7 @@ interface InitialState {
 
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
-const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'http://localhost:8989';
+const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://force.ncas.ac.uk/tile-server';
 /*const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://localhost:8989';*/
 
 const initialState: InitialState = {
