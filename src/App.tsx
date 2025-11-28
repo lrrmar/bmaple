@@ -25,12 +25,18 @@ import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeV
 import fwsTileReducer from './modules/fws-tiles/fwsTileSlice';
 import FwsTileSource from './modules/fws-tiles/FwsTileSource';
 import FwsTileProfile from './modules/fws-tiles/FwsTileProfile';
+
+import regionsReducer from './modules/regions/regionsSlice';
+import RegionsSource from './modules/regions/RegionsSource';
+import RegionsProfile from './modules/regions/RegionsProfile';
+
 import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
 import DiscreteMetaDataMenu from './features/DiscreteMetaDataMenu';
+import RegionsMenu from './modules/regions/RegionsMenu';
 import './App.css';
 
 export const store = configureStore({
@@ -40,6 +46,7 @@ export const store = configureStore({
     waypoint: waypointReducer,
     trajectories: trajectoriesReducer,
     fwsTile: fwsTileReducer,
+    regions: regionsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -60,11 +67,13 @@ const App = () => {
           <TimeVerticalSensitiveWaypointsProfile />
           <TimeVerticalSensitiveTrajectoryProfile />
           <FwsTileProfile />
+          <RegionsProfile />
         </Profiles>
         <Sources>
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
           <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
           <FwsTileSource sourceIdentifier={'tiles'} />
+          <RegionsSource sourceIdentifier={'regions'} />
         </Sources>
         <BaseMaps>
           <LightBaseMap id={'light'} />
@@ -89,11 +98,14 @@ const App = () => {
         <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
           <WaypointsMenu />
         </FoldOutItem>
-        <FoldOutItem id={'Trajectories'} icon={'share alternate'}>
+        <FoldOutItem id={'Trajectories'} icon={'map signs'}>
           <TrajectoriesMenu />
         </FoldOutItem>
-        <FoldOutItem id={'Data'} icon={'pencil'}>
+        <FoldOutItem id={'Live Data'} icon={'image'}>
           <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'} />
+        </FoldOutItem>
+        <FoldOutItem id={'Layers'} icon={'object group'}>
+          <RegionsMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>

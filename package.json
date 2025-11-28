@@ -2,7 +2,7 @@
   "name": "react-redux-openlayers-framework",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/flight-demo",
+  "homepage": "/",
   "dependencies": {
     "@bokeh/bokehjs": "^3.7.0",
     "@emotion/react": "^11.14.0",

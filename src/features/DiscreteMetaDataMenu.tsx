@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { Icon } from 'semantic-ui-react';
-import Slider from '@mui/material/Slider'
+import Slider from '@mui/material/Slider';
 import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
@@ -110,13 +110,11 @@ const DiscreteMetaDataMenu = ({
   const [currentHashes, setCurrentHashes] = useState<Hash[]>([]);
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  console.log('rendering');
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
     // selectionRef i.e. due to a change in tiling
     if (selectionRef.current) {
-      console.log(selectionRef.current);
       setSelection(selectionRef.current);
     }
   }, []);
@@ -124,7 +122,6 @@ const DiscreteMetaDataMenu = ({
   useEffect(() => {
     // After any selection change, store a copy in selectionRef
     if (selection) selectionRef.current = selection;
-    console.log(selection);
   }, [selection]);
 
   useEffect(() => {
@@ -215,7 +212,7 @@ const DiscreteMetaDataMenu = ({
                 renderValue={(val: string) => {
                   return val;
                 }}
-                style={{width: '100%', backgroundColor: '#ffffff'}}
+                style={{ width: '100%', backgroundColor: '#ffffff' }}
                 onChange={(e) => {
                   if (typeof e.target.value === 'number') {
                     const newSelection: DiscreteMetaData = {
@@ -284,7 +281,6 @@ const DiscreteMetaDataMenu = ({
   ]);
 
   useEffect(() => {
-    console.log('dispatching');
     dispatch(
       updateDiscreteMetaDataSelections({
         id: id.toString(),
@@ -388,13 +384,12 @@ const DiscreteMetaDataMenu = ({
     >
       {menus}
       <Slider
-        min={0} 
-        max={1} 
+        min={0}
+        max={1}
         step={0.02}
-        onChange={(e: Event, value: number | number[] ) => {
+        onChange={(e: Event, value: number | number[]) => {
           if (typeof value === 'number') dispatch(updateOpacity(value));
         }}
-
       />
     </div>
   );

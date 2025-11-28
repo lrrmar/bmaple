@@ -220,16 +220,21 @@ export const selectOutlineContours = (state: RootState) =>
 export const selectVerticalLevel = (state: RootState) =>
   state.map.verticalLevel;
 export const selectVerticalLevels = (state: RootState) => {
+  const levels:number[] = [];
+  for (let i = 0; i < 40; i++){levels.push(i*1000)};
+  return levels;
+}
+ /*{
   return verticalLevelOrder.filter((level) =>
     state.map.verticalLevels.includes(level),
   );
-};
+};*/
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
 export const selectDisplayTimesIntersection = (state: RootState) => {
   let times = Object.values(state.map.displayTimes)[0];
   if (times) {
-    for (let i = 1; i < Object.keys(state.map.displayTimes).length; i++) {
+    for (let i = 0; i < Object.keys(state.map.displayTimes).length; i++) {
       times = times.filter((time) =>
         Object.values(state.map.displayTimes)[i].includes(time),
       );

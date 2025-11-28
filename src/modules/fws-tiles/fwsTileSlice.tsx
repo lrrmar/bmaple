@@ -42,7 +42,9 @@ interface InitialState {
 
 let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
-const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://force.ncas.ac.uk/tile-server';
+const apiUrl = GEOJSON_API_URL
+  ? GEOJSON_API_URL
+  : 'https://force.ncas.ac.uk/tile-server';
 /*const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://localhost:8989';*/
 
 const initialState: InitialState = {
@@ -158,7 +160,9 @@ export const selectOpacity = (state: RootState) => state.fwsTile.opacity;
 export const selectApiUrl = (state: RootState) => state.fwsTile.apiUrl;
 export const selectStartTime = (state: RootState) => state.fwsTile.startTime;
 export const selectVerticalLevel = (state: RootState) => state.fwsTile.level;
-export const selectVerticalLevels = (state: RootState) => state.fwsTile.levels;
+export const selectVerticalLevels = (state: RootState) => [
+  0, 1000, 2000, 3000, 4000, 5000, 8000, 12000, 20000, 30000,
+]; // state.fwsTile.levels;
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.fwsTile.levelUnits;
 export const selectBackendDiscreteMetaData = (state: RootState) =>
