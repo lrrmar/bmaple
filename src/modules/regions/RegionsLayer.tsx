@@ -92,7 +92,14 @@ const RegionsLayer = ({
               visible: false,
             });
             if (map) map.addLayer(layer);
-            dispatch(ingest({ ...featureData, id: `nats-danger-area-${i}`, name: f.get('name'), ol_uid: getUid(layer) }));
+            dispatch(
+              ingest({
+                ...featureData,
+                id: `nats-danger-area-${i}`,
+                name: f.get('name'),
+                ol_uid: getUid(layer),
+              }),
+            );
           });
         });
     }

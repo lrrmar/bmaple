@@ -30,6 +30,10 @@ import regionsReducer from './modules/regions/regionsSlice';
 import RegionsSource from './modules/regions/RegionsSource';
 import RegionsProfile from './modules/regions/RegionsProfile';
 
+import faamPhysicsReducer from './modules/faam-physics/faamPhysicsSlice';
+import FaamPhysicsSource from './modules/faam-physics/FaamPhysicsSource';
+import FaamPhysicsProfile from './modules/faam-physics/FaamPhysicsProfile';
+
 import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -47,6 +51,7 @@ export const store = configureStore({
     trajectories: trajectoriesReducer,
     fwsTile: fwsTileReducer,
     regions: regionsReducer,
+    faamPhysics: faamPhysicsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -68,12 +73,14 @@ const App = () => {
           <TimeVerticalSensitiveTrajectoryProfile />
           <FwsTileProfile />
           <RegionsProfile />
+          <FaamPhysicsProfile />
         </Profiles>
         <Sources>
           <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
           <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
           <FwsTileSource sourceIdentifier={'tiles'} />
           <RegionsSource sourceIdentifier={'regions'} />
+          <FaamPhysicsSource sourceIdentifier={'faam-physics'} />
         </Sources>
         <BaseMaps>
           <LightBaseMap id={'light'} />
