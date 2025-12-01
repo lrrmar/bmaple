@@ -5,6 +5,7 @@ import MapType from 'ol/Map';
 import Feature, { FeatureLike } from 'ol/Feature';
 import Geometry from 'ol/geom/Geometry';
 import { toLonLat, fromLonLat } from 'ol/proj';
+import { getUid } from 'ol/util';
 
 import {
   selectCenter,
@@ -24,6 +25,12 @@ import OpenLayersMap from './OpenLayersMap';
 
 type Props = {
   children: React.ReactNode;
+};
+
+type ClickEvent = {
+  longitude: number;
+  latitude: number;
+  features: string[];
 };
 
 const Map = ({ children }: Props) => {
@@ -84,7 +91,6 @@ const Map = ({ children }: Props) => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
     if (mouseIsDragging) {
-      console.log('dragging');
     } else {
       handleClick(event);
     }
@@ -97,38 +103,24 @@ const Map = ({ children }: Props) => {
     const lonLat: number[] = toLonLat(
       map.getCoordinateFromPixel([e.clientX, e.clientY]),
     );
-    const mapCoordinate = {
+    const clickEvent: ClickEvent = {
       longitude: lonLat[0],
       latitude: lonLat[1],
     };
     const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
       map.getFeaturesAtPixel([e.clientX, e.clientY]);
     if (!featuresAtPixel) return;
-    const featuresAtClick: (FeatureAtClick | undefined)[] = featuresAtPixel.map(
+    const featuresAtClick: (string | undefined)[] = featuresAtPixel.map(
       (feature: Feature<Geometry> | FeatureLike) => {
         if (!feature) return;
-        const geometry = feature.getGeometry();
-        if (!geometry) return;
-        const geometryType: string = geometry.getType();
-        const ol_uid: string = feature.getProperties()['ol_uid'];
-        if (!ol_uid) return;
-
-        const values: { [key: string]: string | number } = {
-          ...feature.getProperties(),
-        }; // get type
-        delete values.geometry;
-        const info: FeatureAtClick = {
-          ol_uid: ol_uid,
-          geometry: geometryType,
-          ...values,
-        };
-        return info;
+        const ol_uid = getUid(feature);
+        return ol_uid;
       },
     );
-    const filteredFeaturesAtClick: FeatureAtClick[] =
-      featuresAtClick.filter(isFeatureAtClick);
-    dispatch(updateClickEvent(mapCoordinate));
-    dispatch(updateFeaturesAtClick(filteredFeaturesAtClick));
+    const filteredFeaturesAtClick: string[] =
+      featuresAtClick.filter((f) => f !== undefined); // cut undefined
+    clickEvent['features'] = filteredFeaturesAtClick;
+    dispatch(updateClickEvent(clickEvent));
   }
 
   return (

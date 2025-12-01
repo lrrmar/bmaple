@@ -64,7 +64,6 @@ const colours: { [key: number]: string } = {
 const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
   const clickEvent = useSelector(selectClickEvent);
-  const featuresAtClick = useSelector(selectFeaturesAtClick);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
   const mode = useSelector(selectMode);
@@ -76,49 +75,18 @@ const WaypointSource = ({ sourceIdentifier, cache }: Props) => {
     if (!clickEvent) {
       return;
     }
-    // detect click on exisiting point
-    const pointBools: FeatureAtClick[] = featuresAtClick.filter(
-      (feature: FeatureAtClick) => feature.geometry === 'Point',
-    );
-    if (pointBools.length > 0) {
-      return;
-    }
 
-    //    Filter all clicked geojson featuresso that the prescribed properties
-    // match those define in geojsonFilter
-
-    const geojsonFilter: { [key: string]: string } = {
-      source: sourceIdentifier,
-      ObjectType: 'contour',
-    };
-
-    const geojsonFeatures = featuresAtClick.filter((feature) =>
-      Object.keys(geojsonFilter)
-        .map((key) => feature[key] === geojsonFilter[key])
-        .every(Boolean),
-    );
-    const geojsonFeature = geojsonFeatures[0];
-
-    let featureData;
-    if (geojsonFeature) {
-      featureData = {
-        dataSource: geojsonFeature.source,
-        dataType: geojsonFeature.ObjectType,
-        dataValue: geojsonFeature.contourRange,
-        dataVariable: geojsonFeature.variable,
-        dataUnit: geojsonFeature.unit,
-      };
-    }
-    const uid = 'id' + new Date().getTime();
+    const uid = 'waypoint-' + new Date().getTime();
     dispatch(
       request({
         source: sourceIdentifier,
         mode: mode,
         id: uid,
-        ...clickEvent,
+        longitude: clickEvent['longitude'],
+        latitude: clickEvent['latitude'],
+        conflictingFeatures: clickEvent['features'],
         time: displayTime,
         verticalLevel: verticalLevel,
-        ...featureData,
       }),
     );
   }, [clickEvent]);

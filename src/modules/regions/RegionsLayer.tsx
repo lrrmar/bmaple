@@ -98,6 +98,7 @@ const RegionsLayer = ({
                 id: `nats-danger-area-${i}`,
                 name: f.get('name'),
                 ol_uid: getUid(layer),
+                features: [getUid(f)] // allows better searching for clicks
               }),
             );
           });

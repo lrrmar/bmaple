@@ -2,10 +2,7 @@ import React from 'react';
 import { useEffect, useState, useRef, useMemo } from 'react';
 
 import Map from 'ol/Map';
-import OLVectorLayer from 'ol/layer/Vector';
-import GeoJSON from 'ol/format/GeoJSON';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { OSM } from 'ol/source';
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import { Vector as VectorSource } from 'ol/source';
@@ -27,7 +24,7 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-import { selectDisplayTime, selectVerticalLevel } from '../../mapping/mapSlice';
+import { selectDisplayTime, selectVerticalLevel, updateErrorMessage } from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from './waypointSlice';
 
@@ -38,6 +35,7 @@ export interface Waypoint extends Pending {
   verticalLevel: string;
   name: string;
   id: string;
+  features: string[];
   dataSource?: string;
   dataType?: string;
   dataValue?: string;
@@ -138,7 +136,6 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
   useEffect(() => {
     // Assess what to do with incoming layer data
-    if (!layerData) console.log(id);
     if (!layerData) return;
 
     // Wrong source
@@ -176,33 +173,88 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     if (!coordinates) {
       return;
     }
-    const point = new Point(
-      fromLonLat([coordinates.longitude, coordinates.latitude]),
-    );
-    const feature = new Feature({
-      geometry: point,
-    });
-    // Create a vector source and layer to hold the features
-    const vectorSource = new VectorSource({
-      features: [feature],
-    });
 
-    const vectorLayer = new VectorLayer({
-      source: vectorSource,
-      zIndex: 30,
-      visible: false,
-    });
+    // Check for geometry conflicts with other layers e.g. inside flyable
+    // region
+    const mapUtils = new OpenLayersMap();
+    let conflictIds: string[] = [];
+    const conflictFeatureOlUids = layerData.conflictingFeatures;
+    console.log(conflictFeatureOlUids)
+    if (conflictFeatureOlUids && conflictFeatureOlUids instanceof Array && conflictFeatureOlUids.length > 0) {
 
-    map.addLayer(vectorLayer);
-    const waypoint: Generic & Entry & Action = {
-      ...layerData,
-      id: id,
-      ol_uid: getUid(vectorLayer),
-    };
-    if (isEntryWaypoint(waypoint)) getClosestSettlementAndIngest(waypoint);
-    return () => {
-      map.removeLayer(vectorLayer);
-    };
+      const filteredCache = Object.values(cache).filter((entry) => 'features' in entry)
+
+      // Get the cache entries that represent the layers holding each feature
+      const cacheEntries = conflictFeatureOlUids.map((ol_uid) => {
+        if (typeof(ol_uid) === 'string') {
+          const conflictCacheEntries = Object.values(filteredCache).filter((entry) => {
+            const features = entry.features;
+            if (features instanceof Array && features.length > 0) {
+              if (features.includes(ol_uid)) {
+                return true;
+              }
+            } else {
+              return false;
+            }
+          })
+          return conflictCacheEntries[0]; // Hack, check for errors
+        }
+      })
+      const conflictCacheEntries = cacheEntries.filter((entry) => !!entry);
+      conflictIds = conflictCacheEntries.map((entry) => entry.id);
+    }
+
+    const errorMessages = new Set<string>()
+    if (!conflictIds.includes('faam-ring')) {
+      errorMessages.add('Outside flight range');
+    } 
+    conflictIds.forEach((id) => {
+      if (id.includes('nats-danger')) {
+        errorMessages.add('Danger area');
+      }
+    })
+
+    conflictIds.forEach((id) => {
+      if (id.includes('waypoint')) {
+        errorMessages.add('Waypoint already present - duplicate for different time');
+      }
+    }); 
+
+    if (errorMessages.size > 0) {
+      dispatch(updateErrorMessage([...errorMessages][0]))
+
+    } else {
+
+      const point = new Point(
+        fromLonLat([coordinates.longitude, coordinates.latitude]),
+      );
+      const feature = new Feature({
+        geometry: point,
+      });
+      // Create a vector source and layer to hold the features
+      const vectorSource = new VectorSource({
+        features: [feature],
+      });
+  
+      const vectorLayer = new VectorLayer({
+        source: vectorSource,
+        zIndex: 30,
+        visible: false,
+      });
+  
+  
+      map.addLayer(vectorLayer);
+      const waypoint: Generic & Entry & Action = {
+        ...layerData,
+        id: id,
+        features: [getUid(feature)],
+        ol_uid: getUid(vectorLayer),
+      };
+      if (isEntryWaypoint(waypoint)) getClosestSettlementAndIngest(waypoint);
+      return () => {
+        map.removeLayer(vectorLayer);
+      };
+    }
   }, [coordinates]);
 
   return <div></div>;

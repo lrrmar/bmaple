@@ -1,5 +1,6 @@
 import * as ol from 'ol';
 import BaseLayer from 'ol/layer/Base';
+import Feature from "ol/Feature";
 import { fromLonLat } from 'ol/proj';
 import { getUid } from 'ol/util';
 
@@ -42,6 +43,7 @@ class OpenLayersMap {
     });
     return layer ? layer : undefined;
   }
+
 }
 
 export default OpenLayersMap;

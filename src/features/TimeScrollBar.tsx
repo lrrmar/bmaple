@@ -153,7 +153,6 @@ const ScrollingScale = () => {
       });
       setMarks(newMarks);*/
       setIntersectionTimes(times);
-      console.log(!displayTime);
       if (!displayTime) dispatch(updateDisplayTime(times[0]));
     }
   }, [displayTimesIntersection]);
