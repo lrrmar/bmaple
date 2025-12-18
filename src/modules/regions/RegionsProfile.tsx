@@ -9,7 +9,7 @@ import { isEntryRegions } from './RegionsLayer';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import VectorLayer from 'ol/layer/Vector';
 import { Feature } from 'ol';
-import {Style, Stroke, Fill} from 'ol/style';
+import { Style, Stroke, Fill } from 'ol/style';
 
 import { selectVerticalLevel } from '../../mapping/mapSlice';
 
@@ -23,10 +23,8 @@ const RegionsProfile = () => {
   const [displayedIds, setDisplayedIds] = useState<string[]>([]);
 
   useEffect(() => {
-
     if (loaded.current) return;
     const ids = Object.keys(cache).filter((id) => id.includes('nats-danger'));
-    console.log(ids)
     ids.forEach((id) => {
       const element = cache[id];
       if (element && isEntry(element)) {
@@ -34,15 +32,18 @@ const RegionsProfile = () => {
         let olLayer: VectorLayer<Feature> | undefined;
         const ol_uid = element.ol_uid;
         if (ol_uid) olLayer = mapUtils.getLayerByUid(ol_uid);
-        if (olLayer) olLayer.setStyle(new Style({
-          stroke: new Stroke({
-            color: 'rgba(255,255,0,1)',
-            width: 0.7,
-          }),
-          fill: new Fill({
-            color: 'rgba(255,255,0,0.1)',
-          })
-        }));
+        if (olLayer)
+          olLayer.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: 'rgba(255,255,0,1)',
+                width: 0.7,
+              }),
+              fill: new Fill({
+                color: 'rgba(255,255,0,0.1)',
+              }),
+            }),
+          );
       }
     });
   }, [verticalLevel]);

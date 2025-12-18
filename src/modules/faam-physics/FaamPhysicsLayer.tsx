@@ -62,7 +62,7 @@ const FaamPhysicsLayer = ({
     } else {
       loaded.current = true;
       const circle = new Feature({
-        geometry: new Circle(fromLonLat([-0.1276, 51.5072]), 20000),
+        geometry: new Circle(fromLonLat([-0.6086, 52.0686]), 20000),
       });
       const layer = new VectorLayer({
         source: new VectorSource({
@@ -72,13 +72,13 @@ const FaamPhysicsLayer = ({
         visible: false,
       });
       if (map) map.addLayer(layer);
-    dispatch(
+      dispatch(
         ingest({
           source: sourceIdentifier,
           id: 'faam-ring',
           name: 'faam ring',
           ol_uid: getUid(layer),
-          features: [getUid(circle)] // allows better searching for clicks
+          features: [getUid(circle)], // allows better searching for clicks
         }),
       );
     }

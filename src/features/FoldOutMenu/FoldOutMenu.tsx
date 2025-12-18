@@ -225,7 +225,6 @@ function IconBar({
 function MenuIconHandler({
   align,
   id,
-  key,
   icon,
   theme,
   currentFoldOutId,
@@ -235,7 +234,6 @@ function MenuIconHandler({
 }: {
   align: string;
   id: string;
-  key: string;
   icon: SemanticICONS;
   theme: string;
   currentFoldOutId: string | null;
@@ -299,6 +297,7 @@ function MenuIconHandler({
 
     return (
       <div
+        key={id}
         className={className}
         onClick={() =>
           onMenuIconClick(

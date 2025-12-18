@@ -47,6 +47,10 @@ export const trajectoriesSlice = createSlice({
       const trajectoryExists = state.all[trajectoryId.payload];
       if (!trajectoryExists) state.all[trajectoryId.payload] = [];
     },
+    updateCurrentTrajectoryId: (state, update: PayloadAction<string | null>) => {
+      // update the currently active waypoint
+      state.current = update.payload;
+    },
     updateCurrentTrajectory: (state, update: PayloadAction<string[]>) => {
       // Append a waypoint ID to a trajectory
       if (state.current) {
@@ -70,8 +74,6 @@ export const trajectoriesSlice = createSlice({
         trajectory.splice(index, 1);
         allTrajectories[trajectoryId] = trajectory;
       });
-      console.log(allTrajectories);
-      console.log(state.all);
       state.all = allTrajectories;
     },
   },
@@ -81,6 +83,7 @@ export const {
   newTrajectory,
   updateCurrentTrajectory,
   updateHighlightedTrajectories,
+  updateCurrentTrajectoryId,
   removeWaypointFromAllTrajectories,
 } = trajectoriesSlice.actions;
 
@@ -135,6 +138,27 @@ export const selectTrajectories = (state: RootState) => state.trajectories.all;
 
 export const selectCurrentTrajectoryId = (state: RootState) =>
   state.trajectories.current;
+
+export const selectCurrentTrajectoryWaypoints = (state: RootState) => {
+  const current = state.trajectories.current;
+  if (current) {
+    const trajectory = state.cache[current];
+    if (trajectory) {
+      const waypointIds = trajectory.waypoints;
+      if (waypointIds && waypointIds instanceof Array) {
+        const waypoints: CacheElement[] = [];
+        waypointIds.forEach((id) => {
+          if (typeof(id) == 'string') {
+            const entry = state.cache[id];
+            if (entry) waypoints.push(entry);
+          }
+        })
+        return waypoints;
+      }
+    }
+  }
+
+}
 export const selectCurrentTrajectory = (state: RootState) => {
   if (state.trajectories.current) {
     return state.trajectories.all[state.trajectories.current];

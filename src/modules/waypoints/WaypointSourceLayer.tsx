@@ -24,9 +24,14 @@ import {
   CacheElement,
 } from '../../mapping/cacheSlice';
 
-import { selectDisplayTime, selectVerticalLevel, updateErrorMessage } from '../../mapping/mapSlice';
+import {
+  selectDisplayTime,
+  selectVerticalLevel,
+  updateErrorMessage,
+} from '../../mapping/mapSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { LongitudeLatitude } from './waypointSlice';
+import { selectCurrentTrajectory } from '../trajectories/trajectoriesSlice';
 
 export interface Waypoint extends Pending {
   longitude: number;
@@ -77,6 +82,7 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
   const cache = useSelector(selectCache);
   const displayTime = useSelector(selectDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const currentTrajectory = useSelector(selectCurrentTrajectory);
   const [layerData, setLayerData] = useState<CacheElement | null>();
   const [coordinates, setCoordinates] = useState<LongitudeLatitude | null>(
     null,
@@ -177,54 +183,77 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
     // Check for geometry conflicts with other layers e.g. inside flyable
     // region
     const mapUtils = new OpenLayersMap();
-    let conflictIds: string[] = [];
+    let conflictCacheEntries: CacheElement[] = [];
     const conflictFeatureOlUids = layerData.conflictingFeatures;
-    console.log(conflictFeatureOlUids)
-    if (conflictFeatureOlUids && conflictFeatureOlUids instanceof Array && conflictFeatureOlUids.length > 0) {
-
-      const filteredCache = Object.values(cache).filter((entry) => 'features' in entry)
+    console.log(conflictFeatureOlUids);
+    if (
+      conflictFeatureOlUids &&
+      conflictFeatureOlUids instanceof Array &&
+      conflictFeatureOlUids.length > 0
+    ) {
+      const filteredCache = Object.values(cache).filter(
+        (entry) => 'features' in entry,
+      );
 
       // Get the cache entries that represent the layers holding each feature
       const cacheEntries = conflictFeatureOlUids.map((ol_uid) => {
-        if (typeof(ol_uid) === 'string') {
-          const conflictCacheEntries = Object.values(filteredCache).filter((entry) => {
-            const features = entry.features;
-            if (features instanceof Array && features.length > 0) {
-              if (features.includes(ol_uid)) {
-                return true;
+        if (typeof ol_uid === 'string') {
+          const conflictCacheEntries = Object.values(filteredCache).filter(
+            (entry) => {
+              const features = entry.features;
+              if (features instanceof Array && features.length > 0) {
+                if (features.includes(ol_uid)) {
+                  return true;
+                }
+              } else {
+                return false;
               }
-            } else {
-              return false;
-            }
-          })
+            },
+          );
           return conflictCacheEntries[0]; // Hack, check for errors
         }
-      })
-      const conflictCacheEntries = cacheEntries.filter((entry) => !!entry);
-      conflictIds = conflictCacheEntries.map((entry) => entry.id);
+      });
+      conflictCacheEntries = cacheEntries.filter((entry) => !!entry);
+    }
+    const conflictIds = conflictCacheEntries.map((entry) => entry.id);
+
+    const errorMessages = new Set<string>();
+
+    if (!conflictIds.includes('faam-ring') && currentTrajectory) {
+      // Onlydo this check if we are interacting with a trajectory
+      errorMessages.add('Outside flight range');
     }
 
-    const errorMessages = new Set<string>()
-    if (!conflictIds.includes('faam-ring')) {
-      errorMessages.add('Outside flight range');
-    } 
-    conflictIds.forEach((id) => {
+    conflictCacheEntries.forEach((entry) => {
+      const id = entry.id;
       if (id.includes('nats-danger')) {
-        errorMessages.add('Danger area');
+        const lower = entry['lower limit'];
+        const upper = entry['upper limit'];
+        if (
+          lower !== null &&
+          lower !== undefined &&
+          upper &&
+          verticalLevel &&
+          lower <= verticalLevel &&
+          verticalLevel <= upper
+        ) {
+          errorMessages.add('Danger area');
+        }
       }
-    })
+    });
 
     conflictIds.forEach((id) => {
       if (id.includes('waypoint')) {
-        errorMessages.add('Waypoint already present - duplicate for different time');
+        errorMessages.add(
+          'Waypoint already present - duplicate for different time',
+        );
       }
-    }); 
+    });
 
     if (errorMessages.size > 0) {
-      dispatch(updateErrorMessage([...errorMessages][0]))
-
+      dispatch(updateErrorMessage([...errorMessages][0]));
     } else {
-
+      dispatch(updateErrorMessage(null));
       const point = new Point(
         fromLonLat([coordinates.longitude, coordinates.latitude]),
       );
@@ -235,14 +264,13 @@ const WaypointSourceLayer = ({ id, sourceIdentifier }: Props) => {
       const vectorSource = new VectorSource({
         features: [feature],
       });
-  
+
       const vectorLayer = new VectorLayer({
         source: vectorSource,
         zIndex: 30,
         visible: false,
       });
-  
-  
+
       map.addLayer(vectorLayer);
       const waypoint: Generic & Entry & Action = {
         ...layerData,

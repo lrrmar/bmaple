@@ -36,6 +36,7 @@ import FaamPhysicsProfile from './modules/faam-physics/FaamPhysicsProfile';
 
 import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
+import ErrorMessage from './features/ErrorMessage';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
@@ -97,6 +98,9 @@ const App = () => {
           updateValue={updateVerticalLevel}
           orientation={'vertical'}
         />
+      </FloatingBox>
+      <FloatingBox style={{ top: '20px', left: '50%' }}>
+        <ErrorMessage />
       </FloatingBox>
       <FoldOutMenu align={'left'} theme={'glassTablet'}>
         <FoldOutItem id={'Info'} icon={'info'}>

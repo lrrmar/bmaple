@@ -34,7 +34,11 @@ interface InitialState {
   projection: string;
   units: string | null;
   displayTime: number;
-  clickEvent: { longitude: number; latitude: number; features: string[] } | null;
+  clickEvent: {
+    longitude: number;
+    latitude: number;
+    features: string[];
+  } | null;
   featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
   baseMapId: string;
@@ -90,7 +94,11 @@ export const mapSlice = createSlice({
     },
     updateClickEvent: (
       state,
-      click: PayloadAction<{ longitude: number; latitude: number; features: string[] } | null>,
+      click: PayloadAction<{
+        longitude: number;
+        latitude: number;
+        features: string[];
+      } | null>,
     ) => {
       state.clickEvent = click.payload;
     },
@@ -135,12 +143,9 @@ export const mapSlice = createSlice({
     ) => {
       state.verticalLevelUnits = verticalLevelUnits.payload;
     },
-    updateErrorMessage: (
-      state,
-      errorMessage: PayloadAction<string | null>
-    ) => {
+    updateErrorMessage: (state, errorMessage: PayloadAction<string | null>) => {
       state.errorMessage = errorMessage.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(updateExtent.fulfilled, (state, action) => {
@@ -253,6 +258,5 @@ export const selectDisplayTimesIntersection = (state: RootState) => {
   }
   return times;
 };
-export const selectErrorMessage = (state: RootState) =>
-  state.map.errorMessage;
+export const selectErrorMessage = (state: RootState) => state.map.errorMessage;
 export default mapSlice.reducer;

@@ -6,6 +6,7 @@ import {
 
 import {
   updateOpacity,
+  selectOpacity,
   updateCurrentLayerName,
   selectCurrentLayerName,
   selectLayerNames,
@@ -15,6 +16,7 @@ const RegionsMenu = () => {
   const dispatch = useDispatch();
   const layerNames = useSelector(selectLayerNames);
   const currentLayerName = useSelector(selectCurrentLayerName);
+  const opacity = useSelector(selectOpacity);
 
   return (
     <div>
@@ -23,7 +25,6 @@ const RegionsMenu = () => {
         onChange={(e) => {
           dispatch(updateCurrentLayerName(e.target.value));
         }}
-        defaultValue={'select layer'}
       >
         {layerNames.map((name) => (
           <option key={name}>{name}</option>
@@ -34,6 +35,7 @@ const RegionsMenu = () => {
         min={0.0}
         max={1.0}
         step={0.1}
+        value={opacity}
         onChange={(e) => {
           dispatch(updateOpacity(parseFloat(e.target.value)));
         }}

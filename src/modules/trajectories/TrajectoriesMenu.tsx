@@ -37,6 +37,7 @@ import { CustomLabelledInput } from '../waypoints/WaypointsMenu';
 import {
   updateHighlightedTrajectories,
   selectTrajectories,
+  updateCurrentTrajectoryId,
 } from './trajectoriesSlice';
 
 import { updateHighlightedWaypoints } from '../waypoints/waypointSlice';
@@ -87,9 +88,10 @@ const WaypointList = ({
               onMouseEnter={() => setHovered(waypoint.id)}
               onMouseLeave={() => setHovered(null)}
             >
-              <div style={waypointOptionStyle}>
-                <div>{waypoint.name}</div>
+              <div key={waypoint.id} style={waypointOptionStyle}>
+                <div key={waypoint.id} >{waypoint.name}</div>
                 <Icon
+                  key={waypoint.id} 
                   name="window close"
                   onClick={(e: any, value: any) => {
                     // Remove waypoint ID from trajectories waypoint list
@@ -143,6 +145,8 @@ const WaypointMenu = ({
             text={waypoint.name}
             onClick={(e: any, value: any) => {
               const waypointIds = [...trajectory.waypoints];
+              console.log(waypointIds);
+              console.log(value.value);
               if (typeof value.value === 'string') {
                 waypointIds.push(value.value);
                 const sortedWaypointIds = cacheSortByTime(cache, waypointIds);
@@ -167,8 +171,8 @@ const TrajectoryForm = ({ trajectory }: { trajectory: Trajectory }) => {
   return (
     <CustomLabelledInput
       id={'name input'}
-      value={trajectory ? trajectory.name : ''}
-      defaultValue={'enter name'}
+      value={trajectory ? trajectory.name : 'enter name'}
+      defaultValue={''}
       placeholder={'Name'}
       onChange={(e, data) => {
         if (trajectory) {
@@ -252,7 +256,6 @@ const ButtonBar = ({
             }
             sinceStartMs += durationMs;
             const sinceStartMins = sinceStartMs / (1000 * 60);
-            console.log(sinceStartMins);
             const totalMinsInt = sinceStartMins % 60;
             const totalMins =
               totalMinsInt > 9 ? totalMinsInt.toString() : `0${totalMinsInt}`;
@@ -393,7 +396,7 @@ const MenuItem = (
   const buttonStyle: React.CSSProperties = {};
 
   return (
-    <div>
+    <div key={id} >
       {id && (
         <div
           key={id}
@@ -458,6 +461,9 @@ const TrajectoriesMenu = () => {
   const [toUpdate, setToUpdate] = useState<Update | null>(null);
 
   useEffect(() => {
+    // going through trajectories slice
+    dispatch(updateCurrentTrajectoryId(open));
+    // doing manual stuff here
     const trajectoryCacheEntries: (Trajectory & CacheElement)[] = [];
     const trajectoryWaypoints: Waypoint[][] = [];
     const allWaypoints: Waypoint[] = [];
@@ -507,7 +513,7 @@ const TrajectoriesMenu = () => {
           ),
         );
       }
-    }
+                      }
     setTrajectoryComponents(comps);
   }, [cache, open]);
 

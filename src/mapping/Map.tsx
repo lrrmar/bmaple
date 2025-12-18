@@ -117,8 +117,9 @@ const Map = ({ children }: Props) => {
         return ol_uid;
       },
     );
-    const filteredFeaturesAtClick: string[] =
-      featuresAtClick.filter((f) => f !== undefined); // cut undefined
+    const filteredFeaturesAtClick: string[] = featuresAtClick.filter(
+      (f) => f !== undefined,
+    ); // cut undefined
     clickEvent['features'] = filteredFeaturesAtClick;
     dispatch(updateClickEvent(clickEvent));
   }

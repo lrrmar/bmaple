@@ -27,7 +27,12 @@ export interface LongitudeLatitude {
   latitude: number;
 }
 
-export interface Waypoint extends GenericLayerMixIn, LongitudeLatitude {}
+
+export interface Waypoint extends GenericLayerMixIn, LongitudeLatitude {
+  verticalLevel: number; // these both default to zero, i.e. false...
+  time: number
+
+}
 
 export const isWaypoint = (element: any): element is Waypoint => {
   const keys: string[] = Object.keys(element);
