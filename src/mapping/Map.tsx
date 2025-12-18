@@ -86,6 +86,7 @@ const Map = ({ children }: Props) => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
     if (mouseIsDragging) {
+      //pass
     } else {
       handleClick(event);
     }

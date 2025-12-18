@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Slider from '@mui/material/Slider';
+import { Icon } from 'semantic-ui-react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
@@ -153,18 +154,21 @@ const ScrollingScale = () => {
       });
       setMarks(newMarks);*/
       setIntersectionTimes(times);
-      console.log(!displayTime);
       if (!displayTime) dispatch(updateDisplayTime(times[0]));
     }
   }, [displayTimesIntersection]);
 
+  const keyDown = (key: string) => {
+    const throttle = 200; //ms
+    if (Date.now() - keyPress > throttle) {
+      setLastKey(key);
+      setKeyPress(Date.now());
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const throttle = 200; //ms
-      if (Date.now() - keyPress > throttle) {
-        setLastKey(event.key);
-        setKeyPress(Date.now());
-      }
+      keyDown(event.key);
     };
 
     // Add global keydown listener
@@ -199,12 +203,27 @@ const ScrollingScale = () => {
   return (
     <div
       style={{
-        width: '80vw',
-        padding: '0px 35px',
+        width: '77vw',
+        padding: '0px 35px 0px 10px',
         color: '#f1f1f1',
         backgroundColor: '#222222',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}
     >
+      <span style={{ display: 'flex', margin: '0px 35px 0px 0px' }}>
+        <Icon
+          name={'angle left'}
+          size="large"
+          onClick={() => keyDown('ArrowLeft')}
+        />
+        <Icon
+          name={'angle right'}
+          size="large"
+          onClick={() => keyDown('ArrowRight')}
+        />
+      </span>
       <Slider
         defaultValue={0}
         min={lowerLim}

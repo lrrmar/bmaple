@@ -124,7 +124,8 @@ export const mapSlice = createSlice({
     },
     updateVerticalLevels: (state, verticalLevels: PayloadAction<string[]>) => {
       state.verticalLevels = verticalLevels.payload;
-      if (state.verticalLevel == "") state.verticalLevel = verticalLevels.payload[0];
+      if (state.verticalLevel == '')
+        state.verticalLevel = verticalLevels.payload[0];
     },
     updateVerticalLevelUnits: (
       state,

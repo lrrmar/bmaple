@@ -91,6 +91,27 @@ const App = () => {
       >
         <Tiles />
       </div>
+      <FloatingBox
+        style={{
+          bottom: '20px',
+          left: '10px',
+          borderWidth: '0px',
+          zIndex: '21',
+          backgroundColor: 'rgba(0,0,0,0)',
+          width: '20vw',
+          objectFit: 'contain',
+        }}
+      >
+        <img
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+            objectFit: 'contain',
+          }}
+          src={process.env.PUBLIC_URL + '/ncas-logo.png'}
+        />
+      </FloatingBox>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         <TimeScrollBar />
       </FloatingBox>
