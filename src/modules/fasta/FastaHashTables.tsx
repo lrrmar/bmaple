@@ -65,13 +65,25 @@ const FastaHashTablesServer = () => {
   const filterFastaHashes = (hashes: HashTable[], product: string) => {
     // Filter out forecast hashes leaving just observations,
     // and sort so that latest observation is first
+
+    console.log('filterFastaHashes');
+
     const observationHashes = hashes
       .filter((hash) => {
         return hash.forecast_slot === '' && hash.name === product;
       })
-      .sort((a, b) =>
-        a.timeslot < b.timeslot ? 1 : b.timeslot < a.timeslot ? -1 : 0,
-      );
+      .sort((a, b) => {
+        if (a === b) {
+          return 0;
+        }
+        if (!a) {
+          return 1;
+        }
+        if (!b) {
+          return -1;
+        }
+        return a.timeslot < b.timeslot ? 1 : -1;
+      });
 
     const latest = observationHashes[0];
 
@@ -86,7 +98,20 @@ const FastaHashTablesServer = () => {
           hash.forecast_slot !== ''
         );
       })
-      .sort((a, b) => Number(a.forecast_slot) - Number(b.forecast_slot));
+      .sort((a, b) => {
+        if (a === b) {
+          return 0;
+        }
+        if (!a) {
+          return 1;
+        }
+        if (!b) {
+          return -1;
+        }
+        return Number(a.forecast_slot) - Number(b.forecast_slot);
+      });
+
+    //  .sort((a, b) => Number(a.forecast_slot) - Number(b.forecast_slot));
 
     // Keep the most recent observation slots (at most 9, i.e. 2 hours)
     // and the latest forecast slots (at most 10) in an array
@@ -112,6 +137,7 @@ const FastaHashTablesServer = () => {
     const productCodes: { [index: string]: string } = {
       'Convective Rainfall Rate': 'crr',
       'Rapidly Developing Thunderstorms': 'rdt',
+      Lightning: 'li',
     };
 
     const response = await fetch(
@@ -156,9 +182,9 @@ const FastaHashTablesServer = () => {
     });
     appendFastaHashes(hashes);
 
-    const keepers = filterFastaHashes(hashes, 'crr').concat(
-      filterFastaHashes(hashes, 'rdt'),
-    );
+    const keepers = filterFastaHashes(hashes, 'crr')
+      .concat(filterFastaHashes(hashes, 'rdt'))
+      .concat(filterFastaHashes(hashes, 'li'));
 
     setHashTablesToKeep(keepers);
     console.log('keepers:');

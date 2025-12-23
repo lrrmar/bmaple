@@ -9,6 +9,7 @@ import {
   updateCrrChosenStyle,
   updateOpacityCRR,
   updateOpacityRDT,
+  updateOpacityLightning,
 } from './fastaSlice';
 
 import {
@@ -18,6 +19,14 @@ import {
   updateStyle,
   updateDesiredTime,
 } from './fastaCAP/capSlice';
+
+import {
+  updateBaseMapId,
+  selectBaseMaps,
+  selectBaseMapId,
+} from '../../mapping/mapSlice';
+
+import DropDownList from '../../features/DropDownList';
 
 import { selectCountryList } from './fastaCAP/capSlice';
 
@@ -46,18 +55,26 @@ interface Props {
 
 const ColourSchemeMenu = ({ name, id }: Props) => {
   const dispatch = useDispatch();
-  //const baseMaps: string[] = useSelector(selectBaseMaps);
-  //const baseMapId: string = useSelector(selectBaseMapId);
+  const baseMaps: string[] = useSelector(selectBaseMaps);
+  const baseMapId: string = useSelector(selectBaseMapId);
   //const colourPalettes: string[] = useSelector(selectColourPalettes);
   //const colourPaletteId: string = useSelector(selectColourPaletteId);
   //const opacity: number = useSelector(selectOpacity);
+
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     color: 'black',
-    paddingLeft: '10px',
+    paddingLeft: '0px',
+    paddingRight: '0px',
+    paddingBottom: '0px',
   };
+
+  const subHeading: React.CSSProperties = {
+    margin: '5px 0px',
+  };
+
   const optionStyle: React.CSSProperties = {
     color: 'black',
     display: 'flex',
@@ -77,20 +94,7 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
 
   return (
     <div style={style}>
-      <h3> Weather Filters: </h3>
-      <div>
-        <label htmlFor="style">Style: </label>
-        <select
-          id="style"
-          onChange={(event) =>
-            dispatch(updateCrrChosenStyle(event.target.value))
-          }
-        >
-          <option value="rainbow">Rainbow</option>
-          <option value="tol">Tol</option>
-          <option value="viridis">Viridis</option>
-        </select>
-      </div>
+      <h4 style={subHeading}>Weather Filters:</h4>
       <div>
         <label htmlFor="opacityCRR">CRR Opacity: </label>
         <input
@@ -117,19 +121,47 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
           }
         />
       </div>
-      <h3> CAP Filters </h3>
       <div>
-        <label htmlFor="style">Style: </label>
+        <label htmlFor="opacityLightning">Lightning Opacity: </label>
+        <input
+          type="range"
+          id="opacity"
+          min="0"
+          max="1"
+          step="0.1"
+          onChange={(element) =>
+            dispatch(updateOpacityLightning(parseFloat(element.target.value)))
+          }
+        />
+      </div>
+      <br />
+      <div>
+        <label htmlFor="crrStyle">CRR Style: </label>
         <select
-          id="style"
-          onChange={(event) => dispatch(updateStyle(event.target.value))}
+          id="crrStyle"
+          onChange={(event) =>
+            dispatch(updateCrrChosenStyle(event.target.value))
+          }
         >
-          <option value="default"> Default</option>
           <option value="rainbow">Rainbow</option>
           <option value="tol">Tol</option>
           <option value="viridis">Viridis</option>
         </select>
       </div>
+      <div>
+        <label htmlFor="baseMap">Base Map: </label>
+        <select
+          id="baseMap"
+          onChange={(event) => dispatch(updateBaseMapId(event.target.value))}
+        >
+          <option value="OSM">OSM</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <br />
+
+      <h4 style={subHeading}>CAP Filters</h4>
       <div>
         <label htmlFor="opacityCAP">CAP Opacity: </label>
         <input
@@ -145,7 +177,6 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
         />
       </div>
       <div>
-        <p> </p>
         <label htmlFor="miniCapTime">CAP Timescroll Bar:</label>
         <input
           type="range"

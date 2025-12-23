@@ -9,8 +9,10 @@ interface InitialState {
   token: string;
   selectedCrrId: string | null;
   selectedRdtId: string | null;
+  selectedLiId: string | null;
   profileCrrId: string | null;
   profileRdtId: string | null;
+  profileLiId: string | null;
   hashTables: HashTable[];
   latestTimeslot: number | null; // latest as a unix timestamp
   fastaProducts: FastaProduct[];
@@ -18,6 +20,7 @@ interface InitialState {
   mzFlag: boolean;
   opacityCRR: number;
   opacityRDT: number;
+  opacityLightning: number;
   crrChosenStyle: string;
 }
 
@@ -32,8 +35,10 @@ const initialState: InitialState = {
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedCrrId: null,
   selectedRdtId: null,
+  selectedLiId: null,
   profileCrrId: null,
   profileRdtId: null,
+  profileLiId: null,
   hashTables: [],
   latestTimeslot: null,
   fastaProducts: [
@@ -47,11 +52,17 @@ const initialState: InitialState = {
       name: 'RDT',
       visible: true,
     },
+    {
+      order: 2,
+      name: 'LI',
+      visible: true,
+    },
   ],
   zmFlag: false,
   mzFlag: false,
   opacityCRR: 1,
   opacityRDT: 1,
+  opacityLightning: 1,
   crrChosenStyle: 'rainbow',
 };
 
@@ -65,11 +76,17 @@ export const fastaSlice = createSlice({
     updateSelectedRdtId: (state, id: PayloadAction<string | null>) => {
       state.selectedRdtId = id.payload;
     },
+    updateSelectedLightningId: (state, id: PayloadAction<string | null>) => {
+      state.selectedLiId = id.payload;
+    },
     updateProfileCrrId: (state, id: PayloadAction<string | null>) => {
       state.profileCrrId = id.payload;
     },
     updateProfileRdtId: (state, id: PayloadAction<string | null>) => {
       state.profileRdtId = id.payload;
+    },
+    updateProfileLightningId: (state, id: PayloadAction<string | null>) => {
+      state.profileLiId = id.payload;
     },
     updateHashTables: (state, id: PayloadAction<HashTable[]>) => {
       state.hashTables = id.payload;
@@ -92,6 +109,9 @@ export const fastaSlice = createSlice({
     updateOpacityRDT: (state, opacityLevel: PayloadAction<number>) => {
       state.opacityRDT = opacityLevel.payload;
     },
+    updateOpacityLightning: (state, opacityLevel: PayloadAction<number>) => {
+      state.opacityLightning = opacityLevel.payload;
+    },
     updateCrrChosenStyle: (state, newStyle: PayloadAction<string>) => {
       state.crrChosenStyle = newStyle.payload;
     },
@@ -101,10 +121,13 @@ export const fastaSlice = createSlice({
 export const {
   updateOpacityRDT,
   updateOpacityCRR,
+  updateOpacityLightning,
   updateSelectedCrrId,
   updateSelectedRdtId,
+  updateSelectedLightningId,
   updateProfileCrrId,
   updateProfileRdtId,
+  updateProfileLightningId,
   updateHashTables,
   updateLatestTimeslot,
   updateFastaProducts,
@@ -119,10 +142,14 @@ export const selectSelectedCrrId = (state: RootState) =>
   state.fasta.selectedCrrId;
 export const selectSelectedRdtId = (state: RootState) =>
   state.fasta.selectedRdtId;
+export const selectSelectedLightningId = (state: RootState) =>
+  state.fasta.selectedLiId;
 export const selectProfileCrrId = (state: RootState) =>
   state.fasta.profileCrrId;
 export const selectProfileRdtId = (state: RootState) =>
   state.fasta.profileRdtId;
+export const selectProfileLightningId = (state: RootState) =>
+  state.fasta.profileLiId;
 export const selectHashTables = (state: RootState) => state.fasta.hashTables;
 export const selectLatestTimeslot = (state: RootState) =>
   state.fasta.latestTimeslot;
@@ -132,12 +159,15 @@ export const selectCrrVisible = (state: RootState) =>
   isProductVisible(state, 'CRR');
 export const selectRdtVisible = (state: RootState) =>
   isProductVisible(state, 'RDT');
+export const selectLiVisible = (state: RootState) => true; //isProductVisible(state, 'RDT');
 export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
 export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
 export const selectOpacityCRR = (state: RootState) => state.fasta.opacityCRR;
 export const selectCrrChosenStyle = (state: RootState) =>
   state.fasta.crrChosenStyle;
 export const selectOpacityRDT = (state: RootState) => state.fasta.opacityRDT;
+export const selectOpacityLightning = (state: RootState) =>
+  state.fasta.opacityLightning;
 
 const isProductVisible = (state: RootState, productName: string) => {
   const idxProduct = state.fasta.fastaProducts.findIndex(

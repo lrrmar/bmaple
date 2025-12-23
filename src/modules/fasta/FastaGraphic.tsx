@@ -12,12 +12,14 @@ import { get } from 'ol/proj';
 import {
   selectProfileCrrId,
   selectProfileRdtId,
+  selectProfileLightningId,
   selectFastaProducts,
   selectCrrVisible,
   selectRdtVisible,
   FastaProduct,
   selectOpacityCRR,
   selectOpacityRDT,
+  selectOpacityLightning,
   selectCrrChosenStyle,
 } from './fastaSlice';
 import {
@@ -32,13 +34,15 @@ import {
 import openLayersMap from '../../mapping/OpenLayersMap';
 import BaseLayer from 'ol/layer/Base.js';
 import Style, { StyleLike } from 'ol/style/Style.js';
-import Fill from 'ol/style/Fill';
 import { FeatureLike } from 'ol/Feature';
 import { FlatStyleLike } from 'ol/style/flat';
-import Stroke from 'ol/style/Stroke';
 import VectorLayer from 'ol/layer/Vector';
 import missingDataImage from './no_satellites_64.png';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
+import lightningImage from './images/lightning_bolt_32_white.png';
+import { Fill, Stroke } from 'ol/style';
+import { ColorLike } from 'ol/colorlike';
+import imagePatternManager from './ImagePatternManager';
 
 const Picker = () => {
   /* currently handled in layerSelector
@@ -94,13 +98,17 @@ const Graphics = () => {
   const map = openLayersMap.map;
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
+  const lightningLayerId = useSelector(selectProfileLightningId);
+
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string | null>(null);
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string | null>(null);
+  const [currentOlUidLi, setCurrentOlUidLi] = useState<string | null>(null);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
   const opacityCRR = useSelector(selectOpacityCRR);
   const opacityRDT = useSelector(selectOpacityRDT);
+  const opacityLightning = useSelector(selectOpacityLightning);
   const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
   const currentCrrStyle = useSelector(selectCrrChosenStyle);
@@ -309,47 +317,133 @@ const Graphics = () => {
     setCurrentOlUidRdt(newOlUidRdt);
   }, [rdtLayerId, products, currentCrrStyle]);
 
+  useEffect(() => {
+    // Pre-load pattern on component mount
+    const patternInfo = imagePatternManager.loadImagePattern(
+      lightningImage,
+      'lightning_bolt_white',
+    );
+  }, []);
+
+  function createLightningPatternStyleFunction(theme: string) {
+    // Retreive pattern
+    const patternInfo = imagePatternManager.loadImagePattern(
+      lightningImage,
+      'lightning_bolt_white',
+    );
+
+    return (feature: FeatureLike): Style => {
+      if (patternInfo.ready && patternInfo.pattern) {
+        return new Style({
+          fill: new Fill({
+            color: patternInfo.pattern as ColorLike,
+          }),
+          // IF border required:
+          //stroke: new Stroke({
+          //  color: '#FFFFFF',
+          //  width: 1,
+          //}),
+        });
+      } else {
+        return new Style({
+          fill: new Fill({
+            color: 'rgba(200, 200, 200, 0.5)',
+          }),
+          stroke: new Stroke({
+            color: '#FFFFFF',
+            width: 1,
+          }),
+        });
+      }
+    };
+  }
+
+  useEffect(() => {
+    /* get OL vector layers using layer cache and set / remove styling
+     * for new and old layers
+     */
+
+    const liStyle = createLightningPatternStyleFunction(lightningImage);
+
+    let newOlUidLi: string | null = null;
+
+    let layer: Entry | null = null;
+    if (lightningLayerId) {
+      const layerId = lightningLayerId;
+      layer = layerCache[lightningLayerId] as Entry;
+    }
+    if (layer) {
+      console.log('Got the layer');
+      newOlUidLi = layer.ol_uid;
+    }
+
+    const oldLayer = getLayer(currentOlUidLi);
+    const newLayer = getLayer(newOlUidLi);
+
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      oldLayer.setStyle(invisibleStyle);
+    }
+
+    if (newLayer) {
+      console.log('Got newLayer');
+
+      //  if (rdtIsVisible) {
+      newLayer.setVisible(true);
+      newLayer.setStyle(liStyle);
+      //  } else {
+      //    newLayer.setVisible(false);
+      //    newLayer.setStyle(invisibleStyle);
+      //  }
+    }
+
+    newLayer?.setZIndex(5);
+    setCurrentOlUidLi(newOlUidLi);
+  }, [lightningLayerId, products, currentCrrStyle]);
+
   // set opacity
   useEffect(() => {
     let olLayer: VectorLayer<Feature> | undefined;
     const mapUtils = new OpenLayersMap();
     products.forEach((p) => {
       let id: string | null;
+      let opacity: number;
+
       if (p.name === 'CRR') {
         id = crrLayerId;
-        if (id) {
-          const layer = layerCache[id];
-          if (layer && isEntry(layer)) {
-            const ol_uid = layer.ol_uid;
-            if (ol_uid) {
-              olLayer = mapUtils.getLayerByUid(ol_uid);
-            }
-            if (olLayer) {
-              olLayer.setZIndex(5);
-              olLayer.setOpacity(opacityCRR);
-            }
-          }
-        }
+        opacity = opacityCRR;
       } else if (p.name === 'RDT') {
         id = rdtLayerId;
-        if (id) {
-          const layer = layerCache[id];
-          if (layer && isEntry(layer)) {
-            const ol_uid = layer.ol_uid;
-            if (ol_uid) {
-              olLayer = mapUtils.getLayerByUid(ol_uid);
-            }
-            if (olLayer) {
-              olLayer.setZIndex(5);
-              olLayer.setOpacity(opacityRDT);
-            }
-          }
-        }
+        opacity = opacityRDT;
+      } else if (p.name === 'LI') {
+        id = lightningLayerId;
+        opacity = opacityLightning;
       } else {
         return;
       }
+
+      if (id) {
+        const layer = layerCache[id];
+        if (layer && isEntry(layer)) {
+          const ol_uid = layer.ol_uid;
+          if (ol_uid) {
+            olLayer = mapUtils.getLayerByUid(ol_uid);
+          }
+          if (olLayer) {
+            olLayer.setZIndex(5);
+            olLayer.setOpacity(opacity);
+          }
+        }
+      }
     });
-  }, [crrLayerId, rdtLayerId, opacityCRR, opacityRDT]);
+  }, [
+    crrLayerId,
+    rdtLayerId,
+    lightningLayerId,
+    opacityCRR,
+    opacityRDT,
+    opacityLightning,
+  ]);
 
   return <div className="FastaGraphics"></div>;
 };

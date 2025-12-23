@@ -7,9 +7,11 @@ import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
 import {
   selectSelectedCrrId,
   selectSelectedRdtId,
+  selectSelectedLightningId,
   selectHashTables,
   updateProfileCrrId,
   updateProfileRdtId,
+  updateProfileLightningId,
 } from './fastaSlice';
 import FastaHashTablesServer from './FastaHashTables';
 import hashTableToUrl from './fastaHashTableToUrl';
@@ -25,6 +27,7 @@ const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
   const crrRequestId: string | null = useSelector(selectSelectedCrrId);
   const rdtRequestId: string | null = useSelector(selectSelectedRdtId);
+  const liRequestId: string | null = useSelector(selectSelectedLightningId);
   const hashTables: HashTable[] = useSelector(selectHashTables);
 
   useEffect(() => {
@@ -63,6 +66,14 @@ const FastaSource = ({ sourceIdentifier, cache }: Props) => {
       dispatch(updateProfileRdtId(rdtRequestId));
     }
   }, [rdtRequestId]);
+
+  useEffect(() => {
+    if (liRequestId && !cache[liRequestId]) {
+      dispatch(request({ id: liRequestId, source: 'fasta' }));
+    } else {
+      dispatch(updateProfileLightningId(liRequestId));
+    }
+  }, [liRequestId]);
 
   const sourcesToLoad = Object.keys(cache).map((id) => {
     return (
