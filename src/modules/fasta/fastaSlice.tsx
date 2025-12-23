@@ -31,7 +31,7 @@ export interface FastaProduct {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'dev.fastaweather.com',
+  baseUrl: 'fastaweather.com',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedCrrId: null,
   selectedRdtId: null,
