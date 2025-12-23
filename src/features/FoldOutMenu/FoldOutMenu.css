@@ -157,9 +157,9 @@ ul {
 }
 
 .FoldOut {
-  width: 144px;
-  height: 50vh;
-  margin-top: 25vh;
+  width: 300px;
+  height: 60vh;
+  margin-top: 10vh;
   margin-left: 15px;
   color: rgb(200, 200, 200);
   background-color: var(--bg-color-2);
