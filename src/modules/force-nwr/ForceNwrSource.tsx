@@ -5,7 +5,9 @@ import {
 } from '../../hooks';
 import {
   updateDisplayTimes,
+  updateDisplayTime,
   updateVerticalLevels,
+  updateVerticalLevel,
   selectIsoDisplayTime,
   selectDisplayTimesIntersection,
   selectVerticalLevel,
@@ -177,7 +179,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                   times: times,
                 }),
               );
+              if (
+                !displayTime ||
+                (displayTime &&
+                  !times.includes(new Date(displayTime).getTime()))
+              ) {
+                dispatch(updateDisplayTime(times[0]));
+              }
+
               dispatch(updateVerticalLevels(levels));
+              if (
+                !verticalLevel ||
+                (verticalLevel && !levels.includes(verticalLevel))
+              ) {
+                dispatch(updateVerticalLevel(levels[0]));
+              }
             }
           }
         }

@@ -22,12 +22,8 @@ import forceNwrReducer from './modules/force-nwr/forceNwrSlice';
 import ForceNwrSource from './modules/force-nwr/ForceNwrSource';
 import ForceNwrProfile from './modules/force-nwr/ForceNwrProfile';
 import ForceNwrMenu from './modules/force-nwr/ForceNwrMenu';
-import waypointReducer from './modules/waypoints/waypointSlice';
-import geojsonFieldReducer from './modules/force-geojson-field/geojsonFieldSlice';
-import WaypointsSource from './modules/waypoints/WaypointSource';
 //import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
 //import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
-import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
 import FloatingBox from './features/FloatingBox';
 import ImgViewPort from './features/ImgViewPort';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -45,8 +41,6 @@ export const store = configureStore({
     map: mapReducer,
     cache: cacheReducer,
     forceNwr: forceNwrReducer,
-    waypoint: waypointReducer,
-    geojsonField: geojsonFieldReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -69,7 +63,6 @@ const App = () => {
       <Map>
         <Profiles>
           <ForceNwrProfile />
-          <TimeVerticalSensitiveWaypointsProfile />
         </Profiles>
         <Sources>
           <ForceNwrSource sourceIdentifier={'123'} />
@@ -123,26 +116,6 @@ const App = () => {
           orientation={'vertical'}
         />
       </FloatingBox>
-      {/*<FoldOutMenu align={'left'} theme={'glassTablet'}>
-        {/*<FoldOutItem id={'Style'} icon={'paint brush'}>
-          <TempBaseMapMenu id={'Style'} icon={'paint brush'} />
-        </FoldOutItem>*/}
-      {/*<FoldOutItem id={'Flight'} icon={'paper plane outline'}>
-          <FlightTrackMenu />
-        </FoldOutItem>*/}
-      {/*<FoldOutItem id={'Waypoints'} icon={'map pin'}>
-          <WaypointsMenu />
-        </FoldOutItem>}
-        <FoldOutItem id={'data'} icon={'image outline'}>
-          <MetaDataMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'style'} icon={'paint brush'}>
-          <ForceNwrMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'example'} icon={'question mark'}>
-          {'I am an example'}
-        </FoldOutItem>
-      </FoldOutMenu>*/}
       <Themes>
         <GlassTabletTheme id={'glassTablet'} />
         <PlainTheme id={'Plain'} />

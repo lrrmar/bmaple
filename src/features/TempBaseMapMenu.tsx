@@ -23,7 +23,6 @@ import {
   selectColourPalettes,
   selectColourPaletteId,
   selectOpacity,
-} from '../modules/force-geojson-field/geojsonFieldSlice';
 
 import DropDownList from './DropDownList';
 

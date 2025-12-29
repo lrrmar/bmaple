@@ -5,12 +5,11 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-import { selectCache } from '../mapping/cacheSlice';
+//import { selectCache } from '../mapping/cacheSlice';
 import {
-  updateDisplayTimes,
-  updateVerticalLevels,
   selectIsoDisplayTime,
   selectVerticalLevel,
+  selectVerticalLevels,
 } from '../mapping/mapSlice';
 
 import CanvasImgViewPortPreloaded from './CanvasImgViewPortPreloaded';
@@ -76,6 +75,7 @@ const HeaderLock = ({
       {locked ? locked : header}
       <Icon
         name={locked ? 'lock' : 'lock open'}
+        color={locked ? 'red' : 'black'}
         onClick={() => (locked ? setLocked(null) : setLocked(current))}
       />
     </div>
@@ -94,10 +94,13 @@ const ImageViewerWithMenu = ({
   hidden?: boolean;
 }) => {
   const dispatch = useDispatch();
-  const cache = useSelector(selectCache);
   const displayTime = useSelector(selectIsoDisplayTime);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const verticalLevels = useSelector(selectVerticalLevels);
   const profileIds = useSelector(selectProfileIds);
+  const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
+  const readableNames = useSelector(selectReadableNames);
+
   const [profileId, setProfileId] = useState<string | null>(null);
   const [selection, setSelection] = useState<DiscreteMetaData | null>({
     domain: null,
@@ -105,17 +108,11 @@ const ImageViewerWithMenu = ({
     start_time: null,
   });
   const selectionRef = useRef<DiscreteMetaData | null>(null);
-  const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
-  const readableNames = useSelector(selectReadableNames);
-  //const [backendDiscreteMetaData, setMetaData] = useState<MetaData | null>(null);
   const [validTimeLocked, setValidTimeLocked] = useState<string | null>(null);
   const [levelLocked, setLevelLocked] = useState<string | null>(null);
-  const [currentHashes, setCurrentHashes] = useState<Hash[]>([]);
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const [resourceId, setResourceId] = useState<string | null>(null);
-  const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
-  const [dims, setDims] = useState({ width: 0, height: 0 });
+  const verticalLevelsRef = useRef<string[]>([]);
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
@@ -126,6 +123,13 @@ const ImageViewerWithMenu = ({
   }, []);
 
   useEffect(() => {
+
+    // If different from Ref, remove all locks
+    if(JSON.stringify(selectionRef.current) !== JSON.stringify(selection)) {
+      setLevelLocked(null); 
+      setValidTimeLocked(null); 
+    };
+
     // After any selection change, store a copy in selectionRef
     if (selection) selectionRef.current = selection;
   }, [selection]);
@@ -280,8 +284,8 @@ const ImageViewerWithMenu = ({
     backendDiscreteMetaData,
     validTimeLocked,
     levelLocked,
-    displayTime,
-    verticalLevel,
+    //displayTime,
+    //verticalLevel,
     selection,
   ]);
 
@@ -364,12 +368,12 @@ const ImageViewerWithMenu = ({
     }
   }, [selection, displayTime, verticalLevel, currentHashes]);
    */
-  useEffect(() => {
+  /*useEffect(() => {
     setResourceLoaded(false);
     if (profileId) {
       setResourceLoaded(!!cache[profileId]);
     }
-  }, [profileId, cache]);
+  }, [profileId, cache]);*/
 
   useEffect(() => {
     const profileId = profileIds[id.toString()];
@@ -377,6 +381,21 @@ const ImageViewerWithMenu = ({
       setProfileId(profileId);
     }
   }, [profileIds]);
+
+  useEffect(() => {
+    // Auto lock if transferring from a single level to multi
+    
+    console.log('ref:', verticalLevelsRef.current);
+    console.log('state:', verticalLevel);
+    console.log(verticalLevels);
+    console.log('ref len 1:', verticalLevelsRef.current.length == 1)
+    console.log(verticalLevels.includes(verticalLevelsRef.current[0]));
+    console.log(verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0]));
+    if (verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0])) {
+      setLevelLocked(verticalLevelsRef.current[0]);
+    }
+    verticalLevelsRef.current = verticalLevels;
+  }, [verticalLevels]);
 
   return (
     <div
@@ -431,7 +450,9 @@ const ImageViewerWithMenu = ({
         </div>
         <CanvasImgViewPortPreloaded
           profileId={
-            profileId && !hidden && resourceLoaded ? 'img' + profileId : null
+            profileId && !hidden /*&& resourceLoaded*/
+              ? 'img' + profileId
+              : null
           }
           configChange={configChange}
         />

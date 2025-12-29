@@ -121,7 +121,6 @@ const MultiUnitScrollBar = <T, U>({
   }, [marks, value]);
 
   if (Object.keys(values).length === 0) {
-    dispatch(updateValue(''));
     return <div></div>;
   }
   const style: { [key: string]: string } = {
@@ -133,7 +132,6 @@ const MultiUnitScrollBar = <T, U>({
   };
 
   if (Object.keys(values).length === 1) {
-    dispatch(updateValue(values[0]));
     return <div style={style}>{values[0]}</div>;
   }
 

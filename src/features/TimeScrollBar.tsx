@@ -154,7 +154,6 @@ const ScrollingScale = () => {
       });
       setMarks(newMarks);*/
       setIntersectionTimes(times);
-      if (!displayTime) dispatch(updateDisplayTime(times[0]));
     }
   }, [displayTimesIntersection]);
 
@@ -216,7 +215,9 @@ const ScrollingScale = () => {
         <Icon
           name={'angle left'}
           size="large"
-          onClick={() => keyDown('ArrowLeft')}
+          onClick={() => {
+            keyDown('ArrowLeft');
+          }}
         />
         <Icon
           name={'angle right'}
@@ -234,9 +235,19 @@ const ScrollingScale = () => {
         value={new Date(displayTime).getTime()}
         valueLabelDisplay={'on'}
         valueLabelFormat={getUTCString}
+        onChange={(event) => {
+          let e = event as MouseEvent;
+          if (e.type === 'mousedown' && e.target) {
+            interface Target extends EventTarget {
+              value: number;
+            }
+            const target = e.target as Target;
+            dispatch(updateDisplayTime(target.value));
+          }
+        }}
         onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
+          //e.stopPropagation();
+          //e.preventDefault();
         }}
         color={'info'}
         sx={{
