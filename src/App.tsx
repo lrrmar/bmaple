@@ -3,7 +3,7 @@ import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 
 import mapReducer, {
   selectVerticalLevel,
-  selectVerticalLevels,
+  selectVerticalLevelsIntersection,
   updateVerticalLevel,
 } from './mapping/mapSlice';
 import cacheReducer from './mapping/cacheSlice';
@@ -22,8 +22,6 @@ import forceNwrReducer from './modules/force-nwr/forceNwrSlice';
 import ForceNwrSource from './modules/force-nwr/ForceNwrSource';
 import ForceNwrProfile from './modules/force-nwr/ForceNwrProfile';
 import ForceNwrMenu from './modules/force-nwr/ForceNwrMenu';
-//import FlightTrackSource from './modules/flight-paths/FlightTrackSource';
-//import FlightTrackMenu from './modules/flight-paths/FlightTrackMenu';
 import FloatingBox from './features/FloatingBox';
 import ImgViewPort from './features/ImgViewPort';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
@@ -65,8 +63,7 @@ const App = () => {
           <ForceNwrProfile />
         </Profiles>
         <Sources>
-          <ForceNwrSource sourceIdentifier={'123'} />
-          {/*<FlightTrackSource cache={{}} sourceIdentifier={'flight'} />*/}
+          <ForceNwrSource sourceIdentifier={'force-nwr'} />
         </Sources>
         <BaseMaps></BaseMaps>
       </Map>
@@ -74,9 +71,9 @@ const App = () => {
         style={{
           position: 'absolute',
           left: '12vw',
-          top: '12vh',
+          top: '6vh',
           width: '76vw',
-          height: '76vh',
+          height: '82vh',
           zIndex: '20',
           display: 'flex',
           alignItems: 'centre',
@@ -105,13 +102,34 @@ const App = () => {
           src={process.env.PUBLIC_URL + '/ncas-logo.png'}
         />
       </FloatingBox>
+      <FloatingBox
+        style={{
+          top: '20px',
+          left: '10px',
+          borderWidth: '0px',
+          zIndex: '21',
+          backgroundColor: 'rgba(0,0,0,0)',
+          width: '20vw',
+          objectFit: 'contain',
+        }}
+      ></FloatingBox>
+      <FloatingBox
+        style={{
+          top: '20px',
+          left: '10px',
+          borderWidth: '0px',
+          zIndex: '21',
+          backgroundColor: 'rgba(0,0,0,0)',
+          objectFit: 'contain',
+        }}
+      ></FloatingBox>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         <TimeScrollBar />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <MultiUnitScrollBar
           selectValue={selectVerticalLevel}
-          selectValues={selectVerticalLevels}
+          selectValues={selectVerticalLevelsIntersection}
           updateValue={updateVerticalLevel}
           orientation={'vertical'}
         />

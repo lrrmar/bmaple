@@ -23,14 +23,14 @@ const CanvasImgViewPort = ({
   let canvasWidth = 0;
   let canvasHeight = 0;
   const canvas = canvasRef.current;
-  if (!id && canvas){
-    //console.log(id);
+  /*if (!id && canvas) {
     const ctx = canvas.getContext('2d');
     //console.log(ctx);
     //console.log(canvas.width, canvas.height);
     if (ctx) ctx.clearRect(0, 0, 10000, 10000);
-  }
+  }*/
   if (id && canvas) {
+    console.log('canvas', id);
     const parent = canvas.parentElement;
     if (parent) {
       const parentWidth = parent.getClientRects()[0].width;

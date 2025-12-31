@@ -45,7 +45,9 @@ interface InitialState {
   };
   outlineContours: boolean;
   verticalLevel: string | null;
-  verticalLevels: string[];
+  verticalLevels: {
+    [key: string]: string[];
+  };
   verticalLevelUnits: string;
 }
 
@@ -65,7 +67,7 @@ const initialState: InitialState = {
   displayTimes: {},
   outlineContours: false,
   verticalLevel: null,
-  verticalLevels: [],
+  verticalLevels: {},
   verticalLevelUnits: '',
 };
 
@@ -122,10 +124,11 @@ export const mapSlice = createSlice({
     updateVerticalLevel: (state, verticalLevel: PayloadAction<string>) => {
       state.verticalLevel = verticalLevel.payload;
     },
-    updateVerticalLevels: (state, verticalLevels: PayloadAction<string[]>) => {
-      state.verticalLevels = verticalLevels.payload;
-      if (state.verticalLevel == '')
-        state.verticalLevel = verticalLevels.payload[0];
+    updateVerticalLevels: (
+      state,
+      update: PayloadAction<{ source: string; levels: string[] }>,
+    ) => {
+      state.verticalLevels[update.payload.source] = update.payload.levels;
     },
     updateVerticalLevelUnits: (
       state,
@@ -220,9 +223,10 @@ export const selectOutlineContours = (state: RootState) =>
 export const selectVerticalLevel = (state: RootState) =>
   state.map.verticalLevel;
 export const selectVerticalLevels = (state: RootState) => {
-  return verticalLevelOrder.filter((level) =>
+  return state.map.verticalLevels;
+  /*return verticalLevelOrder.filter((level) =>
     state.map.verticalLevels.includes(level),
-  );
+  );*/
 };
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
@@ -236,5 +240,21 @@ export const selectDisplayTimesIntersection = (state: RootState) => {
     }
   }
   return times;
+};
+export const selectVerticalLevelsIntersection = (state: RootState) => {
+  const levelsArrays = Object.values(state.map.verticalLevels).filter(
+    (arr) => arr.length > 1,
+  );
+  if (levelsArrays.length < 1) return [];
+  if (levelsArrays.length == 1) return levelsArrays[0];
+  let levels = levelsArrays[0];
+  if (levels) {
+    for (let i = 1; i < Object.keys(state.map.verticalLevels).length; i++) {
+      levels = levels.filter((level) =>
+        Object.values(state.map.verticalLevels)[i].includes(level),
+      );
+    }
+  }
+  return levels;
 };
 export default mapSlice.reducer;

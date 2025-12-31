@@ -236,7 +236,7 @@ const ScrollingScale = () => {
         valueLabelDisplay={'on'}
         valueLabelFormat={getUTCString}
         onChange={(event) => {
-          let e = event as MouseEvent;
+          const e = event as MouseEvent;
           if (e.type === 'mousedown' && e.target) {
             interface Target extends EventTarget {
               value: number;

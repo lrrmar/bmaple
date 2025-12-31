@@ -58,6 +58,7 @@ interface Query {
   start_time: string | null;
   level: string | null;
 }
+type Locked = { value: string | null; strong: boolean };
 
 const HeaderLock = ({
   header,
@@ -67,19 +68,29 @@ const HeaderLock = ({
 }: {
   header: string;
   current: string | null;
-  locked: string | null;
-  setLocked: React.Dispatch<React.SetStateAction<string | null>>;
+  locked: Locked;
+  setLocked: React.Dispatch<React.SetStateAction<Locked>>;
 }) => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      {locked ? locked : header}
-      <Icon
-        name={locked ? 'lock' : 'lock open'}
-        color={locked ? 'red' : 'black'}
-        onClick={() => (locked ? setLocked(null) : setLocked(current))}
-      />
+    <div style={{display: 'flex', flexDirection: 'column'}}>
+      {header}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {locked.value ? locked.value : '...'}
+        <Icon
+          name={locked.value ? 'lock' : 'lock open'}
+          color={locked.value ? (locked.strong ? 'grey' : 'red') : 'black'}
+          onClick={() =>
+            locked.value
+            ? (
+            locked.strong ? void 0 : 
+            setLocked({ value: null, strong: false })
+            )
+              : setLocked({ value: current, strong: false })
+          }
+        />
+      </div>
     </div>
-  );
+    );
 };
 
 const ImageViewerWithMenu = ({
@@ -108,8 +119,14 @@ const ImageViewerWithMenu = ({
     start_time: null,
   });
   const selectionRef = useRef<DiscreteMetaData | null>(null);
-  const [validTimeLocked, setValidTimeLocked] = useState<string | null>(null);
-  const [levelLocked, setLevelLocked] = useState<string | null>(null);
+  const [validTimeLocked, setValidTimeLocked] = useState<Locked>({
+    value: null,
+    strong: false,
+  });
+  const [levelLocked, setLevelLocked] = useState<Locked>({
+    value: null,
+    strong: false,
+  });
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const verticalLevelsRef = useRef<string[]>([]);
@@ -123,12 +140,11 @@ const ImageViewerWithMenu = ({
   }, []);
 
   useEffect(() => {
-
     // If different from Ref, remove all locks
-    if(JSON.stringify(selectionRef.current) !== JSON.stringify(selection)) {
-      setLevelLocked(null); 
-      setValidTimeLocked(null); 
-    };
+    if (JSON.stringify(selectionRef.current) !== JSON.stringify(selection)) {
+      setLevelLocked({ value: null, strong: false });
+      setValidTimeLocked({ value: null, strong: false });
+    }
 
     // After any selection change, store a copy in selectionRef
     if (selection) selectionRef.current = selection;
@@ -284,8 +300,8 @@ const ImageViewerWithMenu = ({
     backendDiscreteMetaData,
     validTimeLocked,
     levelLocked,
-    //displayTime,
-    //verticalLevel,
+    displayTime,
+    verticalLevel,
     selection,
   ]);
 
@@ -303,8 +319,8 @@ const ImageViewerWithMenu = ({
       updateContinuousMetaDataLocks({
         id: id.toString(),
         locks: {
-          valid_time: validTimeLocked,
-          level: levelLocked,
+          valid_time: validTimeLocked.value,
+          level: levelLocked.value,
         },
       }),
     );
@@ -377,6 +393,7 @@ const ImageViewerWithMenu = ({
 
   useEffect(() => {
     const profileId = profileIds[id.toString()];
+    console.log(profileId);
     if (profileId) {
       setProfileId(profileId);
     }
@@ -384,17 +401,14 @@ const ImageViewerWithMenu = ({
 
   useEffect(() => {
     // Auto lock if transferring from a single level to multi
-    
-    console.log('ref:', verticalLevelsRef.current);
-    console.log('state:', verticalLevel);
-    console.log(verticalLevels);
-    console.log('ref len 1:', verticalLevelsRef.current.length == 1)
-    console.log(verticalLevels.includes(verticalLevelsRef.current[0]));
-    console.log(verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0]));
-    if (verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0])) {
+
+    /*if (verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0])) {
       setLevelLocked(verticalLevelsRef.current[0]);
     }
-    verticalLevelsRef.current = verticalLevels;
+    verticalLevelsRef.current = verticalLevels;*/
+    const levels = verticalLevels['force-nwr' + id];
+    if (levels && levels.length == 1)
+      setLevelLocked({ value: levels[0], strong: true });
   }, [verticalLevels]);
 
   return (

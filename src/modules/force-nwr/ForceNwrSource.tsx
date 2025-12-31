@@ -27,6 +27,7 @@ import {
   updateReadableNames,
   DiscreteMetaData,
 } from './forceNwrSlice';
+
 import { selectCache, request } from '../../mapping/cacheSlice';
 
 import ForceNwrImage from './ForceNwrImage';
@@ -187,11 +188,20 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 dispatch(updateDisplayTime(times[0]));
               }
 
-              dispatch(updateVerticalLevels(levels));
+              dispatch(
+                updateVerticalLevels({
+                  source: sourceIdentifier + key,
+                  levels: levels,
+                }),
+              );
+
               if (
                 !verticalLevel ||
-                (verticalLevel && !levels.includes(verticalLevel))
+                (verticalLevel &&
+                  !levels.includes(verticalLevel) &&
+                  levels.length > 1)
               ) {
+                console.log(levels);
                 dispatch(updateVerticalLevel(levels[0]));
               }
             }
@@ -230,7 +240,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 if (match) return match == value;
               }),
             );
-            if (profileHash) {
+            if (profileHash && profileIds[id] != profileHash.id) {
               dispatch(
                 updateProfileIds({ host: id, resource: profileHash.id }),
               );

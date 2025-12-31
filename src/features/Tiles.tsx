@@ -24,7 +24,7 @@ const Tiles = () => {
   const tileConfigurations: TileConfigurations[] = [
     'single',
     'duo',
-    //    'trio',
+    'trio',
     //'quad',
     //'bottom bar',
   ];
