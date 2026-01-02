@@ -73,7 +73,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const displayTime = useSelector(selectIsoDisplayTime);
   const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
   const verticalLevel = useSelector(selectVerticalLevel);
-  const verticalLevelsIntersection = useSelector(selectVerticalLevelsIntersection);
+  const verticalLevelsIntersection = useSelector(
+    selectVerticalLevelsIntersection,
+  );
   const [continuousMetaData, setContinuousMetaData] = useState<{
     [key: string]: ContinuousMetaData | null;
   }>({});
@@ -182,7 +184,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                   times: times,
                 }),
               );
-              
+
               dispatch(
                 updateVerticalLevels({
                   source: sourceIdentifier + key,
@@ -199,7 +201,8 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     if (
       !displayTime ||
-      (displayTime && displayTimesIntersection &&
+      (displayTime &&
+        displayTimesIntersection &&
         !displayTimesIntersection.includes(new Date(displayTime).getTime()))
     ) {
       dispatch(updateDisplayTime(displayTimesIntersection[0]));
@@ -209,9 +212,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     if (
       !verticalLevel ||
-      (verticalLevel && verticalLevelsIntersection &&
-        !verticalLevelsIntersection.includes(verticalLevel)
-      )
+      (verticalLevel &&
+        verticalLevelsIntersection &&
+        !verticalLevelsIntersection.includes(verticalLevel))
     ) {
       dispatch(updateVerticalLevel(verticalLevelsIntersection[0]));
     }
@@ -300,7 +303,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
               if (match) return match == value;
             }),
           );
-  
+
           if (thesePreloadHashes) {
             const thesePreloadIds = thesePreloadHashes.map(
               (hash: Hash) => hash.id,
@@ -311,7 +314,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       }
     });
     setPreloadIds(updatedLevelHashes);
-  }, [discreteMetaDataSelections, verticalLevel, currentHashes]);
+  }, [verticalLevel, currentHashes]);
 
   useEffect(() => {
     // Preload all along time axis
@@ -319,7 +322,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     const updatedTimeHashes: { [key: string]: string[] } = {};
     let activeHosts = Object.values(profileIds).filter((e) => !!e).length;
     activeHosts = activeHosts == 0 ? 1 : activeHosts;
-    const maxImagesPerScroll = 8;
+    const maxImagesPerScroll = 12;
     const limiter = Math.floor(maxImagesPerScroll / activeHosts);
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
@@ -343,27 +346,31 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
             }),
           );
           /* The ideal behaviour here is to preload all images that are N away from
-          * the current one in the array of displayTimes, i.e. if we are at image 10
-          * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
-          */
-  
+           * the current one in the array of displayTimes, i.e. if we are at image 10
+           * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
+           */
+
           // Filter hashes that have a time outside of display times
           thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
-            displayTimesIntersection.includes(new Date(hash.valid_time).getTime()),
+            displayTimesIntersection.includes(
+              new Date(hash.valid_time).getTime(),
+            ),
           );
-  
+
           // Filter hashes that have been loaded
           thesePreloadHashes = thesePreloadHashes.filter(
             (hash: Hash) => !loadedResources.includes(hash.id),
           );
-  
+
           // Order base on distance from current display time
           thesePreloadHashes = thesePreloadHashes.sort((a: Hash, b: Hash) => {
             const diffA = Math.abs(
-              new Date(a.valid_time).getTime() - new Date(displayTime).getTime(),
+              new Date(a.valid_time).getTime() -
+                new Date(displayTime).getTime(),
             );
             const diffB = Math.abs(
-              new Date(b.valid_time).getTime() - new Date(displayTime).getTime(),
+              new Date(b.valid_time).getTime() -
+                new Date(displayTime).getTime(),
             );
             if (diffA < diffB) {
               return -1;
@@ -372,7 +379,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
             }
             return 0;
           });
-  
+
           if (thesePreloadHashes) {
             const thesePreloadIds = thesePreloadHashes.map(
               (hash: Hash) => hash.id,
@@ -383,7 +390,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       }
     });
     setPreloadIds(updatedTimeHashes);
-  }, [discreteMetaDataSelections, displayTime, currentHashes]);
+  }, [displayTime, currentHashes]);
 
   useEffect(() => {
     const resourceIds: string[] = Object.values(profileIds).filter(
@@ -417,7 +424,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     setLayers(components);
   }, [loadedResources]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (profileIds) {
       Object.keys(profileIds).forEach((id) => {
         const cacheElement = cache[id];
@@ -430,7 +437,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           );
       });
     }
-  }, [profileIds]);
+  }, [profileIds]);*/
 
   return (
     <div style={{ left: '-100000px', position: 'absolute' }}>{layers}</div>

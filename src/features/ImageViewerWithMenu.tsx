@@ -5,7 +5,7 @@ import {
   useAppDispatch as useDispatch,
 } from '../hooks';
 
-//import { selectCache } from '../mapping/cacheSlice';
+import { selectCache } from '../mapping/cacheSlice';
 import {
   selectIsoDisplayTime,
   selectVerticalLevel,
@@ -73,7 +73,7 @@ const HeaderLock = ({
   setLocked: React.Dispatch<React.SetStateAction<Locked>>;
 }) => {
   return (
-    <div style={{display: 'flex', flexDirection: 'column'}}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       {header}
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {locked.value ? locked.value : '...'}
@@ -82,16 +82,15 @@ const HeaderLock = ({
           color={locked.value ? (locked.strong ? 'grey' : 'red') : 'black'}
           onClick={() =>
             locked.value
-            ? (
-            locked.strong ? void 0 : 
-            setLocked({ value: null, strong: false })
-            )
+              ? locked.strong
+                ? void 0
+                : setLocked({ value: null, strong: false })
               : setLocked({ value: current, strong: false })
           }
         />
       </div>
     </div>
-    );
+  );
 };
 
 const ImageViewerWithMenu = ({
@@ -112,6 +111,7 @@ const ImageViewerWithMenu = ({
   const profileIds = useSelector(selectProfileIds);
   const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
   const readableNames = useSelector(selectReadableNames);
+  const cache = useSelector(selectCache);
 
   const [profileId, setProfileId] = useState<string | null>(null);
   const [selection, setSelection] = useState<DiscreteMetaData | null>(null);
@@ -131,10 +131,11 @@ const ImageViewerWithMenu = ({
   });
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
-    // selectionRef 
+    // selectionRef
     setSelection(selectionRef.current);
   }, []);
 
@@ -182,7 +183,9 @@ const ImageViewerWithMenu = ({
           ).fill(1);
           otherDiscreteHeaders.forEach((otherDiscreteHeader) => {
             // Other headers current selection
-            const otherDiscreteHeaderSelection = selection ? selection[otherDiscreteHeader] : null;
+            const otherDiscreteHeaderSelection = selection
+              ? selection[otherDiscreteHeader]
+              : null;
             if (typeof otherDiscreteHeaderSelection === 'string') {
               const otherSelection: number = values[
                 otherDiscreteHeader
@@ -213,7 +216,9 @@ const ImageViewerWithMenu = ({
             );
           });
           let displayName = '...';
-          const selectionHeader = selection ? selection[thisDiscreteHeader] : null;
+          const selectionHeader = selection
+            ? selection[thisDiscreteHeader]
+            : null;
 
           if (selectionHeader) {
             displayName = selectionHeader;
@@ -239,13 +244,14 @@ const ImageViewerWithMenu = ({
                 }}
                 onChange={(e) => {
                   if (typeof e.target.value === 'number') {
-                    let newSelection: DiscreteMetaData = {}
-                    if (selection) newSelection = {
-                      ...selection,
-                    };
-                    newSelection[thisDiscreteHeader] =
-                      thisDiscreteHeaderValues[e.target.value];
-                    setSelection(newSelection);
+                    if (selection) {
+                      const newSelection = {
+                        ...selection,
+                      };
+                      newSelection[thisDiscreteHeader] =
+                        thisDiscreteHeaderValues[e.target.value];
+                      setSelection(newSelection);
+                    }
                   }
                 }}
                 input={<OutlinedInput value={displayName} />}
@@ -382,12 +388,12 @@ const ImageViewerWithMenu = ({
     }
   }, [selection, displayTime, verticalLevel, currentHashes]);
    */
-  /*useEffect(() => {
-    setResourceLoaded(false);
+  useEffect(() => {
+    //setResourceLoaded(false);
     if (profileId) {
       setResourceLoaded(!!cache[profileId]);
     }
-  }, [profileId, cache]);*/
+  }, [profileId, cache]);
 
   useEffect(() => {
     const profileId = profileIds[id.toString()];
@@ -397,7 +403,7 @@ const ImageViewerWithMenu = ({
   }, [profileIds]);
 
   useEffect(() => {
-    // Save verticalLevels in Ref and 
+    // Save verticalLevels in Ref and
     // Auto lock if transferring from a single level to multi
 
     const levels = verticalLevels['force-nwr' + id];
@@ -409,11 +415,12 @@ const ImageViewerWithMenu = ({
   }, [verticalLevels]);
 
   useEffect(() => {
-    // Clean up on close 
-    
+    // Clean up on close
+
     // Remove vertical levels on close of ImageViewer i.e. from single to duo
     const levels = verticalLevels['force-nwr' + id];
-    if (hidden && levels && levels.length > 0) dispatch(updateVerticalLevels({ source: 'force-nwr'+id, levels: []}));
+    if (hidden && levels && levels.length > 0)
+      dispatch(updateVerticalLevels({ source: 'force-nwr' + id, levels: [] }));
 
     // Remove selection on close of ImageViewer
     if (hidden && selection) setSelection(null);
@@ -421,7 +428,12 @@ const ImageViewerWithMenu = ({
     // Start up on open
     if (!hidden) {
       setSelection(selectionRef.current);
-      dispatch(updateVerticalLevels({ source: 'force-nwr' + id, levels: verticalLevelsRef.current }));
+      dispatch(
+        updateVerticalLevels({
+          source: 'force-nwr' + id,
+          levels: verticalLevelsRef.current,
+        }),
+      );
     }
   }, [hidden]);
 
@@ -478,9 +490,7 @@ const ImageViewerWithMenu = ({
         </div>
         <CanvasImgViewPortPreloaded
           profileId={
-            profileId && !hidden /*&& resourceLoaded*/
-              ? 'img' + profileId
-              : null
+            profileId && !hidden && resourceLoaded ? 'img' + profileId : null
           }
           configChange={configChange}
         />

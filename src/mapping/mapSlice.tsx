@@ -248,15 +248,18 @@ export const selectVerticalLevelsIntersection = (state: RootState) => {
   if (levelsArrays.length < 1) return [];
   // The line below gives us or first list of levels to create our total
   // intersection of all levels from AND gets them in the right order
-  let levels = verticalLevelOrder.filter((level) => levelsArrays[0].includes(level));
+  let levels = verticalLevelOrder.filter((level) =>
+    levelsArrays[0].includes(level),
+  );
   if (levels) {
     if (levelsArrays.length == 1) return levels; // No need for intersection
-    for (let i = 1; i < Object.keys(state.map.verticalLevels).length; i++) {
+    for (let i = 1; i < levelsArrays.length; i++) {
       levels = levels.filter((level) =>
-        Object.values(state.map.verticalLevels)[i].includes(level),
+        Object.values(levelsArrays)[i].includes(level),
       );
     }
+    return levels;
   }
-  return levels;
+  return [];
 };
 export default mapSlice.reducer;
