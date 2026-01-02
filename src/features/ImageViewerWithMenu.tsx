@@ -10,6 +10,7 @@ import {
   selectIsoDisplayTime,
   selectVerticalLevel,
   selectVerticalLevels,
+  updateVerticalLevels,
 } from '../mapping/mapSlice';
 
 import CanvasImgViewPortPreloaded from './CanvasImgViewPortPreloaded';
@@ -32,7 +33,7 @@ import {
 
 type DiscreteHeader = 'domain' | 'field' | 'start_time';
 type ContinuousHeader = 'valid_time' | 'level';
-interface MetaData {
+/*interface MetaData {
   headers: DiscreteHeader[];
   values: { [key in DiscreteHeader]: string[] };
   tables: { [key in DiscreteHeader]: { [key: string]: (0 | 1)[][] } };
@@ -57,7 +58,7 @@ interface Query {
   valid_time: string | null;
   start_time: string | null;
   level: string | null;
-}
+}*/
 type Locked = { value: string | null; strong: boolean };
 
 const HeaderLock = ({
@@ -113,12 +114,13 @@ const ImageViewerWithMenu = ({
   const readableNames = useSelector(selectReadableNames);
 
   const [profileId, setProfileId] = useState<string | null>(null);
-  const [selection, setSelection] = useState<DiscreteMetaData | null>({
+  const [selection, setSelection] = useState<DiscreteMetaData | null>(null);
+  const selectionRef = useRef<DiscreteMetaData | null>({
     domain: null,
     field: null,
     start_time: null,
   });
-  const selectionRef = useRef<DiscreteMetaData | null>(null);
+  const verticalLevelsRef = useRef<string[]>([]);
   const [validTimeLocked, setValidTimeLocked] = useState<Locked>({
     value: null,
     strong: false,
@@ -129,18 +131,15 @@ const ImageViewerWithMenu = ({
   });
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
-  const verticalLevelsRef = useRef<string[]>([]);
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
-    // selectionRef i.e. due to a change in tiling
-    if (selectionRef.current) {
-      setSelection(selectionRef.current);
-    }
+    // selectionRef 
+    setSelection(selectionRef.current);
   }, []);
 
   useEffect(() => {
-    // If different from Ref, remove all locks
+    // If new selection different from Ref, remove all locks
     if (JSON.stringify(selectionRef.current) !== JSON.stringify(selection)) {
       setLevelLocked({ value: null, strong: false });
       setValidTimeLocked({ value: null, strong: false });
@@ -156,16 +155,16 @@ const ImageViewerWithMenu = ({
       const discreteHeaders = backendDiscreteMetaData.headers;
       const values = backendDiscreteMetaData.values;
       const tables = backendDiscreteMetaData.tables;
-      if (!selection) {
+      /*if (!selection) {
         //Get initial selection
-        /*const newSelection = {
+        const newSelection = {
           field: values['field'][0],
           domain: values['domain'][0],
           start_time: values['start_time'][0],
         };
-        setSelection(newSelection);*/
+        setSelection(newSelection);
         return;
-      }
+      }*/
       const selects = discreteHeaders.map(
         (thisDiscreteHeader: DiscreteHeader, i) => {
           // First find out which value we have valid hash tables
@@ -183,7 +182,7 @@ const ImageViewerWithMenu = ({
           ).fill(1);
           otherDiscreteHeaders.forEach((otherDiscreteHeader) => {
             // Other headers current selection
-            const otherDiscreteHeaderSelection = selection[otherDiscreteHeader];
+            const otherDiscreteHeaderSelection = selection ? selection[otherDiscreteHeader] : null;
             if (typeof otherDiscreteHeaderSelection === 'string') {
               const otherSelection: number = values[
                 otherDiscreteHeader
@@ -214,7 +213,7 @@ const ImageViewerWithMenu = ({
             );
           });
           let displayName = '...';
-          const selectionHeader = selection[thisDiscreteHeader];
+          const selectionHeader = selection ? selection[thisDiscreteHeader] : null;
 
           if (selectionHeader) {
             displayName = selectionHeader;
@@ -240,7 +239,8 @@ const ImageViewerWithMenu = ({
                 }}
                 onChange={(e) => {
                   if (typeof e.target.value === 'number') {
-                    const newSelection: DiscreteMetaData = {
+                    let newSelection: DiscreteMetaData = {}
+                    if (selection) newSelection = {
                       ...selection,
                     };
                     newSelection[thisDiscreteHeader] =
@@ -262,8 +262,6 @@ const ImageViewerWithMenu = ({
           );
         },
       );
-
-      const continuousHeaders = ['valid_time', 'level'];
 
       selects.push(
         <HeaderLock
@@ -393,23 +391,39 @@ const ImageViewerWithMenu = ({
 
   useEffect(() => {
     const profileId = profileIds[id.toString()];
-    console.log(profileId);
     if (profileId) {
       setProfileId(profileId);
     }
   }, [profileIds]);
 
   useEffect(() => {
+    // Save verticalLevels in Ref and 
     // Auto lock if transferring from a single level to multi
 
-    /*if (verticalLevelsRef.current.length == 1 && verticalLevels.length > 1 && !verticalLevels.includes(verticalLevelsRef.current[0])) {
-      setLevelLocked(verticalLevelsRef.current[0]);
-    }
-    verticalLevelsRef.current = verticalLevels;*/
     const levels = verticalLevels['force-nwr' + id];
+    // The length > 0 below is to counteract the setting of these levels to []
+    // below on change of 'hidden', i.e. stores the last valid levels
+    if (levels && levels.length > 0) verticalLevelsRef.current = levels;
     if (levels && levels.length == 1)
       setLevelLocked({ value: levels[0], strong: true });
   }, [verticalLevels]);
+
+  useEffect(() => {
+    // Clean up on close 
+    
+    // Remove vertical levels on close of ImageViewer i.e. from single to duo
+    const levels = verticalLevels['force-nwr' + id];
+    if (hidden && levels && levels.length > 0) dispatch(updateVerticalLevels({ source: 'force-nwr'+id, levels: []}));
+
+    // Remove selection on close of ImageViewer
+    if (hidden && selection) setSelection(null);
+
+    // Start up on open
+    if (!hidden) {
+      setSelection(selectionRef.current);
+      dispatch(updateVerticalLevels({ source: 'force-nwr' + id, levels: verticalLevelsRef.current }));
+    }
+  }, [hidden]);
 
   return (
     <div

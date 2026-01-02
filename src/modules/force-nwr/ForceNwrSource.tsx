@@ -11,6 +11,7 @@ import {
   selectIsoDisplayTime,
   selectDisplayTimesIntersection,
   selectVerticalLevel,
+  selectVerticalLevelsIntersection,
 } from '../../mapping/mapSlice';
 
 import {
@@ -70,8 +71,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     {},
   );
   const displayTime = useSelector(selectIsoDisplayTime);
-  const displayTimes = useSelector(selectDisplayTimesIntersection);
+  const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
   const verticalLevel = useSelector(selectVerticalLevel);
+  const verticalLevelsIntersection = useSelector(selectVerticalLevelsIntersection);
   const [continuousMetaData, setContinuousMetaData] = useState<{
     [key: string]: ContinuousMetaData | null;
   }>({});
@@ -180,36 +182,40 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                   times: times,
                 }),
               );
-              if (
-                !displayTime ||
-                (displayTime &&
-                  !times.includes(new Date(displayTime).getTime()))
-              ) {
-                dispatch(updateDisplayTime(times[0]));
-              }
-
+              
               dispatch(
                 updateVerticalLevels({
                   source: sourceIdentifier + key,
                   levels: levels,
                 }),
               );
-
-              if (
-                !verticalLevel ||
-                (verticalLevel &&
-                  !levels.includes(verticalLevel) &&
-                  levels.length > 1)
-              ) {
-                console.log(levels);
-                dispatch(updateVerticalLevel(levels[0]));
-              }
             }
           }
         }
       });
     }
   }, [currentHashes]);
+
+  useEffect(() => {
+    if (
+      !displayTime ||
+      (displayTime && displayTimesIntersection &&
+        !displayTimesIntersection.includes(new Date(displayTime).getTime()))
+    ) {
+      dispatch(updateDisplayTime(displayTimesIntersection[0]));
+    }
+  }, [displayTimesIntersection]);
+
+  useEffect(() => {
+    if (
+      !verticalLevel ||
+      (verticalLevel && verticalLevelsIntersection &&
+        !verticalLevelsIntersection.includes(verticalLevel)
+      )
+    ) {
+      dispatch(updateVerticalLevel(verticalLevelsIntersection[0]));
+    }
+  }, [verticalLevelsIntersection]);
 
   useEffect(() => {
     // On ANY metadata change, check cache and if not present
@@ -240,11 +246,20 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 if (match) return match == value;
               }),
             );
-            if (profileHash && profileIds[id] != profileHash.id) {
-              dispatch(
-                updateProfileIds({ host: id, resource: profileHash.id }),
-              );
+            if (profileHash) {
+              // If a profileHash does exists for our selection we need to update
+              // the profileId if it is not equal to that currently set;
+              // however if it is the same (which happens quite frequently due to
+              // the many bits of state this useEffect subscribes to) then just do
+              // nothing and keep it the same as it was previously.
+              if (profileIds[id] != profileHash.id) {
+                dispatch(
+                  updateProfileIds({ host: id, resource: profileHash.id }),
+                );
+              }
             } else {
+              // If profileHash does not exist then we express that there is no
+              // valid profileId available for this host
               dispatch(updateProfileIds({ host: id, resource: null }));
             }
           }
@@ -266,91 +281,104 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     const updatedLevelHashes: { [key: string]: string[] } = {};
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
-      const time = displayTime;
-      const timesQuery = {
-        ...selection,
-        valid_time: time,
-      };
-      // Get all hashes that match the query for any time
-      const theseHashes = currentHashes[id];
-      if (theseHashes) {
-        const thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
-          Object.entries(timesQuery).every(([key, value]) => {
-            const match = dict[key];
-            if (match) return match == value;
-          }),
-        );
-
-        if (thesePreloadHashes) {
-          const thesePreloadIds = thesePreloadHashes.map(
-            (hash: Hash) => hash.id,
+      if (selection) {
+        const locks = continuousMetaDataLocks[id];
+        let time = displayTime;
+        if (locks) {
+          time = locks.valid_time ? locks.valid_time : time;
+        }
+        const timesQuery = {
+          ...selection,
+          valid_time: time,
+        };
+        // Get all hashes that match the query for any time
+        const theseHashes = currentHashes[id];
+        if (theseHashes) {
+          const thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
+            Object.entries(timesQuery).every(([key, value]) => {
+              const match = dict[key];
+              if (match) return match == value;
+            }),
           );
-          updatedLevelHashes[id] = thesePreloadIds;
+  
+          if (thesePreloadHashes) {
+            const thesePreloadIds = thesePreloadHashes.map(
+              (hash: Hash) => hash.id,
+            );
+            updatedLevelHashes[id] = thesePreloadIds;
+          }
         }
       }
     });
     setPreloadIds(updatedLevelHashes);
   }, [discreteMetaDataSelections, verticalLevel, currentHashes]);
+
   useEffect(() => {
     // Preload all along time axis
 
     const updatedTimeHashes: { [key: string]: string[] } = {};
     let activeHosts = Object.values(profileIds).filter((e) => !!e).length;
     activeHosts = activeHosts == 0 ? 1 : activeHosts;
-    const maxImagesPerScroll = 12;
+    const maxImagesPerScroll = 8;
     const limiter = Math.floor(maxImagesPerScroll / activeHosts);
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
-      const level = verticalLevel;
-      const timesQuery = {
-        ...selection,
-        level: level,
-      };
-      // Get all hashes that match the query for any time
-      const theseHashes = currentHashes[id];
-      if (theseHashes) {
-        let thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
-          Object.entries(timesQuery).every(([key, value]) => {
-            const match = dict[key];
-            if (match) return match == value;
-          }),
-        );
-        /* The ideal behaviour here is to preload all images that are N away from
-         * the current one in the array of displayTimes, i.e. if we are at image 10
-         * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
-         */
-
-        // Filter hashes that have a time outside of display times
-        thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
-          displayTimes.includes(new Date(hash.valid_time).getTime()),
-        );
-
-        // Filter hashes that have been loaded
-        thesePreloadHashes = thesePreloadHashes.filter(
-          (hash: Hash) => !loadedResources.includes(hash.id),
-        );
-
-        // Order base on distance from current display time
-        thesePreloadHashes = thesePreloadHashes.sort((a: Hash, b: Hash) => {
-          const diffA = Math.abs(
-            new Date(a.valid_time).getTime() - new Date(displayTime).getTime(),
+      if (selection) {
+        const locks = continuousMetaDataLocks[id];
+        let level = verticalLevel;
+        if (locks) {
+          level = locks.level ? locks.level : level;
+        }
+        const timesQuery = {
+          ...selection,
+          level: level,
+        };
+        // Get all hashes that match the query for any time
+        const theseHashes = currentHashes[id];
+        if (theseHashes) {
+          let thesePreloadHashes = currentHashes[id].filter((dict: Hash) =>
+            Object.entries(timesQuery).every(([key, value]) => {
+              const match = dict[key];
+              if (match) return match == value;
+            }),
           );
-          const diffB = Math.abs(
-            new Date(b.valid_time).getTime() - new Date(displayTime).getTime(),
+          /* The ideal behaviour here is to preload all images that are N away from
+          * the current one in the array of displayTimes, i.e. if we are at image 10
+          * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
+          */
+  
+          // Filter hashes that have a time outside of display times
+          thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
+            displayTimesIntersection.includes(new Date(hash.valid_time).getTime()),
           );
-          if (diffA < diffB) {
-            return -1;
-          } else if (diffA > diffB) {
-            return 1;
+  
+          // Filter hashes that have been loaded
+          thesePreloadHashes = thesePreloadHashes.filter(
+            (hash: Hash) => !loadedResources.includes(hash.id),
+          );
+  
+          // Order base on distance from current display time
+          thesePreloadHashes = thesePreloadHashes.sort((a: Hash, b: Hash) => {
+            const diffA = Math.abs(
+              new Date(a.valid_time).getTime() - new Date(displayTime).getTime(),
+            );
+            const diffB = Math.abs(
+              new Date(b.valid_time).getTime() - new Date(displayTime).getTime(),
+            );
+            if (diffA < diffB) {
+              return -1;
+            } else if (diffA > diffB) {
+              return 1;
+            }
+            return 0;
+          });
+  
+          if (thesePreloadHashes) {
+            const thesePreloadIds = thesePreloadHashes.map(
+              (hash: Hash) => hash.id,
+            );
+            updatedTimeHashes[id] = thesePreloadIds.slice(0, limiter); // limited
           }
-          return 0;
-        });
-
-        if (thesePreloadHashes) {
-          const thesePreloadIds = thesePreloadHashes.map(
-            (hash: Hash) => hash.id,
-          );
-          updatedTimeHashes[id] = thesePreloadIds.slice(0, limiter); // limited
         }
       }
     });
