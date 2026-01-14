@@ -36,7 +36,6 @@ const MultiUnitScrollBar = <T, U>({
   const [content, setContent] = useState<React.ReactNode>([]);
   const [lastKey, setLastKey] = useState<string | null>(null);
   const [keyPress, setKeyPress] = useState<number>(0);
-  console.log(values);
 
   useEffect(() => {
     const newMarks: Mark[] = values.map((val, i) => {
