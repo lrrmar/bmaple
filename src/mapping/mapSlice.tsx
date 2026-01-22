@@ -24,8 +24,9 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  center: [-3, 54],
-  zoom: 5,
+  center: [-0.862, 7.45],
+  //center: [-3, 54],
+  zoom: 7,
   units: null,
   displayTime: '',
   verticalLevel: '',
@@ -73,6 +74,9 @@ export const mapSlice = createSlice({
     updateBaseMapId: (state, baseMapId: PayloadAction<string>) => {
       state.baseMapId = baseMapId.payload;
     },
+    updateCenter: (state, baseMapId: PayloadAction<number[]>) => {
+      state.center = baseMapId.payload;
+    },
   },
 });
 
@@ -86,6 +90,7 @@ export const {
   updateFeaturesAtClick,
   updateBaseMaps,
   updateBaseMapId,
+  updateCenter,
 } = mapSlice.actions;
 
 export const selectCenter = (state: RootState) => state.map.center;

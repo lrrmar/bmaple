@@ -7,7 +7,6 @@ import Geometry from 'ol/geom/Geometry';
 import { toLonLat, fromLonLat } from 'ol/proj';
 import { getUid } from 'ol/util';
 
-
 import {
   selectCenter,
   selectZoom,

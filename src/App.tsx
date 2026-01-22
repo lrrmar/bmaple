@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { configureStore } from '@reduxjs/toolkit';
 
-import mapReducer from './mapping/mapSlice';
+import mapReducer, { mapSlice } from './mapping/mapSlice';
 import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
@@ -14,9 +14,21 @@ import waypointReducer from './modules/waypoints/waypointSlice';
 import WaypointSource from './modules/waypoints/WaypointSource';
 import WaypointProfile from './modules/waypoints/WaypointProfile';
 
+import cumulusReducer from './modules/cumulus/cumulusSlice';
+import CumulusProfile from './modules/cumulus/CumulusGraphic';
+import CumulusSource from './modules/cumulus/CumulusSource';
+
+import PopUpListener from './modules/cumulus/PopUpListener';
+
+import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
+import Slider from './modules/cumulus/Slider';
+import SliderStartDate from './modules/cumulus/SliderStartDate';
+import MapLegendOnsetDay from './modules/cumulus/MapLegendOnsetDay';
+
 export const store = configureStore({
   reducer: {
     map: mapReducer,
+    cumulus: cumulusReducer,
     cache: cacheReducer,
     waypoint: waypointReducer,
   },
@@ -36,14 +48,25 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
+          <CumulusProfile />
           <WaypointProfile />
         </Profiles>
         <Sources>
-          <WaypointSource cache={{}} sourceIdentifier={'waypoint'} />
+          <CumulusSource cache={{}} sourceIdentifier={'cumulus'} />
         </Sources>
+
         <BaseMaps>
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
+
+        <MapLegendOnsetDay></MapLegendOnsetDay>
+
+        <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
+
+        <DateNavigationMenu>
+          <SliderStartDate></SliderStartDate>
+          <Slider></Slider>
+        </DateNavigationMenu>
       </Map>
     </div>
   );

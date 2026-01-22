@@ -1,0 +1,20 @@
+.DateNavigationMenu {
+  position: absolute;
+  color: rgba(255, 255, 255, 1);
+  bottom: 20px;
+  right: 5px;
+  width: 95%;
+  z-index: 10;
+  border-color: black;
+  border-width: 2px;
+  border-style: solid;
+  /*background-color: rgba(0,0,0,0.8);*/
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 3px;
+}
+
+@media (min-width: 1024px) {
+  .DateNavigationMenu {
+    width: 1024px;
+  }
+}
