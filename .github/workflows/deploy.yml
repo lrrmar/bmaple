@@ -1,0 +1,31 @@
+name: Build and deploy CRA to Azure Web App
+
+on:
+  push:
+    branches: [ cumulus-onset ]
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_CUMULUS_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_CUMULUS_WEBAPP_PUBLISH_PROFILE }}
+          package: ./build
+
