@@ -24,6 +24,56 @@ jobs:
           DISABLE_ESLINT_PLUGIN: 'true'
         run: npm run build --if-present
 
+      - name: Add lightweight Node static server
+        run: |
+          cat > server.js <<'NODE_SERVER'
+          const http = require('http');
+          const fs = require('fs');
+          const path = require('path');
+          const url = require('url');
+          const mime = {
+            '.html':'text/html', '.js':'application/javascript', '.css':'text/css',
+            '.json':'application/json', '.png':'image/png', '.jpg':'image/jpeg',
+            '.svg':'image/svg+xml', '.ico':'image/x-icon', '.txt':'text/plain'
+          };
+          const buildDir = path.join(__dirname, 'build');
+          const port = process.env.PORT || 8080;
+          const serveIndex = (res) => {
+            const index = path.join(buildDir, 'index.html');
+            fs.readFile(index, (err, data) => {
+              if (err) { res.writeHead(500); res.end('Server error'); return; }
+              res.writeHead(200, {'Content-Type':'text/html'});
+              res.end(data);
+            });
+          };
+          const server = http.createServer((req, res) => {
+            try {
+              const parsed = url.parse(req.url || '/');
+              let filePath = path.join(buildDir, decodeURIComponent(parsed.pathname));
+              if (filePath.endsWith(path.sep)) filePath = path.join(filePath, 'index.html');
+              fs.stat(filePath, (err, stats) => {
+                if (!err && stats.isFile()) {
+                  const ext = path.extname(filePath);
+                  res.writeHead(200, {'Content-Type': mime[ext] || 'application/octet-stream'});
+                  fs.createReadStream(filePath).pipe(res);
+                } else {
+                  serveIndex(res);
+                }
+              });
+            } catch (e) { res.writeHead(500); res.end('Server error'); }
+          });
+          server.listen(port, () => console.log('Static server listening on', port));
+          NODE_SERVER
+
+      - name: Ensure `start` script in package.json
+        run: |
+          node -e "let p=require('./package.json'); p.scripts=p.scripts||{}; p.scripts.start='node server.js'; require('fs').writeFileSync('package.json', JSON.stringify(p,null,2));"
+
+      - name: Package app for Azure (app.zip)
+        run: |
+          rm -f app.zip
+          zip -r app.zip . -x "node_modules/*" ".git/*" "*.zip"
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
