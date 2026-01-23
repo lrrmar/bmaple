@@ -79,5 +79,5 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_CUMULUS_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_CUMULUS_WEBAPP_PUBLISH_PROFILE }}
-          package: ./build
+          package: ./app.zip
 
