@@ -4,9 +4,6 @@ import ReactSlider from 'react-slider';
 import './Slider.css';
 import {
   //selectHashTables,
-  selectSelectedDayOfYear,
-  selectSelectedEntry,
-  updateSelectedDayOfYear,
   updateSelectedEntry,
 } from './cumulusSlice';
 //import type { HashTable } from './CumulusHashTables';

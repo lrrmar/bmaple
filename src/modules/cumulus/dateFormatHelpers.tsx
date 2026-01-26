@@ -58,7 +58,8 @@ function dateDisplayString(timestamp: number | undefined) {
   const dayOfWeek = days[date.getDay()];
   const day = String(date.getDate()).padStart(2, '0');
   const month = months[date.getMonth()];
-  return `${dayOfWeek} ${day} ${month}`;
+  const year = date.getFullYear();
+  return `${dayOfWeek} ${day} ${month} ${year}`;
 }
 
 // Return timestamp as local date and time string

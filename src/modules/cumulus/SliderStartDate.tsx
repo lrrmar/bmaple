@@ -77,7 +77,7 @@ const SliderStartDate = () => {
       return;
     }
 
-    const strSelectedDate = dateTimeDisplayString(selectedDate);
+    const strSelectedDate = dateDisplayString(selectedDate);
     setSelectedDateString('Forecast start date: ' + strSelectedDate);
 
     const urlString = timestampAsUrlParamString(selectedDate);

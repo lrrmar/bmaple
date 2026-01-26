@@ -6,7 +6,7 @@ interface LegendData {
   hex_palette: { [key: string]: string };
 }
 
-interface MapLegendProps {
+export interface MapLegendProps {
   data: LegendData;
   title?: string;
   labelInterval?: number;

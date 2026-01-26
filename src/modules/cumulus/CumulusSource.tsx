@@ -6,6 +6,7 @@ import {
 } from '../../hooks';
 import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
 import {
+  selectSelectedOnsetVariable,
   selectSelectedDayOfYear,
   selectSelectedEntry,
   updateSelectedDayOfYear,
@@ -25,6 +26,7 @@ interface Props {
 
 const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
+  const onsetVariable = useSelector(selectSelectedOnsetVariable);
   const dayOfYear: string | null = useSelector(selectSelectedDayOfYear);
   const entry: string | null = useSelector(selectSelectedEntry);
   //const liRequestId: string | null = useSelector(selectSelectedLightningId);
@@ -32,7 +34,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
 
   // Put initial entry into cache
   useEffect(() => {
-    const requestId = dayOfYear + '?' + entry;
+    const requestId = onsetVariable + '?' + dayOfYear + '?' + entry;
     const newRequest = {
       id: requestId,
       source: 'cumulus',
@@ -65,7 +67,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   */
 
   useEffect(() => {
-    const requestId = dayOfYear + '?' + entry;
+    const requestId = onsetVariable + '?' + dayOfYear + '?' + entry;
     if (requestId && !cache[requestId]) {
       console.log('CACHE MISS');
       dispatch(request({ id: requestId, source: 'cumulus' }));
@@ -73,7 +75,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
       console.log('CACHE HIT');
       dispatch(updateProfileLayerId(requestId));
     }
-  }, [dayOfYear, entry]);
+  }, [onsetVariable, dayOfYear, entry]);
 
   /*
   useEffect(() => {

@@ -7,6 +7,7 @@ import { Root } from 'react-dom/client';
 interface InitialState {
   baseUrl: string;
   token: string;
+  selectedOnsetVariable: string | null;
   selectedDayOfYear: string | null;
   selectedEntry: string | null;
   profileLayerId: string | null;
@@ -19,7 +20,8 @@ interface InitialState {
 const initialState: InitialState = {
   baseUrl: 'dev.fastaweather.com',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
-  selectedDayOfYear: '2025/03/20',
+  selectedOnsetVariable: 'doy',
+  selectedDayOfYear: '2025/02/01',
   selectedEntry: '0',
   profileLayerId: null,
   //profileCrrId: null,
@@ -33,6 +35,9 @@ export const cumulusSlice = createSlice({
   name: 'cumulus',
   initialState,
   reducers: {
+    updateSelectedOnsetVariable: (state, id: PayloadAction<string | null>) => {
+      state.selectedOnsetVariable = id.payload;
+    },
     updateSelectedDayOfYear: (state, id: PayloadAction<string | null>) => {
       state.selectedDayOfYear = id.payload;
     },
@@ -52,6 +57,7 @@ export const cumulusSlice = createSlice({
 });
 
 export const {
+  updateSelectedOnsetVariable,
   updateSelectedDayOfYear,
   updateSelectedEntry,
   //updateHashTables,
@@ -61,6 +67,8 @@ export const {
 
 export const selectBaseUrl = (state: RootState) => state.cumulus.baseUrl;
 export const selectToken = (state: RootState) => state.cumulus.token;
+export const selectSelectedOnsetVariable = (state: RootState) =>
+  state.cumulus.selectedOnsetVariable;
 export const selectSelectedDayOfYear = (state: RootState) =>
   state.cumulus.selectedDayOfYear;
 export const selectSelectedEntry = (state: RootState) =>

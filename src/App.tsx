@@ -23,7 +23,7 @@ import PopUpListener from './modules/cumulus/PopUpListener';
 import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
 import Slider from './modules/cumulus/Slider';
 import SliderStartDate from './modules/cumulus/SliderStartDate';
-import MapLegendOnsetDay from './modules/cumulus/MapLegendOnsetDay';
+import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
 
 export const store = configureStore({
   reducer: {
@@ -59,7 +59,7 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
 
-        <MapLegendOnsetDay></MapLegendOnsetDay>
+        <OnsetVariableSelector />
 
         <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
 

@@ -26,7 +26,7 @@ const CumulusSourceLayer = ({ id, sourceIdentifier }: Props) => {
 
   const urlParams = id.split('?');
   const [url, setUrl] = useState(
-    `https://${cumulusBaseUrl}/api/v1/onset/doy/${urlParams[0]}/${urlParams[1]}/`,
+    `https://${cumulusBaseUrl}/api/v1/onset/${urlParams[0]}/${urlParams[1]}/${urlParams[2]}/`,
   );
 
   const hasFetched = useRef(false);
