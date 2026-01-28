@@ -30,6 +30,8 @@ import TimeScrollBar from './features/TimeScrollBar';
 import MetaDataMenu from './features/MetaDataMenu';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
 import Tiles from './features/Tiles';
+import LoadingScreen from './modules/force-nwr/LoadingScreen';
+import BackgroundImage from './modules/force-nwr/BackgroundImage';
 import './App.css';
 
 // Configure the reducers that will be used in the app
@@ -67,6 +69,8 @@ const App = () => {
         </Sources>
         <BaseMaps></BaseMaps>
       </Map>
+      <LoadingScreen />
+      <BackgroundImage />
       <div
         style={{
           position: 'absolute',

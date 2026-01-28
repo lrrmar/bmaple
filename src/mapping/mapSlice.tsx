@@ -191,7 +191,9 @@ export const {
 } = mapSlice.actions;
 
 export const selectIsoDisplayTime = (state: RootState) => {
-  const isoDisplayTime = new Date(state.map.displayTime).toISOString();
+
+  const displayTime = state.map.displayTime == undefined ? 0 : state.map.displayTime;
+  const isoDisplayTime = new Date(displayTime).toISOString();
   const reducedIsoDisplayTime = isoDisplayTime.substring(
     0,
     isoDisplayTime.length - 2,

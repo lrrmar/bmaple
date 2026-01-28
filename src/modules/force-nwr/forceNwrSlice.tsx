@@ -38,6 +38,7 @@ interface InitialState {
   selectedResources: {
     [key: number]: string | null;
   };
+  backgroundImageLoaded: boolean;
 }
 
 let GEOJSON_API_URL: string | undefined | null = null;
@@ -63,6 +64,7 @@ const initialState: InitialState = {
   readableNames: null,
   setMapExtent: false,
   selectedResources: {},
+  backgroundImageLoaded: false,
 };
 
 export const forceNwrSlice = createSlice({
@@ -132,6 +134,9 @@ export const forceNwrSlice = createSlice({
     ) => {
       state.continuousMetaDataLocks[locks.payload.id] = locks.payload.locks;
     },
+    updateBackgroundImageLoaded: (state) => {
+      state.backgroundImageLoaded = true;
+    },
   },
 });
 
@@ -150,6 +155,7 @@ export const {
   updateReadableNames,
   updateDiscreteMetaDataSelections,
   updateContinuousMetaDataLocks,
+  updateBackgroundImageLoaded,
 } = forceNwrSlice.actions;
 
 export const selectSelectedId = (state: RootState) => state.forceNwr.selectedId;
@@ -173,4 +179,14 @@ export const selectContinuousMetaDataLocks = (state: RootState) =>
   state.forceNwr.continuousMetaDataLocks;
 export const selectSetMapExtent = (state: RootState) =>
   state.forceNwr.setMapExtent;
+export const selectBackgroundImageLoaded = (state: RootState) =>
+  state.forceNwr.backgroundImageLoaded;
+
+export const selectPreloadComplete = (state: RootState) => {
+  return (
+    !!state.forceNwr.backendDiscreteMetaData &&
+    !!state.forceNwr.readableNames &&
+    !!state.forceNwr.backgroundImageLoaded
+  );
+};
 export default forceNwrSlice.reducer;

@@ -463,9 +463,12 @@ const ImageViewerWithMenu = ({
       >
         <Icon
           onClick={() => setMenuOpen(!menuOpen)}
-          name="angle down"
+          name={menuOpen ? 'angle up' : 'angle down'}
+          circular={true}
+          size={'large'}
           style={{
-            backgroundColor: 'rgba(255,255,255,0.5)',
+            backgroundColor: menuOpen ? 'black' : 'rgba(255,255,255,0.5)',
+            color: menuOpen ? 'white' : 'black',
             backdropFilter: 'blur(10px)',
             width: '2em',
             height: '2em',
@@ -484,6 +487,8 @@ const ImageViewerWithMenu = ({
             left: menuOpen ? '' : '-1000vw',
             position: 'absolute',
             padding: '1em',
+            borderStyle: 'solid',
+            borderColor: 'black',
           }}
         >
           {menus}

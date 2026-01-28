@@ -135,12 +135,6 @@ const Map = ({ children }: Props) => {
 
   return (
     <div
-      style={{
-        backgroundImage: `url('${process.env.PUBLIC_URL}/blencathra.jpg')`,
-        backgroundSize: 'cover',
-        width: '100vw',
-        height: '100vh',
-      }}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
