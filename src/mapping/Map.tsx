@@ -59,10 +59,35 @@ const Map = ({ children }: Props) => {
     mapToMount.setTarget(mapRef.current);
     mapToMount.updateSize();
     setMap(mapToMount);
+
     return () => {
       map === null ? null : map.setTarget(undefined);
     };
   }, [map, mapRef]);
+
+  // on click
+  useEffect(() => {
+  if (map) {
+    map.on('singleclick', (e) => {
+      const pixel = e.pixel;
+      const lonLat: number[] = toLonLat(
+        map.getCoordinateFromPixel(pixel),
+      );
+      const clickEvent: ClickEvent = {
+        longitude: lonLat[0],
+        latitude: lonLat[1],
+        features: [],
+      };
+      const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
+        map.getFeaturesAtPixel(pixel);
+      
+      const features: string[] = featuresAtPixel.map((feature) => feature.get('id'));
+      clickEvent['features'] = features;
+      dispatch(updateClickEvent(clickEvent));
+ 
+    });
+  }
+  }, [map]);
 
   // zoom change handler
   useEffect(() => {
@@ -100,35 +125,32 @@ const Map = ({ children }: Props) => {
     if (map === null) {
       return;
     }
+    const rect = map.getTargetElement().getBoundingClientRect();
+    console.log(rect);
+    const pixel = [
+      e.clientX - rect.left,
+      e.clientY - rect.top
+    ];
+
+
     const lonLat: number[] = toLonLat(
-      map.getCoordinateFromPixel([e.clientX, e.clientY]),
+      map.getCoordinateFromPixel(pixel),
     );
     const clickEvent: ClickEvent = {
       longitude: lonLat[0],
       latitude: lonLat[1],
+      features: [],
     };
     const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
       map.getFeaturesAtPixel([e.clientX, e.clientY]);
-    if (!featuresAtPixel) return;
-    const featuresAtClick: (string | undefined)[] = featuresAtPixel.map(
-      (feature: Feature<Geometry> | FeatureLike) => {
-        if (!feature) return;
-        const ol_uid = getUid(feature);
-        return ol_uid;
-      },
-    );
-    const filteredFeaturesAtClick: string[] = featuresAtClick.filter(
-      (f) => f !== undefined,
-    ); // cut undefined
-    clickEvent['features'] = filteredFeaturesAtClick;
+    
+    const features: string[] = featuresAtPixel.map((feature) => feature.get('id'));
+    clickEvent['features'] = features;
     dispatch(updateClickEvent(clickEvent));
   }
 
   return (
     <div
-      onMouseMove={handleMouseMove}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
       ref={mapRef}
       className="ol-map"
     >

@@ -17,12 +17,12 @@ class OpenLayersMap {
       const options = {
         view: new ol.View({
           center: fromLonLat([-3.0, 54.0]),
-          extent: [...fromLonLat([-11.0, 50.0]), ...fromLonLat([4.0, 60.0])],
+          //extent: [...fromLonLat([-11.0, 50.0]), ...fromLonLat([4.0, 60.0])],
           smoothExtentConstraint: false,
           zoom: 5,
           projection: 'EPSG:3857',
-          minZoom: 7,
-          maxZoom: 10,
+          //minZoom: 7,
+          //maxZoom: 10,
         }),
         zIndex: 0,
         controls: [],
@@ -34,6 +34,18 @@ class OpenLayersMap {
     return OpenLayersMap.#map;
   }
 
+  private featureToLayer: {[key: string]: string} = {
+
+  }
+
+  private getLayerById(id: string): BaseLayer {
+    return OpenLayersMap.#map.get(id);
+  }
+
+  public getById(id: string) {
+    return OpenLayersMap.#map.get(id);
+  }
+
   public getLayerByUid(ol_uid: string) {
     let layer: BaseLayer | undefined = undefined;
     OpenLayersMap.#map.getLayers().forEach((l: BaseLayer): void => {
@@ -43,6 +55,7 @@ class OpenLayersMap {
     });
     return layer ? layer : undefined;
   }
+
 }
 
 export default OpenLayersMap;

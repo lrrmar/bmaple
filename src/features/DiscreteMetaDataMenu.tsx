@@ -254,7 +254,7 @@ const DiscreteMetaDataMenu = ({
         />,
       );
 
-      selects.push(<br  key={'br'} />);
+      selects.push(<br key={'br'} />);
       selects.push(
         <HeaderLock
           key={'level'}

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import './App.css';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import mapReducer, {
   selectVerticalLevel,
@@ -13,46 +14,27 @@ import Sources from './mapping/Sources';
 import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
-import Themes from './mapping/Themes';
-import waypointReducer from './modules/waypoints/waypointSlice';
-import WaypointsSource from './modules/waypoints/WaypointSource';
-import WaypointsMenu from './modules/waypoints/WaypointsMenu';
-import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
-import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
-import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
-import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
-import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
-import fwsTileReducer from './modules/fws-tiles/fwsTileSlice';
-import FwsTileSource from './modules/fws-tiles/FwsTileSource';
-import FwsTileProfile from './modules/fws-tiles/FwsTileProfile';
 
-import regionsReducer from './modules/regions/regionsSlice';
-import RegionsSource from './modules/regions/RegionsSource';
-import RegionsProfile from './modules/regions/RegionsProfile';
-
-import faamPhysicsReducer from './modules/faam-physics/faamPhysicsSlice';
-import FaamPhysicsSource from './modules/faam-physics/FaamPhysicsSource';
-import FaamPhysicsProfile from './modules/faam-physics/FaamPhysicsProfile';
-
-import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import ErrorMessage from './features/ErrorMessage';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
-import DiscreteMetaDataMenu from './features/DiscreteMetaDataMenu';
-import RegionsMenu from './modules/regions/RegionsMenu';
-import './App.css';
 
+import regionsReducer from './modules/regions/regionsSlice';
+import RegionsSource from './modules/regions/RegionsSource';
+import RegionsProfile from './modules/regions/RegionsProfile';
+
+import WaypointSource from './modules/sortie/WaypointSource';
+
+import FlightPlan from './modules/sortie/components/FlightPlan';
+import sortieReducer from './modules/sortie/sortieSlice';
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
-    waypoint: waypointReducer,
-    trajectories: trajectoriesReducer,
-    fwsTile: fwsTileReducer,
     regions: regionsReducer,
-    faamPhysics: faamPhysicsReducer,
+    sortie: sortieReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -68,26 +50,34 @@ const App = () => {
   }, []);
   return (
     <div className="App">
-      <Map>
-        <Profiles>
-          <TimeVerticalSensitiveWaypointsProfile />
-          <TimeVerticalSensitiveTrajectoryProfile />
-          <FwsTileProfile />
-          <RegionsProfile />
-          <FaamPhysicsProfile />
-        </Profiles>
-        <Sources>
-          <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
-          <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
-          <FwsTileSource sourceIdentifier={'tiles'} />
-          <RegionsSource sourceIdentifier={'regions'} />
-          <FaamPhysicsSource sourceIdentifier={'faam-physics'} />
-        </Sources>
-        <BaseMaps>
-          <LightBaseMap id={'light'} />
-          <OSMBaseMap id={'Open Street Map'} />
-        </BaseMaps>
-      </Map>
+      <div style={{
+        display: 'flex',
+        width: '100vw',
+        height: '100vh'
+      }} >
+        <div style={{
+          width: '50%',
+            height: '100vh'
+        }}>
+          <FlightPlan />
+        </div>
+        <div style={{
+          width: '50%',
+          height: '100vh'
+        }} >
+          <Map>
+            <Profiles>
+            </Profiles>
+            <Sources>
+              <WaypointSource sourceIdentifier={'waypoint'} />
+            </Sources>
+            <BaseMaps>
+              <LightBaseMap id={'light'} />
+              <OSMBaseMap id={'Open Street Map'} />
+            </BaseMaps>
+          </Map>
+        </div>
+      </div>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
         <TimeScrollBar />
       </FloatingBox>
@@ -102,24 +92,6 @@ const App = () => {
       <FloatingBox style={{ top: '20px', left: '50%' }}>
         <ErrorMessage />
       </FloatingBox>
-      <FoldOutMenu align={'left'} theme={'glassTablet'}>
-        <FoldOutItem id={'Info'} icon={'info'}>
-          <Info />
-        </FoldOutItem>
-        <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
-          <WaypointsMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'Trajectories'} icon={'map signs'}>
-          <TrajectoriesMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'Live Data'} icon={'image'}>
-          <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'} />
-        </FoldOutItem>
-        <FoldOutItem id={'Layers'} icon={'object group'}>
-          <RegionsMenu />
-        </FoldOutItem>
-      </FoldOutMenu>
-      <Themes></Themes>
     </div>
   );
 };
