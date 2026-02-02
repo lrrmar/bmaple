@@ -1,37 +1,33 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../../hooks';
-import {
-  updateFlightPlan,
-  updateWaypoints
-} from '../sortieSlice';
-import { type RoutineSequence } from "../lib/JsonParser";
+import { updateFlightPlan, updateWaypoints } from '../sortieSlice';
+import { type RoutineSequence } from '../lib/io/JsonParser';
+import Routine from '../lib/routines/Routine';
 
+import State from '../lib/state/State';
+import WaypointRegistry from '../lib/state/WaypointRegistry';
+import CompositeRoutine from '../lib/routines/CompositeRoutine';
+import { SLR } from '../lib/routines/Runs';
 import {
-  State,
-  WaypointRegistry,
-  CompositeRoutine,
   cranfieldTakeOffEntryState,
   CranfieldTakeOff,
-  SLR,
-} from "../lib/Routine";
+} from '../lib/routines/TakeOff';
+import { selectClickEvent } from '../../../mapping/mapSlice';
 
-import {
- selectClickEvent
-} from '../../../mapping/mapSlice';
+import { OptionProp, OptionsMenu } from './OptionsMenu';
 
-import { OptionProp, OptionsMenu } from "./OptionsMenu";
-
-import Maneuvre from "./Maneuvre";
+import Maneuvre from './Maneuvre';
 const FlightPlan = () => {
-
   const dispatch = useDispatch();
   const [openManeuvre, setOpenManeuvre] = useState<number | null>(null);
   const [maneuvres, setManeuvres] = useState<React.ReactNode[]>([]);
-  const [allDurations, setAllDurations] = useState<{[key: number]: number | null}>({})
+  const [allDurations, setAllDurations] = useState<{
+    [key: number]: number | null;
+  }>({});
   const [composite, setComposite] = useState<CompositeRoutine>();
   const compositeRef = useRef<CompositeRoutine | null>(null);
   const [json, setJson] = useState<RoutineSequence | null>();
@@ -45,49 +41,55 @@ const FlightPlan = () => {
       const comp = new CompositeRoutine(cranfieldTakeOffEntryState);
       if (comp) setComposite(comp);
       compositeRef.current = comp;
-      dispatch(updateWaypoints(WaypointRegistry.toJson()))
-      }
+      dispatch(updateWaypoints(WaypointRegistry.toJson()));
+    }
   }, []);
 
   useEffect(() => {
     if (composite) {
       setManeuvres(
-        composite.routines.map((routine, i) => {
-          const accumulatedDuration = composite.accumulatedDurationForRoutine(routine);
-          return <Maneuvre
-            id={i}
-            openManeuvre={openManeuvre}
-            setOpenManeuvre={setOpenManeuvre}
-            accumulatedDuration={accumulatedDuration}
-            routine={routine}
-            composite={composite}
-            setComposite={setComposite}
-            setOptions={setOptions}
-          />
-          })
+        composite.getRoutines().map((routine, i) => {
+          const accumulatedDuration =
+            composite.accumulatedDurationForRoutine(routine);
+          return (
+            <Maneuvre
+              id={i}
+              key={i}
+              openManeuvre={openManeuvre}
+              setOpenManeuvre={setOpenManeuvre}
+              accumulatedDuration={accumulatedDuration}
+              routine={routine}
+              composite={composite}
+              setComposite={setComposite}
+              setOptions={setOptions}
+            />
+          );
+        }),
       );
       const jsonSequence = composite.jsonSequence({
         bearing: true,
         includeNull: true,
-      })
+      });
       if (jsonSequence) dispatch(updateFlightPlan(jsonSequence));
     }
   }, [composite, openManeuvre, allDurations]);
 
   useEffect(() => {
     if (maneuvres.length == 0 && composite) {
-      console.log(composite.routines)
-      setOptions(CranfieldTakeOff.all.map((takeoff) => {
-        const display = takeoff.toString();
-        return { display: display ? display : '',
-          onClick: () => {
-            composite.appendRoutine(takeoff);
-            setComposite(composite.copy())
-          }
-         }
-      }))
+      setOptions(
+        CranfieldTakeOff.all.map((takeoff) => {
+          const display = takeoff.toString();
+          return {
+            display: display ? display : '',
+            onClick: () => {
+              composite.appendRoutine(takeoff);
+              setComposite(composite.copy());
+            },
+          };
+        }),
+      );
     }
-  }, [maneuvres])
+  }, [maneuvres]);
 
   useEffect(() => {
     const appendMode = true;
@@ -96,18 +98,20 @@ const FlightPlan = () => {
       const clickedFeatures = clickEvent.features;
       const clickedWaypointId = clickedFeatures.find((id) => {
         return id.includes('waypoint');
-      })
+      });
       if (clickedWaypointId) {
-        const waypoint = WaypointRegistry.getWaypoint(clickedWaypointId.split('-')[1]);
+        const waypoint = WaypointRegistry.getWaypoint(
+          clickedWaypointId.split('-')[1],
+        );
         if (waypoint) {
-          composite.appendRoutine(new SLR(
-            composite.getExitState(),
-            new State({waypoint: waypoint})
-          ))
-          setComposite(composite.copy())
-
+          composite.appendRoutine(
+            new SLR({
+              entry: composite.getExitState(),
+              exit: new State({ waypoint: waypoint })
+            }),
+          );
+          setComposite(composite.copy());
         }
-
       }
     }
   }, [clickEvent]);
@@ -115,69 +119,77 @@ const FlightPlan = () => {
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        width: "70%",
-        margin: '5% 15%'
+        display: 'flex',
+        flexDirection: 'column',
+        width: '70%',
+        margin: '5% 15%',
       }}
     >
       <div
         style={{
-          width: "100%",
-          height: "20px",
-          border: "2px solid #000000",
-          display: "flex",
+          width: '100%',
+          height: '20px',
+          border: '2px solid #000000',
+          display: 'flex',
         }}
       >
         <div
           style={{
-            width: "40%",
-            height: "100%",
-            textAlign: "left",
+            width: '40%',
+            height: '100%',
+            textAlign: 'left',
           }}
         >
           Routine
         </div>
         <div
           style={{
-            width: "20%",
-            height: "100%",
-            textAlign: "left",
+            width: '20%',
+            height: '100%',
+            textAlign: 'left',
           }}
         >
           Altitude
         </div>
         <div
           style={{
-            width: "20%",
-            height: "100%",
-            textAlign: "left",
+            width: '20%',
+            height: '100%',
+            textAlign: 'left',
           }}
         >
           Duration
         </div>
         <div
           style={{
-            width: "20%",
-            height: "100%",
-            textAlign: "left",
+            width: '20%',
+            height: '100%',
+            textAlign: 'left',
           }}
         >
           Total
         </div>
       </div>
       {maneuvres}
-      <br/>
-      <div style={{
-        border: 'solid 2px black',
-      }}
-      onClick={() => composite ? alert(JSON.stringify(composite.jsonSequence())) : void(0)}
-      >View JSON format</div>
-      <div style={{
-        border: 'solid 2px black',
-      }}
-      onClick={() => composite ? alert(composite.toString()) : void(0)}
-      >View string</div>
+      <br />
+      <div
+        style={{
+          border: 'solid 2px black',
+        }}
+        onClick={() =>
+          composite ? alert(JSON.stringify(composite.jsonSequence())) : void 0
+        }
+      >
+        View JSON format
+      </div>
+      <div
+        style={{
+          border: 'solid 2px black',
+        }}
+        onClick={() => (composite ? alert(composite.toString()) : void 0)}
+      >
+        View string
+      </div>
       <OptionsMenu options={options} />
     </div>
   );

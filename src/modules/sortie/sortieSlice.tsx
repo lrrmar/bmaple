@@ -1,7 +1,7 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
-import { WaypointType } from './lib/Routine';
-import { type RoutineSequence } from "./lib/JsonParser";
+import { WaypointType } from './lib/state/Waypoint';
+import { type RoutineSequence } from './lib/io/JsonParser';
 interface InitialState {
   flightPlan: RoutineSequence;
   waypoints: WaypointType[];
@@ -26,6 +26,8 @@ export const sortieSlice = createSlice({
 
 export const { updateFlightPlan, updateWaypoints } = sortieSlice.actions;
 
-export const selectFlightPlan = (state: RootState): RoutineSequence => state.sortie.flightPlan;
-export const selectWaypoints = (state: RootState): WaypointType[] => state.sortie.waypoints;
+export const selectFlightPlan = (state: RootState): RoutineSequence =>
+  state.sortie.flightPlan;
+export const selectWaypoints = (state: RootState): WaypointType[] =>
+  state.sortie.waypoints;
 export default sortieSlice.reducer;

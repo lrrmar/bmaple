@@ -20,21 +20,19 @@ import Polygon from 'ol/geom/Polygon';
 import { getUid } from 'ol/util';
 import { fromLonLat } from 'ol/proj';
 import Fill from 'ol/style/Fill.js';
-import Icon from 'ol/style/Icon.js';
-import RegularShape from 'ol/style/RegularShape.js';
 import Stroke from 'ol/style/Stroke.js';
 import Style from 'ol/style/Style.js';
 
-export interface Waypoint extends Pending {
+export interface Track extends Pending {
   name: string;
 }
 
-export const isPendingWaypoint = (element: any): element is Waypoint => {
+export const isPendingTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
   return isPending(element) && keys.includes('name');
 };
 
-export const isEntryWaypoint = (element: any): element is Waypoint => {
+export const isEntryTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
   return isEntry(element) && keys.includes('name');
 };
@@ -54,8 +52,8 @@ const parseLimit = (limit: string) => {
   return feet;
 };
 
-const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
-  // Access to fundamental data structures
+const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
+/*  // Access to fundamental data structures
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
@@ -64,14 +62,16 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
 
   useEffect(() => {
     const featureData = cache[id];
+    console.log(featureData);
     if (featureData && !initialised.current && map) {
       const layer = map.get(layerId);
+      console.log(featureData);
       if (layer) {
-        const latitude = featureData.latitude;
-        const longitude = featureData.longitude;
-        if (typeof latitude == 'number' && typeof longitude == 'number') {
-          const text = featureData.id.split('-')[1];
-          const flag = WaypointFlag(text);
+        const waypointIds = featureData.waypoints;
+        if (waypointIds) {
+          console.log(waypointIds);
+
+          /////// start here!
 
           const feature = new Feature({
             geometry: new Point(fromLonLat([-longitude, latitude])),
@@ -81,8 +81,8 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
           feature.setStyle(
             new Style({
               image: new Icon({
-                img: flag,
-                size: [flag.width, flag.height],
+                img: canvas,
+                size: [canvas.width, canvas.height],
                 anchor: [0, 1],
               }),
             }),
@@ -99,45 +99,9 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
         }
       }
     }
-  }, [cache]);
+  }, [cache]);*/
 
   return <div></div>;
 };
 
-const WaypointFlag = (text: string) => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 40;
-  canvas.height = 20;
-
-  const ctx = canvas.getContext('2d');
-
-  if (ctx) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0,100,100,0.9)';
-    ctx.fillStyle = 'rgba(0,100,100,0.9)';
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(canvas.height * 0.25, 0);
-    ctx.lineTo(canvas.width, 0);
-    ctx.lineTo(canvas.width - canvas.height * 0.125, canvas.height * 0.51);
-    ctx.lineTo(canvas.height * 0.125, canvas.height * 0.5);
-    ctx.lineTo(0, canvas.height);
-    ctx.closePath();
-
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillText(text, canvas.height * 0.5, canvas.height * 0.5);
-
-    ctx.restore();
-  }
-
-  return canvas;
-};
-
-export default WaypointFeature;
+export default TrackFeature;

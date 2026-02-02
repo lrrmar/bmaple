@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 export type OptionProp = {
   display: string;
@@ -26,37 +26,43 @@ export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
   }, [options]);
 
   return (
-    <div style={{
-      backgroundColor: 'rgba(55,55,55,0.4)',
-      position: 'absolute',
-      left: '0px',
-      right: '0px',
-      width: optionComponents.length == 0 ? '0px' : '100vw',
-      height: optionComponents.length == 0 ? '0px': '100vh',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
-      <div style={{
-          backgroundColor:'white',
+    <div
+      style={{
+        backgroundColor: 'rgba(55,55,55,0.4)',
+        position: 'absolute',
+        left: '0px',
+        right: '0px',
+        width: optionComponents.length == 0 ? '0px' : '100vw',
+        height: optionComponents.length == 0 ? '0px' : '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'white',
           width: 'fit-content',
           height: '20%',
         }}
       >
-        <div style={{
-          overflow: 'scroll',
-          height: '100%'
-        }}>
+        <div
+          style={{
+            overflow: 'scroll',
+            height: '100%',
+          }}
+        >
           {optionComponents}
         </div>
         {optionComponents.length > 0 && (
-            <div style={{backgroundColor: 'white'}} 
-              onClick={() => {
-                setOptionComponents([]);
-              }}
-            >
-              Cancel
-            </div>
+          <div
+            style={{ backgroundColor: 'white' }}
+            onClick={() => {
+              setOptionComponents([]);
+            }}
+          >
+            Cancel
+          </div>
         )}
       </div>
     </div>

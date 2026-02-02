@@ -19,16 +19,16 @@ import VectorSource from 'ol/source/Vector';
 import KML from 'ol/format/KML';
 import { getUid } from 'ol/util';
 
-export interface Waypoint extends Pending {
+export interface Track extends Pending {
   name: string;
 }
 
-export const isPendingWaypoint = (element: any): element is Waypoint => {
+export const isPendingTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
   return isPending(element) && keys.includes('name');
 };
 
-export const isEntryWaypoint = (element: any): element is Waypoint => {
+export const isEntryTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
   return isEntry(element) && keys.includes('name');
 };
@@ -48,7 +48,7 @@ const parseLimit = (limit: string) => {
   return feet;
 };
 
-const WaypointLayer = ({
+const TrackLayer = ({
   id,
   children,
 }: {
@@ -86,4 +86,4 @@ const WaypointLayer = ({
   return <div>{children}</div>;
 };
 
-export default WaypointLayer;
+export default TrackLayer;

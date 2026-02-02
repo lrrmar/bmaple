@@ -26,6 +26,7 @@ import RegionsSource from './modules/regions/RegionsSource';
 import RegionsProfile from './modules/regions/RegionsProfile';
 
 import WaypointSource from './modules/sortie/WaypointSource';
+import TrackSource from './modules/sortie/TrackSource';
 
 import FlightPlan from './modules/sortie/components/FlightPlan';
 import sortieReducer from './modules/sortie/sortieSlice';
@@ -50,26 +51,32 @@ const App = () => {
   }, []);
   return (
     <div className="App">
-      <div style={{
-        display: 'flex',
-        width: '100vw',
-        height: '100vh'
-      }} >
-        <div style={{
-          width: '50%',
-            height: '100vh'
-        }}>
+      <div
+        style={{
+          display: 'flex',
+          width: '100vw',
+          height: '100vh',
+        }}
+      >
+        <div
+          style={{
+            width: '50%',
+            height: '100vh',
+          }}
+        >
           <FlightPlan />
         </div>
-        <div style={{
-          width: '50%',
-          height: '100vh'
-        }} >
+        <div
+          style={{
+            width: '50%',
+            height: '100vh',
+          }}
+        >
           <Map>
-            <Profiles>
-            </Profiles>
+            <Profiles></Profiles>
             <Sources>
               <WaypointSource sourceIdentifier={'waypoint'} />
+              <TrackSource sourceIdentifier={'track'} />
             </Sources>
             <BaseMaps>
               <LightBaseMap id={'light'} />

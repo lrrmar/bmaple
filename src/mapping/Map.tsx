@@ -67,26 +67,25 @@ const Map = ({ children }: Props) => {
 
   // on click
   useEffect(() => {
-  if (map) {
-    map.on('singleclick', (e) => {
-      const pixel = e.pixel;
-      const lonLat: number[] = toLonLat(
-        map.getCoordinateFromPixel(pixel),
-      );
-      const clickEvent: ClickEvent = {
-        longitude: lonLat[0],
-        latitude: lonLat[1],
-        features: [],
-      };
-      const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
-        map.getFeaturesAtPixel(pixel);
-      
-      const features: string[] = featuresAtPixel.map((feature) => feature.get('id'));
-      clickEvent['features'] = features;
-      dispatch(updateClickEvent(clickEvent));
- 
-    });
-  }
+    if (map) {
+      map.on('singleclick', (e) => {
+        const pixel = e.pixel;
+        const lonLat: number[] = toLonLat(map.getCoordinateFromPixel(pixel));
+        const clickEvent: ClickEvent = {
+          longitude: lonLat[0],
+          latitude: lonLat[1],
+          features: [],
+        };
+        const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
+          map.getFeaturesAtPixel(pixel);
+
+        const features: string[] = featuresAtPixel.map((feature) =>
+          feature.get('id'),
+        );
+        clickEvent['features'] = features;
+        dispatch(updateClickEvent(clickEvent));
+      });
+    }
   }, [map]);
 
   // zoom change handler
@@ -127,15 +126,9 @@ const Map = ({ children }: Props) => {
     }
     const rect = map.getTargetElement().getBoundingClientRect();
     console.log(rect);
-    const pixel = [
-      e.clientX - rect.left,
-      e.clientY - rect.top
-    ];
+    const pixel = [e.clientX - rect.left, e.clientY - rect.top];
 
-
-    const lonLat: number[] = toLonLat(
-      map.getCoordinateFromPixel(pixel),
-    );
+    const lonLat: number[] = toLonLat(map.getCoordinateFromPixel(pixel));
     const clickEvent: ClickEvent = {
       longitude: lonLat[0],
       latitude: lonLat[1],
@@ -143,17 +136,16 @@ const Map = ({ children }: Props) => {
     };
     const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
       map.getFeaturesAtPixel([e.clientX, e.clientY]);
-    
-    const features: string[] = featuresAtPixel.map((feature) => feature.get('id'));
+
+    const features: string[] = featuresAtPixel.map((feature) =>
+      feature.get('id'),
+    );
     clickEvent['features'] = features;
     dispatch(updateClickEvent(clickEvent));
   }
 
   return (
-    <div
-      ref={mapRef}
-      className="ol-map"
-    >
+    <div ref={mapRef} className="ol-map">
       {children}
     </div>
   );

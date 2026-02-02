@@ -34,9 +34,7 @@ class OpenLayersMap {
     return OpenLayersMap.#map;
   }
 
-  private featureToLayer: {[key: string]: string} = {
-
-  }
+  private featureToLayer: { [key: string]: string } = {};
 
   private getLayerById(id: string): BaseLayer {
     return OpenLayersMap.#map.get(id);
@@ -55,7 +53,6 @@ class OpenLayersMap {
     });
     return layer ? layer : undefined;
   }
-
 }
 
 export default OpenLayersMap;

@@ -92,6 +92,7 @@ export const cacheSlice = createSlice({
         : [data.payload];
       toUpdate.forEach((update: Update) => {
         const id: string = update.id;
+        console.log(id);
         if (!isEntry(cache[id])) return;
         const updates: Generic = update;
         //delete updates.id;

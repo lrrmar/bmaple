@@ -1,23 +1,13 @@
-import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
-import {
-  type CompositeRoutine,
-  type Routine,
-  SLR,
-  Profile,
-  State,
-  type Waypoint,
-} from "../lib/Routine";
-import { type RoutineJson, type Measure } from "../lib/JsonParser";
-
-import { type OptionProp } from "./OptionsMenu";
-
-const ManeuvreTab = ({
-  str,
-  duration,
-}: {
-  str: string;
-  duration: number;
-}) => {};
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import CompositeRoutine from '../lib/routines/CompositeRoutine';
+import WaypointRegistry from '../lib/state/WaypointRegistry';
+import Routine from '../lib/routines/Routine';
+import { SLR } from '../lib/routines/Runs';
+import { Profile } from '../lib/routines/Profiles';
+import State from '../lib/state/State';
+import Waypoint from '../lib/state/Waypoint';
+import Measure from '../lib/state/Measure';
+import { type OptionProp } from './OptionsMenu';
 
 const Maneuvre = ({
   id,
@@ -47,9 +37,10 @@ const Maneuvre = ({
   const [altitudeComponents, setAltitudeComponents] = useState<React.ReactNode>(
     [],
   );
-  const [accumulatedDurationDisplay, setAccumulatedDurationDisplay] = useState<string>('');
+  const [accumulatedDurationDisplay, setAccumulatedDurationDisplay] =
+    useState<string>('');
 
-  const [backgroundColor, setBackgroundColor] = useState<string>("#ffffff");
+  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -77,25 +68,31 @@ const Maneuvre = ({
 
   useEffect(() => {
     if (routine instanceof SLR && open) {
-      const defaultValue = entryAltitude ? entryAltitude.value.toString() : "...";
+      const defaultValue = entryAltitude
+        ? entryAltitude.value.toString()
+        : '...';
       setAltitudeComponents(
         <TextInputSubmit
           onSubmit={(value) =>
-            setEntryAltitude({ value: parseInt(value), unit: "ft" })
+            setEntryAltitude({ value: parseInt(value), unit: 'ft' })
           }
           defaultValue={defaultValue}
         />,
       );
     } else if (routine instanceof Profile) {
-      let defaultValue = ''
-      defaultValue +=  entryAltitude ? `${entryAltitude.value.toString()}` : '...';
+      let defaultValue = '';
+      defaultValue += entryAltitude
+        ? `${entryAltitude.value.toString()}`
+        : '...';
       defaultValue += ' -> ';
-      defaultValue +=  exitAltitude ? `${exitAltitude.value.toString()}` : '...';
+      defaultValue += exitAltitude ? `${exitAltitude.value.toString()}` : '...';
       setAltitudeComponents(defaultValue);
-    } else if (routine.isNull()){
-      setAltitudeComponents("");
+    } else if (routine.isNull()) {
+      setAltitudeComponents('');
     } else {
-      const defaultValue = entryAltitude ? entryAltitude.value.toString() : "...";
+      const defaultValue = entryAltitude
+        ? entryAltitude.value.toString()
+        : '...';
       setAltitudeComponents(defaultValue);
     }
   }, [entryAltitude, exitAltitude, open, composite]);
@@ -126,13 +123,13 @@ const Maneuvre = ({
 
   useEffect(() => {
     if (routine.isNull()) {
-      setBackgroundColor('#f0f0f0')
+      setBackgroundColor('#f0f0f0');
     } else if (routine.availableNextRoutines().length < 1) {
-      setBackgroundColor('#f6f6f6')
+      setBackgroundColor('#f6f6f6');
     } else if (open) {
-      setBackgroundColor('#a0f0f0')
+      setBackgroundColor('#a0f0f0');
     } else {
-      setBackgroundColor('#ffffff')
+      setBackgroundColor('#ffffff');
     }
   }, [open]);
 
@@ -140,26 +137,25 @@ const Maneuvre = ({
     if (duration && !routine.isNull()) {
       let st = '';
       // Hours
-      st += `${Math.floor(accumulatedDuration / 60)}:`
+      st += `${Math.floor(accumulatedDuration / 60)}:`;
       // mins
-      let mins = (accumulatedDuration % 60).toString();
+      const mins = (accumulatedDuration % 60).toString();
       st += mins.length == 1 ? '0' + mins : mins;
       setAccumulatedDurationDisplay(st);
     } else {
       setAccumulatedDurationDisplay('');
     }
-
   }, [duration, accumulatedDuration]);
 
   return (
     <div
       style={{
         backgroundColor: backgroundColor,
-        width: "100%",
-        height: 'fit-content',// open ? "80px" : "20px",
-        borderBottom: "2px dotted #000000",
-        borderLeft: "2px dotted #000000",
-        display: "flex",
+        width: '100%',
+        height: 'fit-content', // open ? "80px" : "20px",
+        borderBottom: '2px dotted #000000',
+        borderLeft: '2px dotted #000000',
+        display: 'flex',
       }}
       onClick={() => {
         if (routine.isNull() || routine.availableNextRoutines().length < 1)
@@ -171,10 +167,10 @@ const Maneuvre = ({
     >
       <div
         style={{
-          width: "40%",
-          height: "100%",
-          textAlign: "left",
-          borderRight: "2px dotted #000000",
+          width: '40%',
+          height: '100%',
+          textAlign: 'left',
+          borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
       >
@@ -182,8 +178,8 @@ const Maneuvre = ({
           style={{
             //backgroundColor: open ? "black" : "white",
             //color: open ? "white" : "black",
-            width: "fit-content",
-            height: "fit-content",
+            width: 'fit-content',
+            height: 'fit-content',
           }}
           onClick={() => {
             if (routine.isNull() || routine.availableNextRoutines().length < 1)
@@ -196,12 +192,14 @@ const Maneuvre = ({
           {routine.isNull() ? '' : display}
         </div>
         {open && (
-          <div style={{
-            display: 'flex'
-          }}>
+          <div
+            style={{
+              display: 'flex',
+            }}
+          >
             <div
               style={{
-                backgroundColor: "white",
+                backgroundColor: 'white',
                 width: 'fit-content',
                 color: 'black',
                 border: 'solid 2px black',
@@ -210,41 +208,44 @@ const Maneuvre = ({
                 composite.deleteRoutine(routine);
                 setComposite(composite.copy());
               }}
-              >
+            >
               Remove
             </div>
 
-          {routine.swappableRoutines().length > 0 ? <div
-              style={{
-                backgroundColor: "white",
-                width: 'fit-content',
-                color: 'black',
-                border: 'solid 2px black',
-              }}
-              onClick={() => {
-                const options: OptionProp[] = [];
-                routine.swappableRoutines().forEach((routine) => {
-                  const display = routine.toString();
-                  if (display) {
-                    options.push({
-                      display: display,
-                      onClick: () => {
+            {routine.swappableRoutines().length > 0 ? (
+              <div
+                style={{
+                  backgroundColor: 'white',
+                  width: 'fit-content',
+                  color: 'black',
+                  border: 'solid 2px black',
+                }}
+                onClick={() => {
+                  const options: OptionProp[] = [];
+                  routine.swappableRoutines().forEach((routine) => {
+                    const display = routine.toString();
+                    if (display) {
+                      options.push({
+                        display: display,
+                        onClick: () => {
                           composite.swapRoutine(routine);
                           setComposite(composite.copy());
-                      }
-                    })
-                  }
-                });
-                setOptions(options);
-              }}
+                        },
+                      });
+                    }
+                  });
+                  setOptions(options);
+                }}
               >
-              Replace
-            </div> : ''}
- 
- 
+                Replace
+              </div>
+            ) : (
+              ''
+            )}
+
             <div
               style={{
-                backgroundColor: "white",
+                backgroundColor: 'white',
                 width: 'fit-content',
                 color: 'black',
                 border: 'solid 2px black',
@@ -265,7 +266,7 @@ const Maneuvre = ({
                           // We are just adding a break
                           const options: OptionProp[] = [];
                           const waypoints: Waypoint[] = Object.values(
-                            composite.waypointRegistry.waypoints,
+                            WaypointRegistry.waypoints,
                           );
                           waypoints.forEach((waypoint) => {
                             const newRoutine = routine.copy();
@@ -273,7 +274,7 @@ const Maneuvre = ({
                               new State({ waypoint: waypoint }),
                             );
                             options.push({
-                              display: "to " + waypoint.name,
+                              display: 'to ' + waypoint.name,
                               onClick: () => {
                                 composite.appendRoutine(newRoutine);
                                 setComposite(composite.copy());
@@ -289,7 +290,7 @@ const Maneuvre = ({
                 });
                 setOptions(options);
               }}
-              >
+            >
               Add After
             </div>
           </div>
@@ -297,9 +298,9 @@ const Maneuvre = ({
       </div>
       <div
         style={{
-          width: "20%",
-          height: "100%",
-          borderRight: "2px dotted #000000",
+          width: '20%',
+          height: '100%',
+          borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
       >
@@ -307,19 +308,19 @@ const Maneuvre = ({
       </div>
       <div
         style={{
-          width: "20%",
-          height: "100%",
-          borderRight: "2px dotted #000000",
+          width: '20%',
+          height: '100%',
+          borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
       >
-        {duration ? duration : ""}
+        {duration ? duration : ''}
       </div>
       <div
         style={{
-          width: "20%",
-          height: "100%",
-          borderRight: "2px dotted #000000",
+          width: '20%',
+          height: '100%',
+          borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
       >
@@ -336,12 +337,12 @@ type TextInputSubmitProps = {
 
 export const TextInputSubmit = ({
   onSubmit,
-  defaultValue = "",
+  defaultValue = '',
 }: TextInputSubmitProps) => {
   const [value, setValue] = useState<string>(defaultValue);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && value.trim()) {
+    if (e.key === 'Enter' && value.trim()) {
       onSubmit(value);
       setValue(value);
     }
@@ -352,7 +353,7 @@ export const TextInputSubmit = ({
   }, [defaultValue]);
   return (
     <input
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
       type="text"
       value={value}
       onChange={(e) => setValue(e.target.value)}

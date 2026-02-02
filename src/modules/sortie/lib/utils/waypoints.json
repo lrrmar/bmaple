@@ -1,0 +1,394 @@
+{
+  "1": {
+    "id": "1",
+    "latitude[DMS]": "53\u00b020\u00b4N",
+    "longitude[DMS]": "000\u00b010\u00b4W",
+    "latitude": { "value": 52.666666666666664, "units": "degrees" },
+    "longitude": { "value": -0.16666666666666666, "units": "degrees" },
+    "name": "LOUTH"
+  },
+  "2": {
+    "id": "2",
+    "latitude[DMS]": "53\u00b008\u2019N",
+    "longitude[DMS]": "001\u00b000\u00b4E",
+    "latitude": { "value": 52.86666666666667, "units": "degrees" },
+    "longitude": { "value": 1.0, "units": "degrees" },
+    "name": "BLAKENEY POINT"
+  },
+  "3": {
+    "id": "3",
+    "latitude[DMS]": "52\u00b057\u00b4N",
+    "longitude[DMS]": "001\u00b007\u00b4E",
+    "latitude": { "value": 51.05, "units": "degrees" },
+    "longitude": { "value": 0.8833333333333333, "units": "degrees" },
+    "name": "WEYBOURNE"
+  },
+  "4": {
+    "id": "4",
+    "latitude[DMS]": "52\u00b040\u00b4N",
+    "longitude[DMS]": "000\u00b057\u00b4E",
+    "latitude": { "value": 51.333333333333336, "units": "degrees" },
+    "longitude": { "value": -0.95, "units": "degrees" },
+    "name": "EAST DEREHAM"
+  },
+  "5": {
+    "id": "5",
+    "latitude[DMS]": "52\u00b023\u00b4N",
+    "longitude[DMS]": "000\u00b029\u00b4W",
+    "latitude": { "value": 51.61666666666667, "units": "degrees" },
+    "longitude": { "value": -0.48333333333333334, "units": "degrees" },
+    "name": "DTY EAST"
+  },
+  "6": {
+    "id": "6",
+    "latitude[DMS]": "51\u00b058\u00b4N",
+    "longitude[DMS]": "001\u00b047\u00b4W",
+    "latitude": { "value": 50.03333333333333, "units": "degrees" },
+    "longitude": { "value": 0.21666666666666667, "units": "degrees" },
+    "name": "DTY WEST"
+  },
+  "7": {
+    "id": "7",
+    "latitude[DMS]": "52\u00b050\u00b4N",
+    "longitude[DMS]": "001\u00b055\u00b4E",
+    "latitude": { "value": 51.166666666666664, "units": "degrees" },
+    "longitude": { "value": 0.08333333333333337, "units": "degrees" },
+    "name": "NE. GREAT YARMOUTH"
+  },
+  "8": {
+    "id": "8",
+    "latitude[DMS]": "52\u00b005\u00b4N",
+    "longitude[DMS]": "001\u00b047\u00b4E",
+    "latitude": { "value": 51.916666666666664, "units": "degrees" },
+    "longitude": { "value": 0.21666666666666667, "units": "degrees" },
+    "name": "E. FELIXSTOWE"
+  },
+  "9": {
+    "id": "9",
+    "latitude[DMS]": "51\u00b011\u00b4N",
+    "longitude[DMS]": "001\u00b045\u00b4E",
+    "latitude": { "value": 50.81666666666667, "units": "degrees" },
+    "longitude": { "value": 0.25, "units": "degrees" },
+    "name": "E. DOVER"
+  },
+  "10": {
+    "id": "10",
+    "latitude[DMS]": "50\u00b032\u00b4N",
+    "longitude[DMS]": "000\u00b030\u00b4E",
+    "latitude": { "value": 49.46666666666667, "units": "degrees" },
+    "longitude": { "value": -0.5, "units": "degrees" },
+    "name": "S. BEXHILL"
+  },
+  "11": {
+    "id": "11",
+    "latitude[DMS]": "50\u00b040\u00b4N",
+    "longitude[DMS]": "001\u00b000\u00b4W",
+    "latitude": { "value": 49.333333333333336, "units": "degrees" },
+    "longitude": { "value": 1.0, "units": "degrees" },
+    "name": "E. BEMBRIDGE"
+  },
+  "12": {
+    "id": "12",
+    "latitude[DMS]": "50\u00b001\u00b4N",
+    "longitude[DMS]": "002\u00b000\u00b4W",
+    "latitude": { "value": 49.983333333333334, "units": "degrees" },
+    "longitude": { "value": 2.0, "units": "degrees" },
+    "name": "SE D023"
+  },
+  "13": {
+    "id": "13",
+    "latitude[DMS]": "50\u00b001\u00b4N",
+    "longitude[DMS]": "003\u00b025\u00b4W",
+    "latitude": { "value": 49.983333333333334, "units": "degrees" },
+    "longitude": { "value": 2.5833333333333335, "units": "degrees" },
+    "name": "S.START POINT"
+  },
+  "14": {
+    "id": "14",
+    "latitude[DMS]": "51\u00b000\u00b4N",
+    "longitude[DMS]": "004\u00b050\u00b4W",
+    "latitude": { "value": 51.0, "units": "degrees" },
+    "longitude": { "value": 3.1666666666666665, "units": "degrees" },
+    "name": "W. HARTLAND POINT"
+  },
+  "15": {
+    "id": "15",
+    "latitude[DMS]": "50\u00b013.01\u00b4N",
+    "longitude[DMS]": "005\u00b019.01\u00b4W",
+    "latitude": { "value": 49.783166666666666, "units": "degrees" },
+    "longitude": { "value": 4.683166666666667, "units": "degrees" },
+    "name": "CAMBORNE"
+  },
+  "16": {
+    "id": "16",
+    "latitude[DMS]": "50\u00b000\u00b4N",
+    "longitude[DMS]": "007\u00b000\u00b4W",
+    "latitude": { "value": 50.0, "units": "degrees" },
+    "longitude": { "value": 7.0, "units": "degrees" },
+    "name": "W. ISLES OF SCILLY"
+  },
+  "17": {
+    "id": "17",
+    "latitude[DMS]": "51\u00b000\u00b4N",
+    "longitude[DMS]": "007\u00b000\u00b4W",
+    "latitude": { "value": 51.0, "units": "degrees" },
+    "longitude": { "value": 7.0, "units": "degrees" },
+    "name": "SW APPROACHES"
+  },
+  "18": {
+    "id": "18",
+    "latitude[DMS]": "51\u00b000\u00b4N",
+    "longitude[DMS]": "006\u00b000\u00b4W",
+    "latitude": { "value": 51.0, "units": "degrees" },
+    "longitude": { "value": 6.0, "units": "degrees" },
+    "name": "SW APPROACHES"
+  },
+  "19": {
+    "id": "19",
+    "latitude[DMS]": "51\u00b020\u00b4N",
+    "longitude[DMS]": "005\u00b000\u00b4W",
+    "latitude": { "value": 50.666666666666664, "units": "degrees" },
+    "longitude": { "value": 5.0, "units": "degrees" },
+    "name": "S. MILFORD HAVEN"
+  },
+  "20": {
+    "id": "20",
+    "latitude[DMS]": "51\u00b030\u00b4N",
+    "longitude[DMS]": "006\u00b000\u00b4W",
+    "latitude": { "value": 50.5, "units": "degrees" },
+    "longitude": { "value": 6.0, "units": "degrees" },
+    "name": "SW. MILFORD HAVEN"
+  },
+  "21": {
+    "id": "21",
+    "latitude[DMS]": "51\u00b030\u00b4N",
+    "longitude[DMS]": "005\u00b030\u00b4W",
+    "latitude": { "value": 50.5, "units": "degrees" },
+    "longitude": { "value": 4.5, "units": "degrees" },
+    "name": "SW. MILFORD HAVEN"
+  },
+  "22": {
+    "id": "22",
+    "latitude[DMS]": "52\u00b009\u00b4N",
+    "longitude[DMS]": "005\u00b025\u00b4W",
+    "latitude": { "value": 51.85, "units": "degrees" },
+    "longitude": { "value": 4.583333333333333, "units": "degrees" },
+    "name": "W. STRUMBLE"
+  },
+  "23": {
+    "id": "23",
+    "latitude[DMS]": "53\u00b030\u00b4N",
+    "longitude[DMS]": "005\u00b025\u00b4W",
+    "latitude": { "value": 52.5, "units": "degrees" },
+    "longitude": { "value": 4.583333333333333, "units": "degrees" },
+    "name": "E.DUBLIN"
+  },
+  "24": {
+    "id": "24",
+    "latitude[DMS]": "53\u00b030\u00b4N",
+    "longitude[DMS]": "004\u00b000\u00b4W",
+    "latitude": { "value": 52.5, "units": "degrees" },
+    "longitude": { "value": 4.0, "units": "degrees" },
+    "name": "N. LLANDUDNO"
+  },
+  "25": {
+    "id": "25",
+    "latitude[DMS]": "54\u00b030\u00b4N",
+    "longitude[DMS]": "004\u00b000\u00b4W",
+    "latitude": { "value": 53.5, "units": "degrees" },
+    "longitude": { "value": 4.0, "units": "degrees" },
+    "name": "W.WHITEHAVEN"
+  },
+  "26": {
+    "id": "26",
+    "latitude[DMS]": "54\u00b030\u00b4N",
+    "longitude[DMS]": "005\u00b015\u00b4W",
+    "latitude": { "value": 53.5, "units": "degrees" },
+    "longitude": { "value": 4.75, "units": "degrees" },
+    "name": "SW MULL OF GALLOWAY"
+  },
+  "27": {
+    "id": "27",
+    "latitude[DMS]": "55\u00b018\u00b4N",
+    "longitude[DMS]": "005\u00b054\u00b4W",
+    "latitude": { "value": 54.7, "units": "degrees" },
+    "longitude": { "value": 4.1, "units": "degrees" },
+    "name": "MULL OF KINTYRE"
+  },
+  "28": {
+    "id": "28",
+    "latitude[DMS]": "55\u00b030\u00b4N",
+    "longitude[DMS]": "007\u00b000\u00b4W",
+    "latitude": { "value": 54.5, "units": "degrees" },
+    "longitude": { "value": 7.0, "units": "degrees" },
+    "name": "N.LONDONDERRY"
+  },
+  "29": {
+    "id": "29",
+    "latitude[DMS]": "55\u00b030\u00b4N",
+    "longitude[DMS]": "009\u00b000\u00b4W",
+    "latitude": { "value": 54.5, "units": "degrees" },
+    "longitude": { "value": 9.0, "units": "degrees" },
+    "name": "NW.DONEGAL"
+  },
+  "30": {
+    "id": "30",
+    "latitude[DMS]": "56\u00b030\u00b4N",
+    "longitude[DMS]": "009\u00b000\u00b4W",
+    "latitude": { "value": 55.5, "units": "degrees" },
+    "longitude": { "value": 9.0, "units": "degrees" },
+    "name": "W.TIREE"
+  },
+  "31": {
+    "id": "31",
+    "latitude[DMS]": "56\u00b030\u00b4N",
+    "longitude[DMS]": "007\u00b000\u00b4W",
+    "latitude": { "value": 55.5, "units": "degrees" },
+    "longitude": { "value": 7.0, "units": "degrees" },
+    "name": "W.TIREE"
+  },
+  "32": {
+    "id": "32",
+    "latitude[DMS]": "57\u00b025\u00b4N",
+    "longitude[DMS]": "007\u00b000\u00b4W",
+    "latitude": { "value": 56.583333333333336, "units": "degrees" },
+    "longitude": { "value": 7.0, "units": "degrees" },
+    "name": "THE MINCH"
+  },
+  "33": {
+    "id": "33",
+    "latitude[DMS]": "58\u00b042\u00b4N",
+    "longitude[DMS]": "005\u00b000\u00b4W",
+    "latitude": { "value": 57.3, "units": "degrees" },
+    "longitude": { "value": 5.0, "units": "degrees" },
+    "name": "N.CAPE WRATH"
+  },
+  "34": {
+    "id": "34",
+    "latitude[DMS]": "59\u00b002\u00b4N",
+    "longitude[DMS]": "005\u00b000\u00b4W",
+    "latitude": { "value": 58.96666666666667, "units": "degrees" },
+    "longitude": { "value": 5.0, "units": "degrees" },
+    "name": "N.CAPE WRATH"
+  },
+  "35": {
+    "id": "35",
+    "latitude[DMS]": "58\u00b042\u00b4N",
+    "longitude[DMS]": "003\u00b000\u00b4W",
+    "latitude": { "value": 57.3, "units": "degrees" },
+    "longitude": { "value": 3.0, "units": "degrees" },
+    "name": "PENTLAND FIRTH"
+  },
+  "36": {
+    "id": "36",
+    "latitude[DMS]": "59\u00b025\u00b4N",
+    "longitude[DMS]": "001\u00b040\u00b4W",
+    "latitude": { "value": 58.583333333333336, "units": "degrees" },
+    "longitude": { "value": 0.33333333333333337, "units": "degrees" },
+    "name": "FAIR ISLE"
+  },
+  "37": {
+    "id": "37",
+    "latitude[DMS]": "58\u00b000\u00b4N",
+    "longitude[DMS]": "001\u00b040\u00b4W",
+    "latitude": { "value": 58.0, "units": "degrees" },
+    "longitude": { "value": 0.33333333333333337, "units": "degrees" },
+    "name": "NE FRASERBURGH"
+  },
+  "38": {
+    "id": "38",
+    "latitude[DMS]": "56\u00b000\u00b4N",
+    "longitude[DMS]": "001\u00b040\u00b4W",
+    "latitude": { "value": 56.0, "units": "degrees" },
+    "longitude": { "value": 0.33333333333333337, "units": "degrees" },
+    "name": "E. ST ABBS HEAD"
+  },
+  "39": {
+    "id": "39",
+    "latitude[DMS]": "54\u00b047\u00b4N",
+    "longitude[DMS]": "001\u00b000\u00b4W",
+    "latitude": { "value": 53.21666666666667, "units": "degrees" },
+    "longitude": { "value": 1.0, "units": "degrees" },
+    "name": "E.SUNDERLAND"
+  },
+  "40": {
+    "id": "40",
+    "latitude[DMS]": "54\u00b030\u00b4N",
+    "longitude[DMS]": "000\u00b031\u00b4W",
+    "latitude": { "value": 53.5, "units": "degrees" },
+    "longitude": { "value": -0.5166666666666667, "units": "degrees" },
+    "name": "E.WHITBY"
+  },
+  "41": {
+    "id": "41",
+    "latitude[DMS]": "54\u00b030\u00b4N",
+    "longitude[DMS]": "000\u00b000\u00b4E",
+    "latitude": { "value": 53.5, "units": "degrees" },
+    "longitude": { "value": 0.0, "units": "degrees" },
+    "name": "E.WHITBY"
+  },
+  "42": {
+    "id": "42",
+    "latitude[DMS]": "53\u00b038\u00b4N",
+    "longitude[DMS]": "000\u00b033\u00b4E",
+    "latitude": { "value": 52.36666666666667, "units": "degrees" },
+    "longitude": { "value": -0.55, "units": "degrees" },
+    "name": "E.SPURN POINT"
+  },
+  "43": {
+    "id": "43",
+    "latitude[DMS]": "56\u00b000\u00b4N",
+    "longitude[DMS]": "000\u00b000\u00b4E",
+    "latitude": { "value": 56.0, "units": "degrees" },
+    "longitude": { "value": 0.0, "units": "degrees" },
+    "name": "BETWEEN D513 AND D613"
+  },
+  "44": {
+    "id": "44",
+    "latitude[DMS]": "56\u00b000\u00b4N",
+    "longitude[DMS]": "003\u00b000\u00b4E",
+    "latitude": { "value": 56.0, "units": "degrees" },
+    "longitude": { "value": 3.0, "units": "degrees" },
+    "name": "NORTH SEA EAST OF D513 AND D323"
+  },
+  "45": {
+    "id": "45",
+    "latitude[DMS]": "55\u00b000\u00b4N",
+    "longitude[DMS]": "003\u00b000\u00b4E",
+    "latitude": { "value": 55.0, "units": "degrees" },
+    "longitude": { "value": 3.0, "units": "degrees" },
+    "name": "NORTH SEA EAST OF D323"
+  },
+  "46": {
+    "id": "46",
+    "latitude[DMS]": "55\u00b000\u00b4N",
+    "longitude[DMS]": "002\u00b000\u00b4E",
+    "latitude": { "value": 55.0, "units": "degrees" },
+    "longitude": { "value": 2.0, "units": "degrees" },
+    "name": "NORTH SEA EAST OF D323"
+  },
+  "47": {
+    "id": "47",
+    "latitude[DMS]": "51\u00b008.7\u00b4N",
+    "longitude[DMS]": "001\u00b026.3\u00b4W",
+    "latitude": { "value": 50.855, "units": "degrees" },
+    "longitude": { "value": 0.5616666666666666, "units": "degrees" },
+    "name": "CHILBOLTON"
+  },
+  "48": {
+    "id": "48",
+    "latitude[DMS]": "50\u00b047\u00b4N",
+    "longitude[DMS]": "002\u00b050\u00b4W",
+    "latitude": { "value": 49.21666666666667, "units": "degrees" },
+    "longitude": { "value": 1.1666666666666665, "units": "degrees" },
+    "name": "CHILBOLTON WEST POINT"
+  },
+  "49": {
+    "id": "49",
+    "latitude[DMS]": "50\u02da49.2\u2019N",
+    "longitude[DMS]": "002\u02da33.6\u2019W",
+    "latitude": { "value": 49.18, "units": "degrees" },
+    "longitude": { "value": 1.44, "units": "degrees" },
+    "name": "WARDON HILL"
+  }
+}
