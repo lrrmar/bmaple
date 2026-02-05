@@ -53,6 +53,7 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         };
         dispatch(request(toRequest));
       } else {
+        console.log('waypoint cache update');
         const toUpdate = {
           waypoints: waypoints,
           id: id,
@@ -60,7 +61,7 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         dispatch(update(toUpdate));
       }
     }
-  }, [flightPlan, layerId, cache]);
+  }, [flightPlan, layerId]);
 
   useEffect(() => {
     const filteredIds = Object.keys(cache).filter((id) => {

@@ -30,7 +30,7 @@ export interface Waypoint {
   toJson(): WaypointJson;
 }
 
-export interface State{
+export interface State {
   isComplete(): boolean;
   isNull(): boolean;
   getEntryForRoutine(): Routine | null;

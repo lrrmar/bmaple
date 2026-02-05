@@ -122,7 +122,10 @@ export abstract class Profile extends WaypointChangeRoutine {
   }
 
   getAltitude() {
-    return [this.getEntryState().getAltitude(), this.getExitState().getAltitude()];
+    return [
+      this.getEntryState().getAltitude(),
+      this.getExitState().getAltitude(),
+    ];
   }
 }
 

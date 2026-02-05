@@ -6,7 +6,9 @@ import { RoutineJson } from '../io/types';
 
 export class WaypointChangeRoutine extends Routine {
   stateCheck() {
-    return this.getEntryState().getWaypoint() !== this.getExitState().getWaypoint();
+    return (
+      this.getEntryState().getWaypoint() !== this.getExitState().getWaypoint()
+    );
   }
 
   init() {
@@ -18,10 +20,10 @@ export class WaypointChangeRoutine extends Routine {
     let s = this.constructor.name;
     const entryWaypoint = this.getEntryState().getWaypoint().id;
     const exitWaypoint = this.getExitState().getWaypoint().id;
-    if (entryWaypoint && entryWaypoint !== 'Null') {
+    if (entryWaypoint && !entryWaypoint.includes('null')) {
       s += ` from ${entryWaypoint}`;
     }
-    if (exitWaypoint && exitWaypoint !== 'Null') {
+    if (exitWaypoint && !exitWaypoint.includes('null')) {
       s += ` to ${exitWaypoint}`;
     }
     return s;
@@ -62,7 +64,7 @@ export class WaypointChangeRoutine extends Routine {
     const entryState = new State(entryStateInfo);
     const exitState = new State(exitStateInfo);
 
-    const routine = new this({ entry: entryState, exit: exitState});
+    const routine = new this({ entry: entryState, exit: exitState });
     routine.init();
 
     const duration = json.duration;
@@ -191,7 +193,7 @@ export class BearingChangeRoutine extends Routine {
     const entryState = new State(entryStateInfo);
     const exitState = new State(entryStateInfo);
 
-    const routine = new this({entry: entryState, exit: exitState});
+    const routine = new this({ entry: entryState, exit: exitState });
     routine.init();
 
     const duration = json.duration;

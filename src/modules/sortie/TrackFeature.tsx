@@ -15,13 +15,21 @@ import OpenLayersMap from '../../mapping/OpenLayersMap';
 // import OpenLayers types
 import Map from 'ol/Map';
 import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
-import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
 import { getUid } from 'ol/util';
 import { fromLonLat } from 'ol/proj';
 import Fill from 'ol/style/Fill.js';
 import Stroke from 'ol/style/Stroke.js';
 import Style from 'ol/style/Style.js';
+import bezierSpline from '@turf/bezier-spline';
+import { GeoJSON } from 'ol/format';
+import {
+  Feature as GeoJSONFeature,
+  LineString as GeoJSONLineString,
+} from 'geojson';
+
+import { type Waypoint } from './lib/state/types';
+import WaypointRegistry from './lib/state/WaypointRegistry';
 
 export interface Track extends Pending {
   name: string;
@@ -53,53 +61,97 @@ const parseLimit = (limit: string) => {
 };
 
 const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
-/*  // Access to fundamental data structures
+  // Access to fundamental data structures
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
   const mapUtils = new OpenLayersMap();
   const initialised = useRef<boolean>(false);
+  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
 
   useEffect(() => {
     const featureData = cache[id];
-    console.log(featureData);
     if (featureData && !initialised.current && map) {
       const layer = map.get(layerId);
-      console.log(featureData);
       if (layer) {
         const waypointIds = featureData.waypoints;
-        if (waypointIds) {
-          console.log(waypointIds);
-
-          /////// start here!
-
-          const feature = new Feature({
-            geometry: new Point(fromLonLat([-longitude, latitude])),
+        if (waypointIds && waypointIds instanceof Array) {
+          const waypoints: Waypoint[] = [];
+          waypointIds.forEach((id) => {
+            if (typeof id == 'string') {
+              const waypoint = WaypointRegistry.getWaypoint(id);
+              if (waypoint) waypoints.push(waypoint);
+            }
           });
-          layer.getSource().addFeature(feature);
-          //feature.on('click', alert(featureData.name) )
-          feature.setStyle(
-            new Style({
-              image: new Icon({
-                img: canvas,
-                size: [canvas.width, canvas.height],
-                anchor: [0, 1],
-              }),
-            }),
-          );
-          feature.set('id', id);
-          map.set(id, feature);
-          dispatch(
-            ingest({
-              ...featureData,
-              ol_uid: getUid(feature),
-            }),
-          );
-          initialised.current = true;
+          setWaypoints(waypoints);
         }
       }
     }
-  }, [cache]);*/
+  }, [cache]);
+
+  useEffect(() => {
+    if (map) {
+      const layer = map.get(layerId);
+      if (layer && waypoints.length > 1) {
+        const coords = waypoints.map((waypoint) => {
+          return fromLonLat([-waypoint.getLongitude(), waypoint.getLatitude()]);
+        });
+
+        const feature = new Feature({
+          geometry: new LineString(coords),
+        });
+        const format = new GeoJSON();
+
+        // Convert to GeoJSON
+        const geojson = format.writeFeatureObject(feature, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857',
+        }) as GeoJSONFeature<GeoJSONLineString>;
+
+        if (geojson.geometry.type !== 'LineString') {
+          // CANCELLING FOR NOW
+          // Smooth it
+          const curved = bezierSpline(geojson, {
+            resolution: 1000000,
+            sharpness: 5,
+          });
+          console.log(curved);
+
+          // Back to OpenLayers feature
+          const curvedFeature = format.readFeature(curved, {
+            dataProjection: 'EPSG:4326',
+            featureProjection: 'EPSG:3857',
+          });
+          curvedFeature.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: '#f0a040',
+                width: 2,
+              }),
+            }),
+          );
+          console.log(curvedFeature.getGeometry()?.getExtent());
+          const oldFeature = map.get(id);
+          layer.getSource().removeFeature(oldFeature);
+          layer.getSource().addFeature(curvedFeature);
+          map.set(id, curvedFeature);
+        } else {
+          feature.setStyle(
+            new Style({
+              stroke: new Stroke({
+                color: '#f0a040',
+                width: 2,
+              }),
+            }),
+          );
+          const oldFeature = map.get(id);
+          layer.getSource().removeFeature(oldFeature);
+          layer.getSource().addFeature(feature);
+          map.set(id, feature);
+        }
+      }
+    }
+  }, [waypoints]);
 
   return <div></div>;
 };

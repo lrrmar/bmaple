@@ -42,5 +42,4 @@ export default class Waypoint implements _Waypoint {
     /// IMPLEMENT DMS!
     return this.longitude.value;
   }
-
 }

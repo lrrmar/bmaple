@@ -1,6 +1,5 @@
 import type { WaypointJson } from './types';
 
-
 const waypoints: { [keys: string]: WaypointJson } = {
   '1': {
     id: 'PT1',

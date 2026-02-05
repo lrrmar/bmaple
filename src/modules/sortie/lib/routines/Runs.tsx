@@ -23,7 +23,10 @@ export class SLR extends WaypointChangeRoutine {
   }
 
   getAltitude() {
-    if (this.getEntryState().getAltitude() != null && this.getExitState().getAltitude()) {
+    if (
+      this.getEntryState().getAltitude() != null &&
+      this.getExitState().getAltitude()
+    ) {
       return this.getEntryState().getAltitude();
     } else {
       return null;

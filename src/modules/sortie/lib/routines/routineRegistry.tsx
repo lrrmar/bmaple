@@ -23,4 +23,3 @@ export const routineRegistry: {
   ProfileDescent: ProfileDescent,
   NullRoutine: NullRoutine,
 };
-

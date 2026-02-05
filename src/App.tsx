@@ -29,6 +29,7 @@ import WaypointSource from './modules/sortie/WaypointSource';
 import TrackSource from './modules/sortie/TrackSource';
 
 import FlightPlan from './modules/sortie/components/FlightPlan';
+import ClickModeMenu from './modules/sortie/components/ClickMode';
 import sortieReducer from './modules/sortie/sortieSlice';
 export const store = configureStore({
   reducer: {
@@ -62,6 +63,7 @@ const App = () => {
           style={{
             width: '50%',
             height: '100vh',
+            overflow: 'scroll',
           }}
         >
           <FlightPlan />
@@ -98,6 +100,15 @@ const App = () => {
       </FloatingBox>
       <FloatingBox style={{ top: '20px', left: '50%' }}>
         <ErrorMessage />
+      </FloatingBox>
+      <FloatingBox style={{ bottom: '20px', left: '50%' }}>
+        <ClickModeMenu
+          modes={[
+            { name: 'append SLR', icon: 'pencil' },
+            { name: 'new waypoint', icon: 'pin' },
+            { name: 'inspect', icon: 'mouse pointer' },
+          ]}
+        />
       </FloatingBox>
     </div>
   );

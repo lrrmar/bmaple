@@ -33,7 +33,6 @@ const routineClassNames: RoutineClassName[] = [
   'NullRoutine',
 ];
 
-
 const userRoutineClassNames: UserRoutineClassName[] = [
   'SLR',
   'Transit',
@@ -41,7 +40,6 @@ const userRoutineClassNames: UserRoutineClassName[] = [
   'ProfileDescent',
   'NullRoutine',
 ];
-
 
 export default class Routine implements _Routine {
   protected entryState: _State;
@@ -65,15 +63,15 @@ export default class Routine implements _Routine {
   }
 
   static registry: Record<RoutineClassName, RoutineClass | null> = {
-    'CranfieldTakeOff': null,
-    'SLR': null,
-    'Transit': null,
-    'OutsideTurn': null,
-    'InsideTurn': null,
-    'RaceTrackTurn': null,
-    'ProfileAscent': null,
-    'ProfileDescent': null,
-    'NullRoutine': null,
+    CranfieldTakeOff: null,
+    SLR: null,
+    Transit: null,
+    OutsideTurn: null,
+    InsideTurn: null,
+    RaceTrackTurn: null,
+    ProfileAscent: null,
+    ProfileDescent: null,
+    NullRoutine: null,
   };
 
   static register(key: RoutineClassName, subclass: RoutineClass) {
@@ -87,7 +85,6 @@ export default class Routine implements _Routine {
     );
     return copy;
   }
-
 
   static create(key: RoutineClassName, args: RoutineConstructor) {
     const SubClass = this.registry[key];
@@ -144,7 +141,7 @@ export default class Routine implements _Routine {
   //////////////////////////
 
   isNull() {
-    return this.constructor.name ==  'NullRoutine';
+    return this.constructor.name == 'NullRoutine';
   }
   // Views
 
@@ -197,6 +194,7 @@ export default class Routine implements _Routine {
 
       return json;
     } else {
+      console.log('is not routine name');
       return null;
     }
   }
@@ -287,7 +285,7 @@ export default class Routine implements _Routine {
     userRoutineClassNames.forEach((name) => {
       const routineClass = Routine.registry[name];
       if (routineClass) classes.push(routineClass);
-    })
+    });
     return classes;
   }
 
@@ -298,29 +296,36 @@ export default class Routine implements _Routine {
   equivalentRoutineClasses(): RoutineClass[] {
     // Provides a list of routine classes that are equivalent to the current one
     const classes: RoutineClass[] = [];
-    Object.values(Routine.registry)
-      .forEach((routineClass: RoutineClass | null) => {
+    Object.values(Routine.registry).forEach(
+      (routineClass: RoutineClass | null) => {
         try {
           if (routineClass) {
             const routine = new routineClass({
               entry: this.getEntryState(),
               exit: this.getExitState(),
             });
-            if (routine.stateCheck() && routine.constructor.name != this.constructor.name) {
+            if (
+              routine.stateCheck() &&
+              routine.constructor.name != this.constructor.name
+            ) {
               classes.push(routineClass);
             }
           }
         } catch {
           void 0;
         }
-      });
+      },
+    );
     return classes;
   }
 
   swappableRoutines(): _Routine[] {
     // Provides a list of routine instances that are equivalent to the current one
     return this.equivalentRoutineClasses().map((routineClass: RoutineClass) => {
-      return new routineClass({entry: this.getEntryState(), exit: this.getExitState()});
+      return new routineClass({
+        entry: this.getEntryState(),
+        exit: this.getExitState(),
+      });
     });
   }
 
@@ -339,7 +344,7 @@ export default class Routine implements _Routine {
     // Create instances that exit to null state of ALL possible permitted
     // routines that follow this one
     this.permittedNextRoutineClasses().forEach((routineClass) => {
-      nextRoutines.push(new routineClass({entry: this.getExitState()}));
+      nextRoutines.push(new routineClass({ entry: this.getExitState() }));
     });
     const availableNextRoutines: _Routine[] = [];
     nextRoutines.forEach((routine) => {

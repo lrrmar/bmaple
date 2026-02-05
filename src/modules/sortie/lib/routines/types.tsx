@@ -1,7 +1,7 @@
-import type { State } from  '../state/types';
+import type { State } from '../state/types';
 import type { RoutineJson } from '../io/types';
 
-export type UserRoutineClassName = 
+export type UserRoutineClassName =
   | 'CranfieldTakeOff'
   | 'SLR'
   | 'Transit'
@@ -9,26 +9,24 @@ export type UserRoutineClassName =
   | 'ProfileDescent'
   | 'NullRoutine';
 
-export type RoutineClassName = 
+export type RoutineClassName =
   | UserRoutineClassName
   | 'OutsideTurn'
   | 'InsideTurn'
-  | 'RaceTrackTurn'
+  | 'RaceTrackTurn';
 
-export type UserRoutineClassNames= Array<UserRoutineClassName>;
-export type RoutineClassNames= Array<RoutineClassName>;
-
-
-
+export type UserRoutineClassNames = Array<UserRoutineClassName>;
+export type RoutineClassNames = Array<RoutineClassName>;
 
 export interface Routine {
   duration: number | null;
-  copy(): Routine; 
+  copy(): Routine;
   init(): void;
   setDuration(duration: number): void;
   setDisplay(display: string): void;
   verifyStateConstructor(): void;
-  fixRoutineToState(): void; attemptToFixState(): void;
+  fixRoutineToState(): void;
+  attemptToFixState(): void;
   stateCheck(): boolean;
   isNull(): boolean;
   toString(): string | null;
@@ -54,16 +52,16 @@ export interface Routine {
 }
 
 export type RoutineConstructor = {
-  entry: State,
-  exit?: State,
-}
+  entry: State;
+  exit?: State;
+};
 export interface RoutineStatic {
-  registry: Record<RoutineClassName, RoutineClass | null> ;
+  registry: Record<RoutineClassName, RoutineClass | null>;
   register(key: RoutineClassName, subclass: RoutineClass): void;
   create(key: RoutineClassName, args: RoutineConstructor): Routine;
   fromJson(json: RoutineJson): Routine;
 }
 
 export type RoutineClass = RoutineStatic & {
-  new(con: RoutineConstructor): Routine;
-}
+  new (con: RoutineConstructor): Routine;
+};

@@ -4,19 +4,19 @@ import State from '../state/State';
 
 abstract class Turn extends BearingChangeRoutine {
   fixState(correctState: State, incorrectState: State) {
-    incorrectState.waypoint = correctState.waypoint;
-    incorrectState.altitude = correctState.altitude;
+    incorrectState.setWaypoint(correctState.getWaypoint());
+    incorrectState.setAltitude(correctState.getAltitude());
   }
 
   stateCheck() {
     return (
-      super.stateCheck() && this.entryState.altitude == this.exitState.altitude
+      super.stateCheck() && this.entryState.getAltitude() == this.exitState.getAltitude()
     );
   }
 
   bearingChange() {
-    const entryBearing = this.getEntryState().bearing;
-    const exitBearing = this.getExitState().bearing;
+    const entryBearing = this.getEntryState().getBearing();
+    const exitBearing = this.getExitState().getBearing();
     if (entryBearing && exitBearing) {
       return Math.abs(entryBearing - exitBearing);
     } else {
@@ -25,11 +25,11 @@ abstract class Turn extends BearingChangeRoutine {
   }
   toString() {
     if (super.toString()) return super.toString();
-    let st = `${this.constructor.name} at ${this.getEntryState().waypoint.name}`;
+    let st = `${this.constructor.name} at ${this.getEntryState().getWaypoint().id}`;
     const nextRoutine = this.getExitState().getEntryForRoutine();
     if (nextRoutine) {
       if (!nextRoutine.getExitState().isNull()) {
-        st += ` towards ${nextRoutine.getExitState().waypoint.name}`;
+        st += ` towards ${nextRoutine.getExitState().getWaypoint().id}`;
       }
     }
     return st;

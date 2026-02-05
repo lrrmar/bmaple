@@ -1,9 +1,6 @@
 import CompositeRoutine from '../routines/CompositeRoutine';
 import { routineRegistry } from '../routines/routineRegistry';
-import { 
-  RoutineJson,
-  isRoutineJson,
-} from './types';
+import { RoutineJson, isRoutineJson } from './types';
 
 export const routineFromJson = (json: RoutineJson) => {
   const routineClass = routineRegistry[json.routine];

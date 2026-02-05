@@ -7,6 +7,7 @@ import { Profile } from '../lib/routines/Profiles';
 import State from '../lib/state/State';
 import Waypoint from '../lib/state/Waypoint';
 import Measure from '../lib/state/Measure';
+import TextInputSubmit from './TextInputSubmit';
 import { type OptionProp } from './OptionsMenu';
 
 const Maneuvre = ({
@@ -327,38 +328,6 @@ const Maneuvre = ({
         {accumulatedDurationDisplay}
       </div>
     </div>
-  );
-};
-
-type TextInputSubmitProps = {
-  onSubmit: (value: string) => void;
-  defaultValue?: string;
-};
-
-export const TextInputSubmit = ({
-  onSubmit,
-  defaultValue = '',
-}: TextInputSubmitProps) => {
-  const [value, setValue] = useState<string>(defaultValue);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && value.trim()) {
-      onSubmit(value);
-      setValue(value);
-    }
-  };
-
-  useEffect(() => {
-    setValue(defaultValue);
-  }, [defaultValue]);
-  return (
-    <input
-      style={{ width: '100%' }}
-      type="text"
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onKeyDown={handleKeyDown}
-    />
   );
 };
 

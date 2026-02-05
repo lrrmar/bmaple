@@ -3,7 +3,6 @@ import type { Routine } from '../routines/types';
 import NullRoutine from '../routines/NullRoutine';
 import type { State as _State, Waypoint, StateConstructor } from './types';
 
-
 export default class State implements _State {
   private waypoint: Waypoint;
   private altitude: number | null = null;
@@ -42,7 +41,7 @@ export default class State implements _State {
     return this.bearing;
   }
 
-  public setBearing(bearing: number| null): void {
+  public setBearing(bearing: number | null): void {
     this.bearing = bearing;
   }
 

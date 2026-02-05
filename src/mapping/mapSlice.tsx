@@ -34,6 +34,7 @@ interface InitialState {
   projection: string;
   units: string | null;
   displayTime: number;
+  clickMode: string | null;
   clickEvent: {
     longitude: number;
     latitude: number;
@@ -61,6 +62,7 @@ const initialState: InitialState = {
   projection: 'force_nwr_projection',
   units: null,
   displayTime: 0,
+  clickMode: null,
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
@@ -91,6 +93,14 @@ export const mapSlice = createSlice({
     },
     updateDisplayTime: (state, displayTime: PayloadAction<number>) => {
       state.displayTime = displayTime.payload;
+    },
+    updateClickMode: (state, mode: PayloadAction<string | null>) => {
+      console.log(mode);
+      if (state.clickMode == mode.payload) {
+        state.clickMode = null;
+      } else {
+        state.clickMode = mode.payload;
+      }
     },
     updateClickEvent: (
       state,
@@ -187,6 +197,7 @@ export const {
   //updateColourPalette,
   updateUnits,
   updateDisplayTime,
+  updateClickMode,
   updateClickEvent,
   updateFeaturesAtClick,
   updateBaseMaps,
@@ -219,6 +230,7 @@ export const selectUnits = (state: RootState) => state.map.units;
 //export const selectColourPalette = (state: RootState) => {
 //  return null;
 //};
+export const selectClickMode = (state: RootState) => state.map.clickMode;
 export const selectClickEvent = (state: RootState) => state.map.clickEvent;
 export const selectFeaturesAtClick = (state: RootState) =>
   state.map.featuresAtClick;

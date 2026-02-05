@@ -1,4 +1,4 @@
-import { type Measure, isMeasure, LatLonMeasure } from '../state/types';;
+import { type Measure, isMeasure, LatLonMeasure } from '../state/types';
 export interface WaypointJson {
   id: string;
   name: string;
@@ -14,7 +14,8 @@ type RoutineName =
   | 'RaceTrackTurn'
   | 'ProfileAscent'
   | 'CranfieldTakeOff'
-  | 'ProfileDescent';
+  | 'ProfileDescent'
+  | 'NullRoutine';
 
 export type RoutineJson = {
   routine: RoutineName;
@@ -38,6 +39,7 @@ const routineNames: readonly RoutineName[] = [
   'ProfileAscent',
   'ProfileDescent',
   'CranfieldTakeOff',
+  'NullRoutine',
 ];
 
 export function isRoutineName(value: unknown): value is RoutineName {

@@ -1,7 +1,7 @@
 import type { WaypointJson } from './types';
 import CompositeRoutine from '../routines/CompositeRoutine';
 import Waypoint from './Waypoint';
-import State from './State';
+import { type State } from './types';
 import FAAMWaypoints from './FAAMWaypoints';
 
 export default class WaypointRegistry {
@@ -27,6 +27,16 @@ export default class WaypointRegistry {
     this.compositeRoutines.push(routine);
   }
 
+  private static alphaCounter = 0;
+
+  static getNextWaypointId(): string {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const letter = alphabet.at(this.alphaCounter);
+    this.alphaCounter += 1;
+    if (letter) return 'PT' + letter;
+    return 'A';
+  }
+
   static registerNewWaypoint(waypoint: Waypoint) {
     if (this.waypoints[waypoint.id] != undefined) {
       throw new Error(`Waypoint ${waypoint.name} already exists`);
@@ -40,7 +50,7 @@ export default class WaypointRegistry {
     this.compositeRoutines.forEach((routine) => {
       const stateSequence = routine.getStateSequence();
       stateSequence.forEach((state: State) => {
-        activeWaypoints.push(state.waypoint.name);
+        activeWaypoints.push(state.getWaypoint().name);
       });
     });
     return [...new Set(activeWaypoints)];

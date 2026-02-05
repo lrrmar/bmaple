@@ -27,7 +27,7 @@ export class CranfieldTakeOff extends TakeOff {
   };
 
   constructor(exit: State) {
-    super({entry: cranfieldTakeOffEntryState, exit: exit});
+    super({ entry: cranfieldTakeOffEntryState, exit: exit });
   }
 
   swappableRoutines(): Routine[] {

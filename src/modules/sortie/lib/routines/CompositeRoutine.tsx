@@ -6,6 +6,7 @@ import { InsideTurn, RaceTrackTurn } from './Turns';
 import State from '../state/State';
 import { type State as _State } from '../state/types';
 import { RoutineJson } from '../io/types';
+import WaypointRegistry from '../state/WaypointRegistry';
 
 export default class CompositeRoutine extends Routine {
   private routines: _Routine[] = [];
@@ -22,7 +23,7 @@ export default class CompositeRoutine extends Routine {
       entry = init;
       exit = new State({});
     }
-    super({entry, exit});
+    super({ entry, exit });
 
     if (routine) {
       this.routines = [routine];
@@ -76,7 +77,7 @@ export default class CompositeRoutine extends Routine {
   }): RoutineJson[] | null {
     const sequence: RoutineJson[] = [];
     this.routines.forEach((routine, i) => {
-      if (routine.isNull() && flags && flags.includeNull != true) return;
+      if (flags && flags.includeNull != true) return;
       const json = routine.toJson(flags);
       if (json) {
         sequence.push(json);
@@ -126,7 +127,18 @@ export default class CompositeRoutine extends Routine {
       states.push(routine.getExitState());
     });
     return [...new Set(states)];
+  } 
+
+  getActiveWaypoints() {
+    const activeWaypoints: string[] = [];
+    this.routines.forEach((routine) => {
+      activeWaypoints.push(routine.getEntryState().getWaypoint().id);
+      activeWaypoints.push(routine.getEntryState().getWaypoint().id);
+    });
+    return [...new Set(activeWaypoints)];
   }
+
+
 
   fixState(entry: _State, exit: _State) {
     void 0;
@@ -155,7 +167,7 @@ export default class CompositeRoutine extends Routine {
   // Handling Null Routines
 
   // Timing
-  accumulatedDurationForRoutine(routine: _Routine) {
+  accumulatedDurationForRoutine(routine: _Routine, toString = false) {
     if (this.routines.includes(routine)) {
       const index = this.routines.indexOf(routine);
       let i = 0;
@@ -165,7 +177,18 @@ export default class CompositeRoutine extends Routine {
         if (time) accumulatedDuration += time;
         i++;
       }
-      return accumulatedDuration;
+      if (toString) {
+        let st = '';
+        // Hours
+        st += `${Math.floor(accumulatedDuration / 60)}:`;
+        // mins
+        const mins = (accumulatedDuration % 60).toString();
+        st += mins.length == 1 ? '0' + mins : mins;
+        return st;
+      } else {
+        return accumulatedDuration;
+      }
+
     } else {
       throw new Error('Routine not in Composite');
     }
@@ -259,10 +282,10 @@ export default class CompositeRoutine extends Routine {
     if (this.getNewRoutineIndex(newRoutine) === null) {
       if (this.routines.length !== 0) {
         // Add to end of routines list
-        const nullRoutine = new NullRoutine(
-          { entry: this.getExitState(),
-          exit: newRoutine.getEntryState(),}
-        );
+        const nullRoutine = new NullRoutine({
+          entry: this.getExitState(),
+          exit: newRoutine.getEntryState(),
+        });
         this.includeRoutine(nullRoutine); // need to do this explicitly to account for gap in state
       }
 
@@ -421,7 +444,7 @@ export default class CompositeRoutine extends Routine {
         } else if (entryRoutine instanceof NullRoutine) {
           entryRoutine.setEntryState(br[0]);
         } else {
-          this.includeRoutine(new NullRoutine({entry: br[0], exit: br[1]}));
+          this.includeRoutine(new NullRoutine({ entry: br[0], exit: br[1] }));
         }
       }
     });
@@ -473,7 +496,9 @@ export default class CompositeRoutine extends Routine {
       const exitRoutine = this.routines.at(i + 1);
       if (
         entryRoutine instanceof WaypointChangeRoutine &&
-        exitRoutine instanceof WaypointChangeRoutine
+        exitRoutine instanceof WaypointChangeRoutine &&
+        entryRoutine.getExitState().getWaypoint() ==
+          exitRoutine.getEntryState().getWaypoint()
       ) {
         missingTurnPoints.push(entryRoutine.getExitState());
       }
@@ -556,7 +581,7 @@ export default class CompositeRoutine extends Routine {
       }
 
       // create an inside turn creating them
-      const insideTurn = new TurnClass({ entry: entryState,exit: exitState});
+      const insideTurn = new TurnClass({ entry: entryState, exit: exitState });
       this.includeRoutine(insideTurn);
     });
   }
@@ -566,6 +591,39 @@ export default class CompositeRoutine extends Routine {
     this.pullRoutines();
     this.pruneRoutines();
     this.injectMissingTurns();
+    this.injectNullRoutines();
+  }
+
+  docxRoutines() {
+    return this.routines.map((routine) => {
+      const description = routine.toString();
+      const duration = routine.calculateDuration();
+      const soFar = this.accumulatedDurationForRoutine(routine, true);
+      const toReturn: Record<'description' | 'duration' | 'soFar', string> = { 
+        description: '',
+        duration: '',
+        soFar: ''
+      };
+      if (description) toReturn['description'] = description;
+      if (duration) toReturn['duration'] = duration.toString();
+      if (soFar && typeof soFar == 'string') toReturn['soFar'] = soFar;
+      return toReturn;
+    })
+  }
+
+  docxWaypoints() {
+    const toReturn: {description: string, coords: string}[] = [];
+    this.getActiveWaypoints().forEach((wp) => {
+      const waypoint = WaypointRegistry.getWaypoint(wp);
+      if (waypoint) {
+        let description = waypoint.id;
+        if (waypoint.name != waypoint.id) {
+          description += ` (${waypoint.name})` ;
+        }
+        toReturn.push({description: description, coords: waypoint.getLatitude().toString()});
+      }
+    });
+    return toReturn;
   }
 
   ////////////////////
