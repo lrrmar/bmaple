@@ -4,8 +4,15 @@ import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../../hooks';
-import { updateFlightPlan, updateWaypoints } from '../sortieSlice';
-import { type RoutineSequence } from '../lib/io/JsonParser';
+import {
+  updateFlightPlan,
+  selectWaypoints,
+  updateWaypoints,
+  updateHighlightedRoutines,
+  selectHighlightedWaypoints,
+  updateHighlightedWaypoints,
+} from '../sortieSlice';
+import { type RoutineSequence } from '../lib/io/types';
 import Routine from '../lib/routines/Routine';
 import { 
   type SortieInfo,  
@@ -33,7 +40,7 @@ import printSortie from '../doc/PrintSortie';
 import Maneuvre from './Maneuvre';
 const FlightPlan = () => {
   const dispatch = useDispatch();
-  const [openManeuvre, setOpenManeuvre] = useState<number | null>(null);
+  const [openManeuvre, setOpenManeuvre] = useState<string | null>(null);
   const [maneuvres, setManeuvres] = useState<React.ReactNode[]>([]);
   const [allDurations, setAllDurations] = useState<{
     [key: number]: number | null;
@@ -62,6 +69,9 @@ const FlightPlan = () => {
   const clickEvent = useSelector(selectClickEvent);
   const clickMode = useSelector(selectClickMode);
 
+  const waypoints = useSelector(selectWaypoints);
+  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
+
   useEffect(() => {
     if (!compositeRef.current) {
       // init
@@ -80,8 +90,8 @@ const FlightPlan = () => {
             composite.accumulatedDurationForRoutine(routine);
           return (
             <Maneuvre
-              id={i}
-              key={i}
+              id={routine.id}
+              key={routine.id}
               openManeuvre={openManeuvre}
               setOpenManeuvre={setOpenManeuvre}
               accumulatedDuration={accumulatedDuration}
@@ -96,10 +106,43 @@ const FlightPlan = () => {
       const jsonSequence = composite.jsonSequence({
         bearing: true,
         includeNull: true,
+        id: true,
       });
       if (jsonSequence) dispatch(updateFlightPlan(jsonSequence));
     }
   }, [composite, openManeuvre, allDurations]);
+
+  useEffect(() => {
+    if(openManeuvre) {
+      dispatch(updateHighlightedRoutines([openManeuvre]));
+    } else {
+      dispatch(updateHighlightedRoutines([]));
+    }
+  }, [openManeuvre]);
+
+  useEffect(() => {
+    if (composite && clickEvent && clickMode == 'inspect') {
+      const routineIds = composite.getRoutines().map((routine) => routine.id);
+      const clickedRoutineIds = routineIds.filter((id)=> clickEvent.features.includes(id));
+      const waypointIds = waypoints.map((wp) => wp.id);
+
+      const clickedWaypointId = waypointIds.filter(
+        (id)=> clickEvent.features.includes('waypoint-'+id) && !highlightedWaypoints.includes(id)
+      ).at(0);
+
+      if (clickedWaypointId) {
+        dispatch(updateHighlightedWaypoints([clickedWaypointId]));
+      } else {
+        dispatch(updateHighlightedWaypoints([]));
+      }
+      const toOpen = clickedRoutineIds.at(0);
+      if (openManeuvre && clickedRoutineIds.includes(openManeuvre)) {
+        setOpenManeuvre(null)
+      } else if (toOpen) {
+        setOpenManeuvre(toOpen);
+      }
+    }
+  }, [clickEvent])
 
   useEffect(() => {
     if (maneuvres.length == 0 && composite) {
@@ -121,6 +164,7 @@ const FlightPlan = () => {
   useEffect(() => {
     if (clickEvent && composite) {
       if (clickMode == 'append SLR') {
+        console.log(clickEvent);
         const clickedFeatures = clickEvent.features;
         const clickedWaypointId = clickedFeatures.find((id) => {
           return id.includes('waypoint');

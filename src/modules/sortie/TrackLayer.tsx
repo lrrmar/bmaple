@@ -66,7 +66,8 @@ const TrackLayer = ({
     if (cache[id] && !initialised.current) {
       const layer = new VectorLayer({
         source: new VectorSource({}),
-        zIndex: 20,
+        zIndex: 19,
+        visible: true,
       });
       if (map) {
         map.addLayer(layer);

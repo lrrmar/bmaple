@@ -4,7 +4,8 @@ import {
   useAppDispatch as useDispatch,
 } from '../../hooks';
 import {
-  ingest,
+  update,
+  remove,
   selectCache,
   Pending,
   isEntry,
@@ -32,12 +33,15 @@ import { type Waypoint } from './lib/state/types';
 import WaypointRegistry from './lib/state/WaypointRegistry';
 
 export interface Track extends Pending {
-  name: string;
+  waypoints: [string, string];
 }
 
+export const isTrack = (element: any): element is Track => {
+  return element.waypoints && element.waypoints.length == 2;
+}
 export const isPendingTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
-  return isPending(element) && keys.includes('name');
+  return element.waypoints && element.waypoints.length == 2 && isPending(element);
 };
 
 export const isEntryTrack = (element: any): element is Track => {
@@ -64,46 +68,39 @@ const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
   // Access to fundamental data structures
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
-  const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
+  const [map, setMap] = useState<Map>(OpenLayersMap.map);
   const mapUtils = new OpenLayersMap();
   const initialised = useRef<boolean>(false);
-  const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
+  const [waypointIds, setWaypointIds] = useState<[string,string]>(['','']);
 
   useEffect(() => {
     const featureData = cache[id];
-    if (featureData && !initialised.current && map) {
+    if (featureData && isTrack(featureData)) {
+      if (waypointIds.at(0) == featureData.waypoints.at(0) && waypointIds.at(1) == featureData.waypoints.at(1)) {
+        // Equality between old and new waypoints , do nowt.
+        void(0)
+      } else {
+      const waypoints: Waypoint[] = [];
+      featureData.waypoints.forEach((id) => {
+        if (typeof id == 'string') {
+          const waypoint = WaypointRegistry.getWaypoint(id);
+          if (waypoint) waypoints.push(waypoint);
+        }
+      });
       const layer = map.get(layerId);
       if (layer) {
-        const waypointIds = featureData.waypoints;
-        if (waypointIds && waypointIds instanceof Array) {
-          const waypoints: Waypoint[] = [];
-          waypointIds.forEach((id) => {
-            if (typeof id == 'string') {
-              const waypoint = WaypointRegistry.getWaypoint(id);
-              if (waypoint) waypoints.push(waypoint);
-            }
-          });
-          setWaypoints(waypoints);
-        }
-      }
-    }
-  }, [cache]);
-
-  useEffect(() => {
-    if (map) {
-      const layer = map.get(layerId);
-      if (layer && waypoints.length > 1) {
         const coords = waypoints.map((waypoint) => {
           return fromLonLat([-waypoint.getLongitude(), waypoint.getLatitude()]);
         });
 
         const feature = new Feature({
           geometry: new LineString(coords),
+          visible: false,
         });
         const format = new GeoJSON();
 
         // Convert to GeoJSON
-        const geojson = format.writeFeatureObject(feature, {
+        /*const geojson = format.writeFeatureObject(feature, {
           dataProjection: 'EPSG:4326',
           featureProjection: 'EPSG:3857',
         }) as GeoJSONFeature<GeoJSONLineString>;
@@ -115,7 +112,6 @@ const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
             resolution: 1000000,
             sharpness: 5,
           });
-          console.log(curved);
 
           // Back to OpenLayers feature
           const curvedFeature = format.readFeature(curved, {
@@ -130,28 +126,30 @@ const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
               }),
             }),
           );
-          console.log(curvedFeature.getGeometry()?.getExtent());
           const oldFeature = map.get(id);
           layer.getSource().removeFeature(oldFeature);
           layer.getSource().addFeature(curvedFeature);
           map.set(id, curvedFeature);
-        } else {
-          feature.setStyle(
-            new Style({
-              stroke: new Stroke({
-                color: '#f0a040',
-                width: 2,
-              }),
-            }),
-          );
-          const oldFeature = map.get(id);
-          layer.getSource().removeFeature(oldFeature);
+      } else {*/
           layer.getSource().addFeature(feature);
           map.set(id, feature);
-        }
+          feature.set('id', id);
+          dispatch(update({
+            id: id,
+            ol_uid: getUid(feature),
+          }))
+        //}
       }
     }
-  }, [waypoints]);
+  }
+
+  return () => {
+    const layer = map.get(layerId);
+    const feature = map.get(id);
+    layer.getSource().removeFeature(feature);
+    map.unset(id);
+  }
+  }, [])
 
   return <div></div>;
 };

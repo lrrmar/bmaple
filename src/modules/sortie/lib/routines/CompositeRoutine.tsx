@@ -74,6 +74,7 @@ export default class CompositeRoutine extends Routine {
   jsonSequence(flags?: {
     bearing?: boolean;
     includeNull?: boolean;
+    id?: boolean;
   }): RoutineJson[] | null {
     const sequence: RoutineJson[] = [];
     this.routines.forEach((routine, i) => {

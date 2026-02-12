@@ -19,12 +19,6 @@ import Point from 'ol/geom/Point';
 import Polygon from 'ol/geom/Polygon';
 import { getUid } from 'ol/util';
 import { fromLonLat } from 'ol/proj';
-import Fill from 'ol/style/Fill.js';
-import Icon from 'ol/style/Icon.js';
-import RegularShape from 'ol/style/RegularShape.js';
-import Stroke from 'ol/style/Stroke.js';
-import Style from 'ol/style/Style.js';
-
 export interface Waypoint extends Pending {
   name: string;
 }
@@ -70,24 +64,12 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
         const latitude = featureData.latitude;
         const longitude = featureData.longitude;
         if (typeof latitude == 'number' && typeof longitude == 'number') {
-          const text = featureData.id.split('-')[1];
-          const flag = WaypointFlag(text);
-
           const feature = new Feature({
             geometry: new Point(fromLonLat([-longitude, latitude])),
           });
           layer.getSource().addFeature(feature);
           //feature.on('click', alert(featureData.name) )
-          feature.setStyle(
-            new Style({
-              image: new Icon({
-                img: flag,
-                size: [flag.width, flag.height],
-                anchor: [0, 1],
-              }),
-            }),
-          );
-          feature.set('id', id);
+                    feature.set('id', id);
           map.set(id, feature);
           dispatch(
             ingest({
@@ -104,40 +86,5 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
   return <div></div>;
 };
 
-const WaypointFlag = (text: string) => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 40;
-  canvas.height = 20;
-
-  const ctx = canvas.getContext('2d');
-
-  if (ctx) {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0,100,100,0.9)';
-    ctx.fillStyle = 'rgba(0,100,100,0.9)';
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(canvas.height * 0.25, 0);
-    ctx.lineTo(canvas.width, 0);
-    ctx.lineTo(canvas.width - canvas.height * 0.125, canvas.height * 0.51);
-    ctx.lineTo(canvas.height * 0.125, canvas.height * 0.5);
-    ctx.lineTo(0, canvas.height);
-    ctx.closePath();
-
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.restore();
-
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.9)';
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-    ctx.fillText(text, canvas.height * 0.5, canvas.height * 0.5);
-
-    ctx.restore();
-  }
-
-  return canvas;
-};
 
 export default WaypointFeature;

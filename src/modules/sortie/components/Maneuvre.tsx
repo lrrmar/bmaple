@@ -20,8 +20,8 @@ const Maneuvre = ({
   setComposite,
   setOptions,
 }: {
-  id: number;
-  openManeuvre: number | null;
+  id: string;
+  openManeuvre: string | null;
   setOpenManeuvre: Dispatch<SetStateAction<number | null>>;
   accumulatedDuration: number;
   routine: Routine;

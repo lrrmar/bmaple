@@ -1,110 +1,98 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
 } from '../../hooks';
-import { selectCache, isEntry } from '../../mapping/cacheSlice';
-import { selectCurrentLayerName, selectOpacity } from './regionsSlice';
-import { isEntryWaypoint } from './WaypointLayer';
+import { selectCache } from '../../mapping/cacheSlice';
+import { selectActiveWaypoints, selectHighlightedWaypoints } from './sortieSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
-import VectorLayer from 'ol/layer/Vector';
-import { Feature } from 'ol';
-import { Style, Stroke, Fill } from 'ol/style';
 
-import { selectVerticalLevel } from '../../mapping/mapSlice';
+import Icon from 'ol/style/Icon.js';
+import Style from 'ol/style/Style.js';
 
-const WaypointProfile = () => {
+
+const WaypointProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const cache = useSelector(selectCache);
-  const opacity = useSelector(selectOpacity);
-  const verticalLevel = useSelector(selectVerticalLevel);
-  const loaded = useRef<boolean>(false);
-
-  const [filteredIds, setFilteredIds] = useState<string[]>([]);
-  const [displayedIds, setDisplayedIds] = useState<string[]>([]);
+  const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
+  const activeWaypoints = useSelector(selectActiveWaypoints);
+  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
 
   useEffect(() => {
-    if (loaded.current) return;
-    const ids = Object.keys(cache).filter((id) => id.includes('nats-danger'));
-    ids.forEach((id) => {
-      const element = cache[id];
-      if (element && isEntry(element)) {
-        const mapUtils = new OpenLayersMap();
-        let olLayer: VectorLayer<Feature> | undefined;
-        const ol_uid = element.ol_uid;
-        if (ol_uid) olLayer = mapUtils.getLayerByUid(ol_uid);
-        if (olLayer)
-          olLayer.setStyle(
+    if (map) {
+      const filteredIds = Object.keys(cache).filter((id) => {
+        const element = cache[id];
+        const source = element.source;
+        return source === sourceIdentifier;
+      });
+      filteredIds.forEach((id) => {
+        const text = id.split('-')[1];
+        let primaryColour: string;
+        let secondaryColour: string;
+
+        if (highlightedWaypoints.includes(text)) {
+           primaryColour = 'rgba(10,200,160,0.9)';
+           secondaryColour = 'rgba(255,255,255,0.9)';
+        } else if (activeWaypoints.includes(text)) {
+           primaryColour = 'rgba(0,100,100,0.9)';
+           secondaryColour = 'rgba(255,255,255,0.9)';
+        } else {
+           primaryColour = 'rgba(255,255,255,0.9)';
+           secondaryColour = 'rgba(0,100,100,0.9)';
+        }
+        const flag = WaypointFlag(text, primaryColour, secondaryColour);
+        const feature =  map.get(id);
+        if (feature) {
+
+          feature.setStyle(
             new Style({
-              stroke: new Stroke({
-                color: 'rgba(255,255,0,1)',
-                width: 0.7,
-              }),
-              fill: new Fill({
-                color: 'rgba(255,255,0,0.1)',
+              image: new Icon({
+                img: flag,
+                size: [flag.width, flag.height],
+                anchor: [0, 1],
               }),
             }),
           );
-      }
-    });
-  }, [verticalLevel]);
-
-  useEffect(() => {
-    const filteredByAltitude = Object.values(cache).filter((c) => {
-      const lower = c['lower limit'];
-      const upper = c['upper limit'];
-      if (lower !== null && lower !== undefined && upper && verticalLevel) {
-        return lower <= verticalLevel && verticalLevel <= upper;
-      } else {
-      }
-      return false;
-    });
-    const filteredByAltitudeIds = filteredByAltitude.map((a) => a.id);
-    setFilteredIds(filteredByAltitudeIds);
-  }, [verticalLevel]);
-
-  useEffect(() => {
-    // When currentLayerName changes, set layers with ids in displayedIds to be invisible and currentLayerName to be visible
-
-    displayedIds.forEach((id) => {
-      const element = cache[id];
-      if (element && isEntry(element)) {
-        const mapUtils = new OpenLayersMap();
-        let olLayer: VectorLayer<Feature> | undefined;
-        const ol_uid = element.ol_uid;
-        if (ol_uid) olLayer = mapUtils.getLayerByUid(ol_uid);
-        if (olLayer) olLayer.setVisible(false);
-      }
-    });
-
-    filteredIds.forEach((id) => {
-      const element = cache[id];
-      if (element && isEntry(element)) {
-        const mapUtils = new OpenLayersMap();
-        let olLayer: VectorLayer<Feature> | undefined;
-        const ol_uid = element.ol_uid;
-        if (ol_uid) olLayer = mapUtils.getLayerByUid(ol_uid);
-        if (olLayer) olLayer.setVisible(true);
-      }
-    });
-    setDisplayedIds(filteredIds);
-  }, [filteredIds, cache]);
-
-  useEffect(() => {
-    // When opacity changes, change corresponding layers
-
-    displayedIds.forEach((id) => {
-      const element = cache[id];
-      if (element && isEntry(element)) {
-        const mapUtils = new OpenLayersMap();
-        let olLayer: VectorLayer<Feature> | undefined;
-        const ol_uid = element.ol_uid;
-        if (ol_uid) olLayer = mapUtils.getLayerByUid(ol_uid);
-        if (olLayer) olLayer.setOpacity(opacity);
-      }
-    });
-  }, [opacity, displayedIds]);
+        }
+      })
+    }
+  }, [cache, activeWaypoints, highlightedWaypoints]);
 
   return <div></div>;
-};
+}
 
+const WaypointFlag = (text: string, primaryColour: string, secondaryColour: string) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 40;
+  canvas.height = 20;
+
+  const ctx = canvas.getContext('2d');
+
+  if (ctx) {
+    ctx.save();
+    ctx.strokeStyle = primaryColour;
+    ctx.fillStyle = primaryColour;
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
+    ctx.lineTo(canvas.height * 0.25, 0);
+    ctx.lineTo(canvas.width, 0);
+    ctx.lineTo(canvas.width - canvas.height * 0.125, canvas.height * 0.51);
+    ctx.lineTo(canvas.height * 0.125, canvas.height * 0.5);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = secondaryColour;
+    ctx.strokeStyle = secondaryColour;
+    ctx.fillText(text, canvas.height * 0.5, canvas.height * 0.5);
+
+    ctx.restore();
+  }
+
+  return canvas;
+};
 export default WaypointProfile;

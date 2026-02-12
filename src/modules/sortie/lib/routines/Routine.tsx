@@ -14,6 +14,7 @@ import { type RoutineJson, isRoutineName } from '../io/types';
 import type { State as _State } from '../state/types';
 import State from '../state/State';
 import WaypointRegistry from '../state/WaypointRegistry';
+import { v4 as uuidv4 } from 'uuid';
 import {
   type Routine as _Routine,
   type RoutineConstructor,
@@ -42,6 +43,7 @@ const userRoutineClassNames: UserRoutineClassName[] = [
 ];
 
 export default class Routine implements _Routine {
+  public id: string;
   protected entryState: _State;
   protected exitState: _State;
   public duration: number | null = null;
@@ -60,6 +62,7 @@ export default class Routine implements _Routine {
       // Automatically add a null exit state if none provided
       this.exitState = new State({});
     }
+    this.id = uuidv4();
   }
 
   static registry: Record<RoutineClassName, RoutineClass | null> = {
@@ -153,7 +156,7 @@ export default class Routine implements _Routine {
     }
   }
 
-  toJson(flags?: { bearing?: boolean }): RoutineJson | null {
+  toJson(flags?: { bearing?: boolean; id?: boolean }): RoutineJson | null {
     const routineName = this.constructor.name;
     if (isRoutineName(routineName)) {
       const altitude0 = this.getEntryState().getAltitude();
@@ -190,6 +193,10 @@ export default class Routine implements _Routine {
 
       if (duration != null) {
         json['duration'] = { value: duration, unit: 'minutes' };
+      }
+
+      if (flags && flags.id) {
+        json['id'] = this.id;
       }
 
       return json;

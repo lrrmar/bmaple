@@ -19,6 +19,7 @@ type RoutineName =
 
 export type RoutineJson = {
   routine: RoutineName;
+  id?: string;
   waypoint0: string;
   waypoint1?: string;
   altitude0?: Measure;

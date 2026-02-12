@@ -19,6 +19,7 @@ export type UserRoutineClassNames = Array<UserRoutineClassName>;
 export type RoutineClassNames = Array<RoutineClassName>;
 
 export interface Routine {
+  id: string;
   duration: number | null;
   copy(): Routine;
   init(): void;

@@ -26,7 +26,10 @@ import RegionsSource from './modules/regions/RegionsSource';
 import RegionsProfile from './modules/regions/RegionsProfile';
 
 import WaypointSource from './modules/sortie/WaypointSource';
+import WaypointProfile from './modules/sortie/WaypointProfile';
+
 import TrackSource from './modules/sortie/TrackSource';
+import TrackProfile from './modules/sortie/TrackProfile';
 
 import FlightPlan from './modules/sortie/components/FlightPlan';
 import ClickModeMenu from './modules/sortie/components/ClickMode';
@@ -75,7 +78,10 @@ const App = () => {
           }}
         >
           <Map>
-            <Profiles></Profiles>
+            <Profiles>
+              <WaypointProfile sourceIdentifier={'waypoint'} />
+              <TrackProfile sourceIdentifier={'track'} />
+            </Profiles>
             <Sources>
               <WaypointSource sourceIdentifier={'waypoint'} />
               <TrackSource sourceIdentifier={'track'} />
