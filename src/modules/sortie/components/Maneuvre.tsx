@@ -153,7 +153,7 @@ const Maneuvre = ({
       style={{
         backgroundColor: backgroundColor,
         width: '100%',
-        height: 'fit-content', // open ? "80px" : "20px",
+        height: '40px', // open ? "80px" : "20px",
         borderBottom: '2px dotted #000000',
         borderLeft: '2px dotted #000000',
         display: 'flex',
@@ -179,8 +179,9 @@ const Maneuvre = ({
           style={{
             //backgroundColor: open ? "black" : "white",
             //color: open ? "white" : "black",
-            width: 'fit-content',
-            height: 'fit-content',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            textOverflow: 'ellipsis',
           }}
           onClick={() => {
             if (routine.isNull() || routine.availableNextRoutines().length < 1)
