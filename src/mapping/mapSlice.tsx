@@ -191,8 +191,8 @@ export const {
 } = mapSlice.actions;
 
 export const selectIsoDisplayTime = (state: RootState) => {
-
-  const displayTime = state.map.displayTime == undefined ? 0 : state.map.displayTime;
+  const displayTime =
+    state.map.displayTime == undefined ? 0 : state.map.displayTime;
   const isoDisplayTime = new Date(displayTime).toISOString();
   const reducedIsoDisplayTime = isoDisplayTime.substring(
     0,
@@ -236,9 +236,10 @@ export const selectDisplayTimesIntersection = (state: RootState) => {
   let times = Object.values(state.map.displayTimes)[0];
   if (times) {
     for (let i = 1; i < Object.keys(state.map.displayTimes).length; i++) {
-      times = times.filter((time) =>
-        Object.values(state.map.displayTimes)[i].includes(time),
-      );
+      const nextTimes = Object.values(state.map.displayTimes)[i];
+      if (nextTimes.length > 0) {
+        times = times.filter((time) => nextTimes.includes(time));
+      }
     }
   }
   return times;

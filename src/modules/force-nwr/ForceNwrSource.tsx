@@ -86,21 +86,44 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const [loadedResources, setLoadedResources] = useState<string[]>([]);
   const [preloadIds, setPreloadIds] = useState<{ [key: string]: string[] }>({});
 
+  const fetchDiscreteMetaData = async () => {
+    const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+    const json = await response.json();
+    //setMetaData(json);
+    dispatch(updateBackendDiscreteMetaData(json));
+  };
+
+  const fetchContinuousHashes = async (
+    hostId: string,
+    selection: DiscreteMetaData,
+  ) => {
+    const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        field: selection.field,
+        domain: selection.domain,
+        start_time: selection.start_time,
+      }),
+    });
+    const json = await response.json();
+    const updatedHashes = { ...currentHashes };
+    updatedHashes[hostId] = json;
+    setCurrentHashes(updatedHashes);
+    previousSelections.current[hostId] = selection;
+  };
+
   useEffect(() => {
-    const fetchMetaData = async () => {
-      const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-        },
-      });
-      const json = await response.json();
-      //setMetaData(json);
-      dispatch(updateBackendDiscreteMetaData(json));
-    };
     // on initial render, fetch meta data
     if (backendDiscreteMetaData) return;
-    fetchMetaData();
+    fetchDiscreteMetaData();
   }, []);
 
   useEffect(() => {
@@ -120,27 +143,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, []);
 
   useEffect(() => {
-    const fetchMetaData = async (
-      hostId: string,
-      selection: DiscreteMetaData,
-    ) => {
-      const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          field: selection.field,
-          domain: selection.domain,
-          start_time: selection.start_time,
-        }),
-      });
-      const json = await response.json();
-      const updatedHashes = { ...currentHashes };
-      updatedHashes[hostId] = json;
-      setCurrentHashes(updatedHashes);
-      previousSelections.current[hostId] = selection;
-    };
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const selection = discreteMetaDataSelections[id];
       const prevSelection = previousSelections.current[id];
@@ -154,13 +156,13 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
               (key: string) => selection[key] !== prevSelection[key], // prev and current selection mismatch
             )))
       ) {
-        fetchMetaData(id.toString(), selection);
+        fetchContinuousHashes(id.toString(), selection);
       }
     });
   }, [discreteMetaDataSelections]);
 
   useEffect(() => {
-    // Populat sliders with continuous variable values
+    // Populate sliders with continuous variable values
     if (currentHashes) {
       Object.keys(currentHashes).forEach((key) => {
         const hashes = currentHashes[key];
@@ -233,6 +235,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         valid_time = locks.valid_time ? locks.valid_time : valid_time;
         level = locks.level ? locks.level : level;
       }
+      let newId: string | null = null;
       if (selection) {
         const query: Query = {
           ...selection,
@@ -255,19 +258,15 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
               // however if it is the same (which happens quite frequently due to
               // the many bits of state this useEffect subscribes to) then just do
               // nothing and keep it the same as it was previously.
-              if (profileIds[id] != profileHash.id) {
-                dispatch(
-                  updateProfileIds({ host: id, resource: profileHash.id }),
-                );
-              }
-            } else {
-              // If profileHash does not exist then we express that there is no
-              // valid profileId available for this host
-              dispatch(updateProfileIds({ host: id, resource: null }));
+                newId = profileHash.id;
             }
           }
         }
       }
+      // If profileHash does not exist then we express that there is no
+      // valid profileId available for this host
+
+      dispatch(updateProfileIds({ host: id, resource: newId }));
     });
   }, [
     discreteMetaDataSelections,

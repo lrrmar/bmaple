@@ -6,7 +6,7 @@ const BackgroundImage = () => {
   const dispatch = useDispatch();
   return (
     <img
-      src={`${process.env.PUBLIC_URL}/blencathra.jpg`}
+      src={`${process.env.PUBLIC_URL}/blencathra-2.jpg`}
       style={{
         height: '100vh',
         width: '100vw',

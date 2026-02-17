@@ -22,6 +22,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import {
   BackendDiscreteMetaData,
+  DiscreteHeader,
   DiscreteMetaData,
   selectBackendDiscreteMetaData,
   selectReadableNames,
@@ -31,7 +32,6 @@ import {
   selectProfileIds,
 } from '../modules/force-nwr/forceNwrSlice';
 
-type DiscreteHeader = 'domain' | 'field' | 'start_time';
 type ContinuousHeader = 'valid_time' | 'level';
 /*interface MetaData {
   headers: DiscreteHeader[];
@@ -132,6 +132,28 @@ const ImageViewerWithMenu = ({
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
+  const [aggregates, setAggregates] = useState<BackendDiscreteMetaData>({
+    domain: [],
+    field: [],
+    start_time: [],
+  });
+
+  const fetchDiscreteAggregates = async (selection: DiscreteMetaData) => {
+    const body: Record<string, string> = {};
+    Object.entries(selection).map(([key, val]) => {
+      if (val) body[key] = val;
+    });
+
+    const response = await fetch(`${apiUrl}/getAggregates/`, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const json = await response.json();
+    setAggregates(json);
+  };
 
   useEffect(() => {
     // on initial render, see if a previous selection has been saved in
@@ -153,121 +175,78 @@ const ImageViewerWithMenu = ({
   useEffect(() => {
     // Generate drop down for each heading
     if (backendDiscreteMetaData) {
-      const discreteHeaders = backendDiscreteMetaData.headers;
-      const values = backendDiscreteMetaData.values;
-      const tables = backendDiscreteMetaData.tables;
-      /*if (!selection) {
-        //Get initial selection
-        const newSelection = {
-          field: values['field'][0],
-          domain: values['domain'][0],
-          start_time: values['start_time'][0],
-        };
-        setSelection(newSelection);
-        return;
-      }*/
-      const selects = discreteHeaders.map(
-        (thisDiscreteHeader: DiscreteHeader, i) => {
-          // First find out which value we have valid hash tables
-          // for by checking against the metadata tables for each
-          // other header
-          const thisDiscreteHeaderValues = values[thisDiscreteHeader];
-          const thisDiscreteHeaderTables = tables[thisDiscreteHeader];
-          const otherDiscreteHeaders = [...discreteHeaders];
-          otherDiscreteHeaders.splice(i, 1);
+      const entries = Object.entries(backendDiscreteMetaData) as [
+        DiscreteHeader,
+        string[],
+      ][];
+      const selects: React.ReactNode[] = [];
+      for (let i = 0; i < entries.length; i++) {
+        // First find out which value we have valid hash tables
+        // for by checking against the metadata tables for each
+        // other header
+        const header = entries[i][0];
+        const values = entries[i][1];
 
-          // Assume true i.e. 1 -> there exists a hash table that contains each of
-          // those values for each header
-          let hashAvailableBools: number[] = new Array(
-            thisDiscreteHeaderValues.length,
-          ).fill(1);
-          otherDiscreteHeaders.forEach((otherDiscreteHeader) => {
-            // Other headers current selection
-            const otherDiscreteHeaderSelection = selection
-              ? selection[otherDiscreteHeader]
-              : null;
-            if (typeof otherDiscreteHeaderSelection === 'string') {
-              const otherSelection: number = values[
-                otherDiscreteHeader
-              ].indexOf(otherDiscreteHeaderSelection);
-              // Get boolean array for header + otherDiscreteHeader, i.e.
-              // check to see what matches in dicsrete metadata we have
-
-              const array = thisDiscreteHeaderTables[otherDiscreteHeader].map(
-                (row) => row[otherSelection],
-              );
-              hashAvailableBools = hashAvailableBools.map(
-                (val, i) => val & array[i],
-              );
-            } else {
-              hashAvailableBools = new Array(
-                thisDiscreteHeaderValues.length,
-              ).fill(0);
-            }
-          });
-          const menuItems = thisDiscreteHeaderValues.map((val, i) => {
-            const sx = {
-              color: hashAvailableBools[i] ? '#000000' : '#888888',
-            };
-            return (
-              <MenuItem key={val} value={i} sx={sx}>
-                {readableNames && readableNames[val] ? readableNames[val] : val}
-              </MenuItem>
-            );
-          });
-          let displayName = '...';
-          const selectionHeader = selection
-            ? selection[thisDiscreteHeader]
-            : null;
-
-          if (selectionHeader) {
-            displayName = selectionHeader;
-            if (readableNames && readableNames[displayName]) {
-              displayName = readableNames[selectionHeader];
-            }
+        const menuItems = values.map((val, i) => {
+          let color = '#c0c0c0';
+          if (aggregates[header] && aggregates[header].includes(val)) {
+            color = '#000000';
           }
-          const select = (
-            <div key={thisDiscreteHeader}>
-              <InputLabel
-                style={{ color: '#0f0f0f' }}
-                id={`${thisDiscreteHeader} label`}
-              >
-                {readableNames && readableNames[thisDiscreteHeader]
-                  ? readableNames[thisDiscreteHeader]
-                  : thisDiscreteHeader}
-              </InputLabel>
-              <Select
-                labelId={`${thisDiscreteHeader} label`}
-                //value={selection[thisDiscreteHeader]}
-                renderValue={(val: string) => {
-                  return val;
-                }}
-                onChange={(e) => {
-                  if (typeof e.target.value === 'number') {
-                    if (selection) {
-                      const newSelection = {
-                        ...selection,
-                      };
-                      newSelection[thisDiscreteHeader] =
-                        thisDiscreteHeaderValues[e.target.value];
-                      setSelection(newSelection);
-                    }
-                  }
-                }}
-                input={<OutlinedInput value={displayName} />}
-              >
-                {menuItems}
-              </Select>
-            </div>
-          );
+          const sx = {
+            color: color,
+          };
           return (
-            <div key={thisDiscreteHeader}>
-              {select}
-              <br />
-            </div>
+            <MenuItem key={val} value={i} sx={sx}>
+              {readableNames && readableNames[val] ? readableNames[val] : val}
+            </MenuItem>
           );
-        },
-      );
+        });
+        let displayName = '...';
+        const selectionHeader = selection ? selection[header] : null;
+
+        if (selectionHeader) {
+          displayName = selectionHeader;
+          if (readableNames && readableNames[displayName]) {
+            displayName = readableNames[selectionHeader];
+          }
+        }
+        const select = (
+          <div key={header}>
+            <InputLabel style={{ color: '#0f0f0f' }} id={`${header} label`}>
+              {readableNames && readableNames[header]
+                ? readableNames[header]
+                : header}
+            </InputLabel>
+            <Select
+              labelId={`${header} label`}
+              //value={selection[thisDiscreteHeader]}
+              renderValue={(val: string) => {
+                return val;
+              }}
+              onChange={(e) => {
+                if (typeof e.target.value === 'number') {
+                  if (selection) {
+                    const newSelection = {
+                      ...selection,
+                    };
+                    newSelection[header] = values[e.target.value];
+                    setSelection(newSelection);
+                  }
+                }
+              }}
+              input={<OutlinedInput value={displayName} />}
+            >
+              {menuItems}
+            </Select>
+          </div>
+        );
+        selects.push(
+          <div key={header}>
+            {select}
+            <br />
+          </div>,
+        );
+      }
 
       selects.push(
         <HeaderLock
@@ -302,6 +281,7 @@ const ImageViewerWithMenu = ({
   }, [
     readableNames,
     backendDiscreteMetaData,
+    aggregates,
     validTimeLocked,
     levelLocked,
     displayTime,
@@ -316,6 +296,11 @@ const ImageViewerWithMenu = ({
         selection: selection,
       }),
     );
+    if (
+      selection && // selection is not null
+      Object.values(selection).some((val) => !!val) // some options not null
+    )
+      fetchDiscreteAggregates(selection);
   }, [selection]);
 
   useEffect(() => {
@@ -399,6 +384,8 @@ const ImageViewerWithMenu = ({
     const profileId = profileIds[id.toString()];
     if (profileId) {
       setProfileId(profileId);
+    } else {
+      setProfileId(null);
     }
   }, [profileIds]);
 
