@@ -19,17 +19,10 @@ import Feature from 'ol/Feature';
 import LineString from 'ol/geom/LineString';
 import { getUid } from 'ol/util';
 import { fromLonLat } from 'ol/proj';
-import Fill from 'ol/style/Fill.js';
-import Stroke from 'ol/style/Stroke.js';
-import Style from 'ol/style/Style.js';
-import bezierSpline from '@turf/bezier-spline';
 import { GeoJSON } from 'ol/format';
-import {
-  Feature as GeoJSONFeature,
-  LineString as GeoJSONLineString,
-} from 'geojson';
 
 import { type Waypoint } from './lib/state/types';
+import { type WaypointJson } from './lib/io/types';
 import WaypointRegistry from './lib/state/WaypointRegistry';
 
 export interface Track extends Pending {
@@ -37,11 +30,18 @@ export interface Track extends Pending {
 }
 
 export const isTrack = (element: any): element is Track => {
-  return element.waypoints && element.waypoints.length == 2;
-}
+  return (
+    element.waypoints &&
+    element.waypoints.length == 2 &&
+    typeof element.waypoints.at(0) == 'string' &&
+    typeof element.waypoints.at(1) == 'string'
+  );
+};
 export const isPendingTrack = (element: any): element is Track => {
   const keys: string[] = Object.keys(element);
-  return element.waypoints && element.waypoints.length == 2 && isPending(element);
+  return (
+    element.waypoints && element.waypoints.length == 2 && isPending(element)
+  );
 };
 
 export const isEntryTrack = (element: any): element is Track => {
@@ -71,85 +71,72 @@ const TrackFeature = ({ id, layerId }: { id: string; layerId: string }) => {
   const [map, setMap] = useState<Map>(OpenLayersMap.map);
   const mapUtils = new OpenLayersMap();
   const initialised = useRef<boolean>(false);
-  const [waypointIds, setWaypointIds] = useState<[string,string]>(['','']);
+  const [waypointIds, setWaypointIds] = useState<[string, string]>(['', '']);
+  const [coords, setCoords] = useState<[[number, number], [number, number]]>();
+  const coordsRef = useRef<[[number, number], [number, number]]>([
+    [-9999, -9999],
+    [-9999, -9999],
+  ]);
 
   useEffect(() => {
+    // Get the coords of waypoints
     const featureData = cache[id];
     if (featureData && isTrack(featureData)) {
-      if (waypointIds.at(0) == featureData.waypoints.at(0) && waypointIds.at(1) == featureData.waypoints.at(1)) {
-        // Equality between old and new waypoints , do nowt.
-        void(0)
-      } else {
-      const waypoints: Waypoint[] = [];
-      featureData.waypoints.forEach((id) => {
-        if (typeof id == 'string') {
-          const waypoint = WaypointRegistry.getWaypoint(id);
-          if (waypoint) waypoints.push(waypoint);
+      const waypointId0 = featureData.waypoints.at(0);
+      const waypointId1 = featureData.waypoints.at(1);
+      if (waypointId0 && waypointId1) {
+        const waypoint0 = WaypointRegistry.getWaypoint(waypointId0);
+        const waypoint1 = WaypointRegistry.getWaypoint(waypointId1);
+        if (waypoint0 && waypoint1) {
+          const coords0: [number, number] = [
+            waypoint0.getLongitude(),
+            waypoint0.getLatitude(),
+          ];
+          const coords1: [number, number] = [
+            waypoint1.getLongitude(),
+            waypoint1.getLatitude(),
+          ];
+          if (
+            coordsRef.current[0][0] !== coords0[0] ||
+            coordsRef.current[0][1] !== coords0[1] ||
+            coordsRef.current[1][0] !== coords1[0] ||
+            coordsRef.current[1][1] !== coords1[1]
+          ) {
+            setCoords([coords0, coords1]);
+          }
         }
-      });
-      const layer = map.get(layerId);
-      if (layer) {
-        const coords = waypoints.map((waypoint) => {
-          return fromLonLat([-waypoint.getLongitude(), waypoint.getLatitude()]);
-        });
-
-        const feature = new Feature({
-          geometry: new LineString(coords),
-          visible: false,
-        });
-        const format = new GeoJSON();
-
-        // Convert to GeoJSON
-        /*const geojson = format.writeFeatureObject(feature, {
-          dataProjection: 'EPSG:4326',
-          featureProjection: 'EPSG:3857',
-        }) as GeoJSONFeature<GeoJSONLineString>;
-
-        if (geojson.geometry.type !== 'LineString') {
-          // CANCELLING FOR NOW
-          // Smooth it
-          const curved = bezierSpline(geojson, {
-            resolution: 1000000,
-            sharpness: 5,
-          });
-
-          // Back to OpenLayers feature
-          const curvedFeature = format.readFeature(curved, {
-            dataProjection: 'EPSG:4326',
-            featureProjection: 'EPSG:3857',
-          });
-          curvedFeature.setStyle(
-            new Style({
-              stroke: new Stroke({
-                color: '#f0a040',
-                width: 2,
-              }),
-            }),
-          );
-          const oldFeature = map.get(id);
-          layer.getSource().removeFeature(oldFeature);
-          layer.getSource().addFeature(curvedFeature);
-          map.set(id, curvedFeature);
-      } else {*/
-          layer.getSource().addFeature(feature);
-          map.set(id, feature);
-          feature.set('id', id);
-          dispatch(update({
-            id: id,
-            ol_uid: getUid(feature),
-          }))
-        //}
       }
     }
-  }
+  }, [cache]);
 
-  return () => {
-    const layer = map.get(layerId);
-    const feature = map.get(id);
-    layer.getSource().removeFeature(feature);
-    map.unset(id);
-  }
-  }, [])
+  useEffect(() => {
+    if (coords) {
+      const layer = map.get(layerId);
+      const oldFeature = map.get(id);
+      if (oldFeature) layer.getSource().removeFeature(oldFeature);
+      const feature = new Feature({
+        geometry: new LineString(coords.map((coord) => fromLonLat(coord))),
+        visible: false,
+      });
+
+      layer.getSource().addFeature(feature);
+      map.set(id, feature);
+      feature.set('id', id);
+      dispatch(
+        update({
+          id: id,
+          ol_uid: getUid(feature),
+        }),
+      );
+
+      return () => {
+        const layer = map.get(layerId);
+        const feature = map.get(id);
+        layer.getSource().removeFeature(feature);
+        map.unset(id);
+      };
+    }
+  }, [coords]);
 
   return <div></div>;
 };

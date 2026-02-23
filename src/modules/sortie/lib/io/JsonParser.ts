@@ -26,9 +26,10 @@ export const routineFromJsonArray = (
           comp = new CompositeRoutine(routine.getEntryState());
           comp.init();
         } else if (
-          comp.getExitState().waypoint.name ==
-            routine.getEntryState().waypoint.name &&
-          comp.getExitState().altitude == routine.getEntryState().altitude
+          comp.getExitState().getWaypoint().name ==
+            routine.getEntryState().getWaypoint().name &&
+          comp.getExitState().getAltitude() ==
+            routine.getEntryState().getAltitude()
         ) {
           routine.setEntryState(comp.getExitState());
         }

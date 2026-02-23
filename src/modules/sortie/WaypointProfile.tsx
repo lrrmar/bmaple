@@ -4,18 +4,28 @@ import {
   useAppDispatch as useDispatch,
 } from '../../hooks';
 import { selectCache } from '../../mapping/cacheSlice';
-import { selectActiveWaypoints, selectHighlightedWaypoints } from './sortieSlice';
+import {
+  selectActiveWaypoints,
+  selectHighlightedFeatures,
+  selectAppStyle,
+} from './sortieSlice';
+
 import OpenLayersMap from '../../mapping/OpenLayersMap';
+import Map from 'ol/Map';
 
 import Icon from 'ol/style/Icon.js';
 import Style from 'ol/style/Style.js';
 
-
-const WaypointProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
+const WaypointProfile = ({
+  sourceIdentifier,
+}: {
+  sourceIdentifier: string;
+}) => {
   const cache = useSelector(selectCache);
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
   const activeWaypoints = useSelector(selectActiveWaypoints);
-  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
+  const highlightedFeatures = useSelector(selectHighlightedFeatures);
+  const appStyle = useSelector(selectAppStyle);
 
   useEffect(() => {
     if (map) {
@@ -29,20 +39,19 @@ const WaypointProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => 
         let primaryColour: string;
         let secondaryColour: string;
 
-        if (highlightedWaypoints.includes(text)) {
-           primaryColour = 'rgba(10,200,160,0.9)';
-           secondaryColour = 'rgba(255,255,255,0.9)';
+        if (highlightedFeatures.includes(text)) {
+          primaryColour = appStyle.secondaryColor;
+          secondaryColour = 'rgba(255,255,255,0.9)';
         } else if (activeWaypoints.includes(text)) {
-           primaryColour = 'rgba(0,100,100,0.9)';
-           secondaryColour = 'rgba(255,255,255,0.9)';
+          primaryColour = appStyle.primaryColor;
+          secondaryColour = 'rgba(255,255,255,0.9)';
         } else {
-           primaryColour = 'rgba(255,255,255,0.9)';
-           secondaryColour = 'rgba(0,100,100,0.9)';
+          primaryColour = 'rgba(255,255,255,0.9)';
+          secondaryColour = appStyle.primaryColor;
         }
         const flag = WaypointFlag(text, primaryColour, secondaryColour);
-        const feature =  map.get(id);
+        const feature = map.get(id);
         if (feature) {
-
           feature.setStyle(
             new Style({
               image: new Icon({
@@ -53,14 +62,18 @@ const WaypointProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => 
             }),
           );
         }
-      })
+      });
     }
-  }, [cache, activeWaypoints, highlightedWaypoints]);
+  }, [cache, activeWaypoints, highlightedFeatures]);
 
   return <div></div>;
-}
+};
 
-const WaypointFlag = (text: string, primaryColour: string, secondaryColour: string) => {
+const WaypointFlag = (
+  text: string,
+  primaryColour: string,
+  secondaryColour: string,
+) => {
   const canvas = document.createElement('canvas');
   canvas.width = 40;
   canvas.height = 20;

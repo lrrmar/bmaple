@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 
 import {
   useAppDispatch as useDispatch,
@@ -8,17 +14,13 @@ import {
   updateFlightPlan,
   selectWaypoints,
   updateWaypoints,
-  updateHighlightedRoutines,
-  selectHighlightedWaypoints,
-  updateHighlightedWaypoints,
+  selectHighlightedFeatures,
+  updateHighlightedFeatures,
+  selectDocxPrintFlag,
 } from '../sortieSlice';
-import { type RoutineSequence } from '../lib/io/types';
-import Routine from '../lib/routines/Routine';
-import { 
-  type SortieInfo,  
-  AutoSortieFormKeys,
-  EditSortieFormKeys
-} from '../types';
+import { type SortieInfo } from '../types';
+
+import { OptionProp } from './OptionsMenu';
 
 import State from '../lib/state/State';
 import WaypointRegistry from '../lib/state/WaypointRegistry';
@@ -31,14 +33,20 @@ import {
 } from '../lib/routines/TakeOff';
 import { selectClickEvent, selectClickMode } from '../../../mapping/mapSlice';
 
-import { OptionProp, OptionsMenu } from './OptionsMenu';
-
-import TextInputSubmit from './TextInputSubmit';
-
 import printSortie from '../doc/PrintSortie';
 
 import Maneuvre from './Maneuvre';
-const FlightPlan = () => {
+const FlightPlan = ({
+  sortieInfo,
+  setSortieInfo,
+  setOptions,
+  setOptionsMessage,
+}: {
+  sortieInfo: SortieInfo;
+  setSortieInfo: Dispatch<SetStateAction<SortieInfo>>;
+  setOptions: Dispatch<SetStateAction<OptionProp[]>>;
+  setOptionsMessage: Dispatch<SetStateAction<string | undefined>>;
+}) => {
   const dispatch = useDispatch();
   const [openManeuvre, setOpenManeuvre] = useState<string | null>(null);
   const [maneuvres, setManeuvres] = useState<React.ReactNode[]>([]);
@@ -47,30 +55,14 @@ const FlightPlan = () => {
   }>({});
   const [composite, setComposite] = useState<CompositeRoutine>();
   const compositeRef = useRef<CompositeRoutine | null>(null);
-  const [json, setJson] = useState<RoutineSequence | null>();
-  const [options, setOptions] = useState<OptionProp[]>([]);
-  const [total, setTotal] = useState<(number | null)[]>([]);
 
-  const [sortieInfo, setSortieInfo] = useState<SortieInfo>({
-    'Mission Scientist': '',
-    'Author': '',
-    'Approver': '',
-    'Scientific Aims': '',
-    'Planned T/O Time': '0900',
-    'Departure Airport': '',
-    'Landing Airport': '',
-    'FIRS / Zones': '',
-    'Weather Conditions': '',
-    'Instrument Servicability': '',
-    'Special Notes ': '',
-  });
-
-  const [formComponents, setFormComponents] = useState<React.ReactNode[]>([])
   const clickEvent = useSelector(selectClickEvent);
   const clickMode = useSelector(selectClickMode);
 
   const waypoints = useSelector(selectWaypoints);
-  const highlightedWaypoints = useSelector(selectHighlightedWaypoints);
+  const highlightedFeatures = useSelector(selectHighlightedFeatures);
+
+  const docxPrintFlag = useSelector(selectDocxPrintFlag);
 
   useEffect(() => {
     if (!compositeRef.current) {
@@ -86,8 +78,10 @@ const FlightPlan = () => {
     if (composite) {
       setManeuvres(
         composite.getRoutines().map((routine, i) => {
-          const accumulatedDuration =
-            composite.accumulatedDurationForRoutine(routine);
+          const accumulatedDuration = composite.accumulatedDurationForRoutine(
+            routine,
+            true,
+          ) as string;
           return (
             <Maneuvre
               id={routine.id}
@@ -99,6 +93,7 @@ const FlightPlan = () => {
               composite={composite}
               setComposite={setComposite}
               setOptions={setOptions}
+              setOptionsMessage={setOptionsMessage}
             />
           );
         }),
@@ -113,36 +108,42 @@ const FlightPlan = () => {
   }, [composite, openManeuvre, allDurations]);
 
   useEffect(() => {
-    if(openManeuvre) {
-      dispatch(updateHighlightedRoutines([openManeuvre]));
+    if (openManeuvre) {
+      dispatch(updateHighlightedFeatures([openManeuvre]));
     } else {
-      dispatch(updateHighlightedRoutines([]));
+      dispatch(updateHighlightedFeatures([]));
     }
   }, [openManeuvre]);
 
   useEffect(() => {
     if (composite && clickEvent && clickMode == 'inspect') {
       const routineIds = composite.getRoutines().map((routine) => routine.id);
-      const clickedRoutineIds = routineIds.filter((id)=> clickEvent.features.includes(id));
+      const clickedRoutineIds = routineIds.filter((id) =>
+        clickEvent.features.includes(id),
+      );
       const waypointIds = waypoints.map((wp) => wp.id);
 
-      const clickedWaypointId = waypointIds.filter(
-        (id)=> clickEvent.features.includes('waypoint-'+id) && !highlightedWaypoints.includes(id)
-      ).at(0);
+      const clickedWaypointId = waypointIds
+        .filter(
+          (id) =>
+            clickEvent.features.includes('waypoint-' + id) &&
+            !highlightedFeatures.includes(id),
+        )
+        .at(0);
 
       if (clickedWaypointId) {
-        dispatch(updateHighlightedWaypoints([clickedWaypointId]));
+        dispatch(updateHighlightedFeatures([clickedWaypointId]));
       } else {
-        dispatch(updateHighlightedWaypoints([]));
+        dispatch(updateHighlightedFeatures([]));
       }
       const toOpen = clickedRoutineIds.at(0);
       if (openManeuvre && clickedRoutineIds.includes(openManeuvre)) {
-        setOpenManeuvre(null)
+        setOpenManeuvre(null);
       } else if (toOpen) {
         setOpenManeuvre(toOpen);
       }
     }
-  }, [clickEvent])
+  }, [clickEvent]);
 
   useEffect(() => {
     if (maneuvres.length == 0 && composite) {
@@ -158,13 +159,13 @@ const FlightPlan = () => {
           };
         }),
       );
+      setOptionsMessage('Choose take off');
     }
   }, [maneuvres]);
 
   useEffect(() => {
     if (clickEvent && composite) {
       if (clickMode == 'append SLR') {
-        console.log(clickEvent);
         const clickedFeatures = clickEvent.features;
         const clickedWaypointId = clickedFeatures.find((id) => {
           return id.includes('waypoint');
@@ -193,7 +194,7 @@ const FlightPlan = () => {
             id,
             id,
             { value: clickEvent.latitude, unit: 'dd' },
-            { value: -clickEvent.longitude, unit: 'dd' },
+            { value: clickEvent.longitude, unit: 'dd' },
           ),
         );
         dispatch(updateWaypoints(WaypointRegistry.toJson()));
@@ -201,49 +202,33 @@ const FlightPlan = () => {
     }
   }, [clickEvent]);
 
-  // Set up form 
-  useEffect(() => {
-    const formLines = EditSortieFormKeys.map((key) => {
-      return <div>
-        {key}
-        <TextInputSubmit 
-          defaultValue={sortieInfo[key]}
-          onSubmit={(value: string) => {
-            const newSortieInfo = {...sortieInfo};
-            newSortieInfo[key] = value;
-            setSortieInfo(newSortieInfo)
-          }}
-        />
-      </div>
-    })
-    setFormComponents(formLines);
-  }, [sortieInfo])
-
   // Handle Waypoint Changes
   useEffect(() => {
     if (composite) {
       const departureAirport = composite.getEntryState().getWaypoint().name;
       const landingAirport = composite.getExitState().getWaypoint().name;
-      const newSortieInfo = {...sortieInfo};
-      if (departureAirport) newSortieInfo['Departure Airport'] = departureAirport;
+      const newSortieInfo = { ...sortieInfo };
+      if (departureAirport)
+        newSortieInfo['Departure Airport'] = departureAirport;
       if (landingAirport) newSortieInfo['Landing Airport'] = landingAirport;
       setSortieInfo(newSortieInfo);
     }
-  }, [composite])
+  }, [composite]);
+
+  // Handle print request
+  useEffect(() => {
+    if (composite) {
+      printSortie(
+        sortieInfo,
+        composite.docxWaypoints(),
+        composite.docxRoutines(),
+      );
+    }
+  }, [docxPrintFlag]);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '70%',
-        margin: '5% 15%',
-      }}
-    >
-      <div>
-        {formComponents}
-      </div>
-      <br />
+    <div className={'Page'}>
+      <h1 style={{ alignSelf: 'center', margin: '1em' }}>Flight Plan</h1>
       <div
         style={{
           width: '100%',
@@ -290,16 +275,6 @@ const FlightPlan = () => {
         </div>
       </div>
       {maneuvres}
-      <OptionsMenu options={options} />
-      <div onClick={() => {
-        if (composite) {
-          printSortie(
-            sortieInfo,
-            composite.docxWaypoints(),
-            composite.docxRoutines(),
-          )
-        }
-      }}>Download</div>
     </div>
   );
 };

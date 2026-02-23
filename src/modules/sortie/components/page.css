@@ -1,0 +1,6 @@
+.Page {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  margin: 5% 15%;
+}

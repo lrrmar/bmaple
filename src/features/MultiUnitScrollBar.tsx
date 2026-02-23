@@ -11,6 +11,12 @@ interface Mark {
   label: string;
 }
 
+/////////////////
+import {
+ selectAppStyle
+} from '../modules/sortie/sortieSlice';
+///////////
+
 interface Props<T, U> {
   selectValue: Selector<string | null>;
   selectValues: Selector<string[]>;
@@ -35,6 +41,9 @@ const MultiUnitScrollBar = <T, U>({
   const [content, setContent] = useState<React.ReactNode>([]);
   const [lastKey, setLastKey] = useState<string | null>(null);
   const [keyPress, setKeyPress] = useState<number>(0);
+
+  ////////
+  const appStyle = useSelector(selectAppStyle);
 
   useEffect(() => {
     const newMarks: Mark[] = values.map((val, i) => {
@@ -119,6 +128,7 @@ const MultiUnitScrollBar = <T, U>({
   const style: { [key: string]: string } = {
     padding: '0px 40px',
     color: '#f1f1f1',
+    backgroundColor: appStyle.primaryColor,
   };
 
   if (Object.keys(values).length === 1) {

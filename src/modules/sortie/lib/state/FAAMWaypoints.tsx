@@ -1,10 +1,10 @@
-import type { WaypointJson } from './types';
+import type { WaypointJson } from '../io/types';
 
 const waypoints: { [keys: string]: WaypointJson } = {
   '1': {
     id: 'PT1',
     latitude: {
-      value: 52.666666666666664,
+      value: 53.333333333333336,
       unit: 'dd',
     },
     longitude: {
@@ -16,7 +16,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '2': {
     id: 'PT2',
     latitude: {
-      value: 52.86666666666667,
+      value: 53.13333333333333,
       unit: 'dd',
     },
     longitude: {
@@ -28,11 +28,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '3': {
     id: 'PT3',
     latitude: {
-      value: 51.05,
+      value: 52.95,
       unit: 'dd',
     },
     longitude: {
-      value: 0.8833333333333333,
+      value: 1.1166666666666667,
       unit: 'dd',
     },
     name: 'WEYBOURNE',
@@ -40,11 +40,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '4': {
     id: 'PT4',
     latitude: {
-      value: 51.333333333333336,
+      value: 52.666666666666664,
       unit: 'dd',
     },
     longitude: {
-      value: -0.95,
+      value: 0.95,
       unit: 'dd',
     },
     name: 'EAST DEREHAM',
@@ -52,7 +52,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '5': {
     id: 'PT5',
     latitude: {
-      value: 51.61666666666667,
+      value: 52.38333333333333,
       unit: 'dd',
     },
     longitude: {
@@ -64,11 +64,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '6': {
     id: 'PT6',
     latitude: {
-      value: 50.03333333333333,
+      value: 51.96666666666667,
       unit: 'dd',
     },
     longitude: {
-      value: 0.21666666666666667,
+      value: -1.7833333333333332,
       unit: 'dd',
     },
     name: 'DTY WEST',
@@ -76,11 +76,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '7': {
     id: 'PT7',
     latitude: {
-      value: 51.166666666666664,
+      value: 52.833333333333336,
       unit: 'dd',
     },
     longitude: {
-      value: 0.08333333333333337,
+      value: 1.9166666666666665,
       unit: 'dd',
     },
     name: 'NE. GREAT YARMOUTH',
@@ -88,11 +88,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '8': {
     id: 'PT8',
     latitude: {
-      value: 51.916666666666664,
+      value: 52.083333333333336,
       unit: 'dd',
     },
     longitude: {
-      value: 0.21666666666666667,
+      value: 1.7833333333333332,
       unit: 'dd',
     },
     name: 'E. FELIXSTOWE',
@@ -100,11 +100,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '9': {
     id: 'PT9',
     latitude: {
-      value: 50.81666666666667,
+      value: 51.18333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: 0.25,
+      value: 1.75,
       unit: 'dd',
     },
     name: 'E. DOVER',
@@ -112,11 +112,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '10': {
     id: 'PT10',
     latitude: {
-      value: 49.46666666666667,
+      value: 50.53333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: -0.5,
+      value: 0.5,
       unit: 'dd',
     },
     name: 'S. BEXHILL',
@@ -124,11 +124,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '11': {
     id: 'PT11',
     latitude: {
-      value: 49.333333333333336,
+      value: 50.666666666666664,
       unit: 'dd',
     },
     longitude: {
-      value: 1.0,
+      value: -1.0,
       unit: 'dd',
     },
     name: 'E. BEMBRIDGE',
@@ -136,11 +136,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '12': {
     id: 'PT12',
     latitude: {
-      value: 49.983333333333334,
+      value: 50.016666666666666,
       unit: 'dd',
     },
     longitude: {
-      value: 2.0,
+      value: -2.0,
       unit: 'dd',
     },
     name: 'SE D023',
@@ -148,11 +148,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '13': {
     id: 'PT13',
     latitude: {
-      value: 49.983333333333334,
+      value: 50.016666666666666,
       unit: 'dd',
     },
     longitude: {
-      value: 2.5833333333333335,
+      value: -3.4166666666666665,
       unit: 'dd',
     },
     name: 'S.START POINT',
@@ -164,7 +164,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 3.1666666666666665,
+      value: -4.833333333333333,
       unit: 'dd',
     },
     name: 'W. HARTLAND POINT',
@@ -172,11 +172,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '15': {
     id: 'PT15',
     latitude: {
-      value: 49.783166666666666,
+      value: 50.216833333333334,
       unit: 'dd',
     },
     longitude: {
-      value: 4.683166666666667,
+      value: -5.316833333333333,
       unit: 'dd',
     },
     name: 'CAMBORNE',
@@ -188,7 +188,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 7.0,
+      value: -7.0,
       unit: 'dd',
     },
     name: 'W. ISLES OF SCILLY',
@@ -200,7 +200,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 7.0,
+      value: -7.0,
       unit: 'dd',
     },
     name: 'SW APPROACHES',
@@ -212,7 +212,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 6.0,
+      value: -6.0,
       unit: 'dd',
     },
     name: 'SW APPROACHES',
@@ -220,11 +220,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '19': {
     id: 'PT19',
     latitude: {
-      value: 50.666666666666664,
+      value: 51.333333333333336,
       unit: 'dd',
     },
     longitude: {
-      value: 5.0,
+      value: -5.0,
       unit: 'dd',
     },
     name: 'S. MILFORD HAVEN',
@@ -232,11 +232,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '20': {
     id: 'PT20',
     latitude: {
-      value: 50.5,
+      value: 51.5,
       unit: 'dd',
     },
     longitude: {
-      value: 6.0,
+      value: -6.0,
       unit: 'dd',
     },
     name: 'SW. MILFORD HAVEN',
@@ -244,11 +244,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '21': {
     id: 'PT21',
     latitude: {
-      value: 50.5,
+      value: 51.5,
       unit: 'dd',
     },
     longitude: {
-      value: 4.5,
+      value: -5.5,
       unit: 'dd',
     },
     name: 'SW. MILFORD HAVEN',
@@ -256,11 +256,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '22': {
     id: 'PT22',
     latitude: {
-      value: 51.85,
+      value: 52.15,
       unit: 'dd',
     },
     longitude: {
-      value: 4.583333333333333,
+      value: -5.416666666666667,
       unit: 'dd',
     },
     name: 'W. STRUMBLE',
@@ -268,11 +268,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '23': {
     id: 'PT23',
     latitude: {
-      value: 52.5,
+      value: 53.5,
       unit: 'dd',
     },
     longitude: {
-      value: 4.583333333333333,
+      value: -5.416666666666667,
       unit: 'dd',
     },
     name: 'E.DUBLIN',
@@ -280,11 +280,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '24': {
     id: 'PT24',
     latitude: {
-      value: 52.5,
+      value: 53.5,
       unit: 'dd',
     },
     longitude: {
-      value: 4.0,
+      value: -4.0,
       unit: 'dd',
     },
     name: 'N. LLANDUDNO',
@@ -292,11 +292,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '25': {
     id: 'PT25',
     latitude: {
-      value: 53.5,
+      value: 54.5,
       unit: 'dd',
     },
     longitude: {
-      value: 4.0,
+      value: -4.0,
       unit: 'dd',
     },
     name: 'W.WHITEHAVEN',
@@ -304,11 +304,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '26': {
     id: 'PT26',
     latitude: {
-      value: 53.5,
+      value: 54.5,
       unit: 'dd',
     },
     longitude: {
-      value: 4.75,
+      value: -5.25,
       unit: 'dd',
     },
     name: 'SW MULL OF GALLOWAY',
@@ -316,11 +316,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '27': {
     id: 'PT27',
     latitude: {
-      value: 54.7,
+      value: 55.3,
       unit: 'dd',
     },
     longitude: {
-      value: 4.1,
+      value: -5.9,
       unit: 'dd',
     },
     name: 'MULL OF KINTYRE',
@@ -328,11 +328,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '28': {
     id: 'PT28',
     latitude: {
-      value: 54.5,
+      value: 55.5,
       unit: 'dd',
     },
     longitude: {
-      value: 7.0,
+      value: -7.0,
       unit: 'dd',
     },
     name: 'N.LONDONDERRY',
@@ -340,11 +340,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '29': {
     id: 'PT29',
     latitude: {
-      value: 54.5,
+      value: 55.5,
       unit: 'dd',
     },
     longitude: {
-      value: 9.0,
+      value: -9.0,
       unit: 'dd',
     },
     name: 'NW.DONEGAL',
@@ -352,11 +352,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '30': {
     id: 'PT30',
     latitude: {
-      value: 55.5,
+      value: 56.5,
       unit: 'dd',
     },
     longitude: {
-      value: 9.0,
+      value: -9.0,
       unit: 'dd',
     },
     name: 'W.TIREE',
@@ -364,11 +364,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '31': {
     id: 'PT31',
     latitude: {
-      value: 55.5,
+      value: 56.5,
       unit: 'dd',
     },
     longitude: {
-      value: 7.0,
+      value: -7.0,
       unit: 'dd',
     },
     name: 'W.TIREE',
@@ -376,11 +376,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '32': {
     id: 'PT32',
     latitude: {
-      value: 56.583333333333336,
+      value: 57.416666666666664,
       unit: 'dd',
     },
     longitude: {
-      value: 7.0,
+      value: -7.0,
       unit: 'dd',
     },
     name: 'THE MINCH',
@@ -388,11 +388,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '33': {
     id: 'PT33',
     latitude: {
-      value: 57.3,
+      value: 58.7,
       unit: 'dd',
     },
     longitude: {
-      value: 5.0,
+      value: -5.0,
       unit: 'dd',
     },
     name: 'N.CAPE WRATH',
@@ -400,11 +400,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '34': {
     id: 'PT34',
     latitude: {
-      value: 58.96666666666667,
+      value: 59.03333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: 5.0,
+      value: -5.0,
       unit: 'dd',
     },
     name: 'N.CAPE WRATH',
@@ -412,11 +412,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '35': {
     id: 'PT35',
     latitude: {
-      value: 57.3,
+      value: 58.7,
       unit: 'dd',
     },
     longitude: {
-      value: 3.0,
+      value: -3.0,
       unit: 'dd',
     },
     name: 'PENTLAND FIRTH',
@@ -424,11 +424,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '36': {
     id: 'PT36',
     latitude: {
-      value: 58.583333333333336,
+      value: 59.416666666666664,
       unit: 'dd',
     },
     longitude: {
-      value: 0.33333333333333337,
+      value: -1.6666666666666665,
       unit: 'dd',
     },
     name: 'FAIR ISLE',
@@ -440,7 +440,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 0.33333333333333337,
+      value: -1.6666666666666665,
       unit: 'dd',
     },
     name: 'NE FRASERBURGH',
@@ -452,7 +452,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 0.33333333333333337,
+      value: -1.6666666666666665,
       unit: 'dd',
     },
     name: 'E. ST ABBS HEAD',
@@ -460,11 +460,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '39': {
     id: 'PT39',
     latitude: {
-      value: 53.21666666666667,
+      value: 54.78333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: 1.0,
+      value: -1.0,
       unit: 'dd',
     },
     name: 'E.SUNDERLAND',
@@ -472,7 +472,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '40': {
     id: 'PT40',
     latitude: {
-      value: 53.5,
+      value: 54.5,
       unit: 'dd',
     },
     longitude: {
@@ -484,7 +484,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '41': {
     id: 'PT41',
     latitude: {
-      value: 53.5,
+      value: 54.5,
       unit: 'dd',
     },
     longitude: {
@@ -496,11 +496,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '42': {
     id: 'PT42',
     latitude: {
-      value: 52.36666666666667,
+      value: 53.63333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: -0.55,
+      value: 0.55,
       unit: 'dd',
     },
     name: 'E.SPURN POINT',
@@ -556,11 +556,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '47': {
     id: 'PT47',
     latitude: {
-      value: 50.855,
+      value: 51.145,
       unit: 'dd',
     },
     longitude: {
-      value: 0.5616666666666666,
+      value: -1.4383333333333335,
       unit: 'dd',
     },
     name: 'CHILBOLTON',
@@ -568,11 +568,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '48': {
     id: 'PT48',
     latitude: {
-      value: 49.21666666666667,
+      value: 50.78333333333333,
       unit: 'dd',
     },
     longitude: {
-      value: 1.1666666666666665,
+      value: -2.8333333333333335,
       unit: 'dd',
     },
     name: 'CHILBOLTON WEST POINT',
@@ -580,11 +580,11 @@ const waypoints: { [keys: string]: WaypointJson } = {
   '49': {
     id: 'PT49',
     latitude: {
-      value: 49.18,
+      value: 50.82,
       unit: 'dd',
     },
     longitude: {
-      value: 1.44,
+      value: -2.56,
       unit: 'dd',
     },
     name: 'WARDON HILL',
@@ -608,7 +608,7 @@ const waypoints: { [keys: string]: WaypointJson } = {
       unit: 'dd',
     },
     longitude: {
-      value: 0.63,
+      value: -0.63,
       unit: 'dd',
     },
     name: 'Cranfield Airport',

@@ -3,13 +3,7 @@ import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
 } from '../../hooks';
-import {
-  ingest,
-  selectCache,
-  Pending,
-  isEntry,
-  isPending,
-} from '../../mapping/cacheSlice';
+import { ingest, selectCache, Pending } from '../../mapping/cacheSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 
 // import OpenLayers types
@@ -22,16 +16,6 @@ import { getUid } from 'ol/util';
 export interface Regions extends Pending {
   name: string;
 }
-
-export const isPendingRegions = (element: any): element is Regions => {
-  const keys: string[] = Object.keys(element);
-  return isPending(element) && keys.includes('name');
-};
-
-export const isEntryRegions = (element: any): element is Regions => {
-  const keys: string[] = Object.keys(element);
-  return isEntry(element) && keys.includes('name');
-};
 
 const parseLimit = (limit: string) => {
   const isSFC = limit.slice(0, 3) === 'SFC';
@@ -50,63 +34,42 @@ const parseLimit = (limit: string) => {
 
 const RegionsLayer = ({
   id,
-  sourceIdentifier,
+  children,
 }: {
   id: string;
-  sourceIdentifier: string;
+  children: React.ReactNode;
 }) => {
   // Access to fundamental data structures
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
+  const featureData = cache[id];
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
-  const layerData = cache[id];
-  const loaded = useRef<boolean>(false);
+  const initialised = useRef<boolean>(false);
 
   useEffect(() => {
-    if (
-      loaded.current ||
-      !map ||
-      !layerData ||
-      isEntry(layerData) ||
-      !isPendingRegions(layerData) ||
-      layerData['source'] !== sourceIdentifier
-    ) {
-    } else {
-      loaded.current = true;
-      fetch('./NATS-danger-areas.kml')
-        .then((r) => r.text())
-        .then((kmlText) => {
-          const features = new KML().readFeatures(kmlText, {
-            featureProjection: 'EPSG:3857',
-          });
-          features.forEach((f, i) => {
-            const description = f.get('description');
-            const upper = description.match(/Upper limit: ([^<]*)<br/)[1];
-            const lower = description.match(/Lower limit: ([^<]*)<br/)[1];
-            const featureData = { ...layerData };
-            featureData['lower limit'] = parseLimit(lower);
-            featureData['upper limit'] = parseLimit(upper);
-            const layer = new VectorLayer({
-              source: new VectorSource({ features: [f] }),
-              zIndex: 20,
-              visible: false,
-            });
-            if (map) map.addLayer(layer);
-            dispatch(
-              ingest({
-                ...featureData,
-                id: `nats-danger-area-${i}`,
-                name: f.get('name'),
-                ol_uid: getUid(layer),
-                features: [getUid(f)], // allows better searching for clicks
-              }),
-            );
-          });
-        });
+    if (cache[id] && !initialised.current) {
+      const layer = new VectorLayer({
+        source: new VectorSource({}),
+        zIndex: 19,
+        visible: true,
+      });
+      if (map) {
+        console.log('adding layer');
+        map.addLayer(layer);
+        layer.set('id', id);
+        map.set(id, layer);
+        dispatch(
+          ingest({
+            ...featureData,
+            ol_uid: getUid(layer),
+          }),
+        );
+        initialised.current = true;
+      }
     }
-  }, []);
+  }, [id]);
 
-  return <div></div>;
+  return <div>{children}</div>;
 };
 
 export default RegionsLayer;

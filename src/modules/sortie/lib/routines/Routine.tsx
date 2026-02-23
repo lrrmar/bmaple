@@ -374,7 +374,7 @@ export default class Routine implements _Routine {
     // swappable routines i.e. options for keeping state the same but swapping
     // the routine that connects them
     const currentPreviousRoutine = this.getEntryState().getExitForRoutine();
-    if (currentPreviousRoutine) {
+    if (currentPreviousRoutine && currentPreviousRoutine.isNull()) {
       previousRoutines = currentPreviousRoutine.swappableRoutines();
     }
 
@@ -382,10 +382,10 @@ export default class Routine implements _Routine {
     // routines that follow this one
     this.permittedPreviousRoutineClasses().forEach((routineClass) => {
       previousRoutines.push(
-        new routineClass(new State({}), this.getEntryState()),
+        new routineClass({ entry: new State({}), exit: this.getEntryState() }),
       );
     });
-    const availablePreviousRoutines: Routine[] = [];
+    const availablePreviousRoutines: _Routine[] = [];
     previousRoutines.forEach((routine) => {
       // verify each routine
       try {

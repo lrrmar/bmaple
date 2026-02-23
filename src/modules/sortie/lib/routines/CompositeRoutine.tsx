@@ -128,18 +128,16 @@ export default class CompositeRoutine extends Routine {
       states.push(routine.getExitState());
     });
     return [...new Set(states)];
-  } 
+  }
 
   getActiveWaypoints() {
     const activeWaypoints: string[] = [];
     this.routines.forEach((routine) => {
       activeWaypoints.push(routine.getEntryState().getWaypoint().id);
-      activeWaypoints.push(routine.getEntryState().getWaypoint().id);
+      activeWaypoints.push(routine.getExitState().getWaypoint().id);
     });
     return [...new Set(activeWaypoints)];
   }
-
-
 
   fixState(entry: _State, exit: _State) {
     void 0;
@@ -189,7 +187,6 @@ export default class CompositeRoutine extends Routine {
       } else {
         return accumulatedDuration;
       }
-
     } else {
       throw new Error('Routine not in Composite');
     }
@@ -600,28 +597,31 @@ export default class CompositeRoutine extends Routine {
       const description = routine.toString();
       const duration = routine.calculateDuration();
       const soFar = this.accumulatedDurationForRoutine(routine, true);
-      const toReturn: Record<'description' | 'duration' | 'soFar', string> = { 
+      const toReturn: Record<'description' | 'duration' | 'soFar', string> = {
         description: '',
         duration: '',
-        soFar: ''
+        soFar: '',
       };
       if (description) toReturn['description'] = description;
       if (duration) toReturn['duration'] = duration.toString();
       if (soFar && typeof soFar == 'string') toReturn['soFar'] = soFar;
       return toReturn;
-    })
+    });
   }
 
   docxWaypoints() {
-    const toReturn: {description: string, coords: string}[] = [];
+    const toReturn: { description: string; coords: string }[] = [];
     this.getActiveWaypoints().forEach((wp) => {
       const waypoint = WaypointRegistry.getWaypoint(wp);
       if (waypoint) {
         let description = waypoint.id;
         if (waypoint.name != waypoint.id) {
-          description += ` (${waypoint.name})` ;
+          description += ` (${waypoint.name})`;
         }
-        toReturn.push({description: description, coords: waypoint.getLatitude().toString()});
+        toReturn.push({
+          description: description,
+          coords: waypoint.getLatitude().toString(),
+        });
       }
     });
     return toReturn;

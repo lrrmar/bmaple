@@ -1,6 +1,8 @@
-type AbstractConstructor<T = unknown> = abstract new (...args: any[]) => T;
+export type AbstractConstructor<T = unknown> = abstract new (
+  ...args: any[]
+) => T;
 
-function isSubclassOf<
+export function isSubclassOf<
   Child extends AbstractConstructor,
   Parent extends AbstractConstructor,
 >(child: Child, parent: Parent): child is Child & Parent {

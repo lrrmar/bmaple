@@ -1,14 +1,21 @@
 import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector,
+} from '../../../hooks';
 import CompositeRoutine from '../lib/routines/CompositeRoutine';
 import WaypointRegistry from '../lib/state/WaypointRegistry';
-import Routine from '../lib/routines/Routine';
+import { Routine } from '../lib/routines/types';
 import { SLR } from '../lib/routines/Runs';
 import { Profile } from '../lib/routines/Profiles';
 import State from '../lib/state/State';
 import Waypoint from '../lib/state/Waypoint';
-import Measure from '../lib/state/Measure';
+import { Measure } from '../lib/state/types';
 import TextInputSubmit from './TextInputSubmit';
 import { type OptionProp } from './OptionsMenu';
+import { selectAppStyle } from '../sortieSlice';
+
+import { Icon, SemanticICONS } from 'semantic-ui-react';
 
 const Maneuvre = ({
   id,
@@ -19,16 +26,19 @@ const Maneuvre = ({
   composite,
   setComposite,
   setOptions,
+  setOptionsMessage,
 }: {
   id: string;
   openManeuvre: string | null;
-  setOpenManeuvre: Dispatch<SetStateAction<number | null>>;
-  accumulatedDuration: number;
+  setOpenManeuvre: Dispatch<SetStateAction<string | null>>;
+  accumulatedDuration: string;
   routine: Routine;
   composite: CompositeRoutine;
   setComposite: Dispatch<SetStateAction<CompositeRoutine | undefined>>;
   setOptions: Dispatch<SetStateAction<OptionProp[]>>;
+  setOptionsMessage: Dispatch<SetStateAction<string | undefined>>;
 }) => {
+  const appStyle = useSelector(selectAppStyle);
   const [display, setDisplay] = useState<string | null>();
   const [duration, setDuration] = useState<number | null>();
   const [entryAltitude, setEntryAltitude] = useState<Measure | null>(null);
@@ -38,12 +48,16 @@ const Maneuvre = ({
   const [altitudeComponents, setAltitudeComponents] = useState<React.ReactNode>(
     [],
   );
-  const [accumulatedDurationDisplay, setAccumulatedDurationDisplay] =
-    useState<string>('');
-
-  const [backgroundColor, setBackgroundColor] = useState<string>('#ffffff');
 
   const [open, setOpen] = useState<boolean>(false);
+
+  let color: string = appStyle.primaryColor;
+  let backgroundColor: string = '#ffffff';
+
+  if (id == openManeuvre) {
+    color = appStyle.primaryColor;
+    backgroundColor = appStyle.secondaryColor;
+  }
 
   useEffect(() => {
     if (openManeuvre == id) {
@@ -74,7 +88,7 @@ const Maneuvre = ({
         : '...';
       setAltitudeComponents(
         <TextInputSubmit
-          onSubmit={(value) =>
+          onSubmit={(value: string) =>
             setEntryAltitude({ value: parseInt(value), unit: 'ft' })
           }
           defaultValue={defaultValue}
@@ -122,40 +136,15 @@ const Maneuvre = ({
     }
   }, [entryAltitude]);
 
-  useEffect(() => {
-    if (routine.isNull()) {
-      setBackgroundColor('#f0f0f0');
-    } else if (routine.availableNextRoutines().length < 1) {
-      setBackgroundColor('#f6f6f6');
-    } else if (open) {
-      setBackgroundColor('#a0f0f0');
-    } else {
-      setBackgroundColor('#ffffff');
-    }
-  }, [open]);
-
-  useEffect(() => {
-    if (duration && !routine.isNull()) {
-      let st = '';
-      // Hours
-      st += `${Math.floor(accumulatedDuration / 60)}:`;
-      // mins
-      const mins = (accumulatedDuration % 60).toString();
-      st += mins.length == 1 ? '0' + mins : mins;
-      setAccumulatedDurationDisplay(st);
-    } else {
-      setAccumulatedDurationDisplay('');
-    }
-  }, [duration, accumulatedDuration]);
-
   return (
     <div
       style={{
         backgroundColor: backgroundColor,
+        color: color,
         width: '100%',
-        height: '40px', // open ? "80px" : "20px",
-        borderBottom: '2px dotted #000000',
-        borderLeft: '2px dotted #000000',
+        height: open ? 'fit-content' : '2em',
+        borderBottom: '2px dotted ' + appStyle.primaryColor,
+        borderLeft: '2px solid ' + appStyle.primaryColor,
         display: 'flex',
       }}
       onClick={() => {
@@ -169,9 +158,9 @@ const Maneuvre = ({
       <div
         style={{
           width: '40%',
-          height: '100%',
+          height: open ? 'fit-content' : '2em',
           textAlign: 'left',
-          borderRight: '2px dotted #000000',
+          borderRight: '2px dotted ' + color,
           padding: '0.5em',
         }}
       >
@@ -179,9 +168,10 @@ const Maneuvre = ({
           style={{
             //backgroundColor: open ? "black" : "white",
             //color: open ? "white" : "black",
-            maxWidth: '100%',
-            maxHeight: '100%',
-            textOverflow: 'ellipsis',
+            width: '100%',
+            //height: open ? '4em' : '2em',
+            //whiteSpace: 'nowrap',
+            //textOverflow: 'ellipsis',
           }}
           onClick={() => {
             if (routine.isNull() || routine.availableNextRoutines().length < 1)
@@ -199,29 +189,16 @@ const Maneuvre = ({
               display: 'flex',
             }}
           >
-            <div
-              style={{
-                backgroundColor: 'white',
-                width: 'fit-content',
-                color: 'black',
-                border: 'solid 2px black',
-              }}
+            <Icon
+              name="trash alternate"
               onClick={() => {
                 composite.deleteRoutine(routine);
                 setComposite(composite.copy());
               }}
-            >
-              Remove
-            </div>
-
-            {routine.swappableRoutines().length > 0 ? (
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  width: 'fit-content',
-                  color: 'black',
-                  border: 'solid 2px black',
-                }}
+            />
+            {routine.swappableRoutines().length > 0 && (
+              <Icon
+                name="sync"
                 onClick={() => {
                   const options: OptionProp[] = [];
                   routine.swappableRoutines().forEach((routine) => {
@@ -237,21 +214,13 @@ const Maneuvre = ({
                     }
                   });
                   setOptions(options);
+                  setOptionsMessage('Choose routine');
                 }}
-              >
-                Replace
-              </div>
-            ) : (
-              ''
+              />
             )}
 
-            <div
-              style={{
-                backgroundColor: 'white',
-                width: 'fit-content',
-                color: 'black',
-                border: 'solid 2px black',
-              }}
+            <Icon
+              name="plus"
               onClick={() => {
                 const options: OptionProp[] = [];
                 routine.availableNextRoutines().forEach((routine) => {
@@ -284,6 +253,7 @@ const Maneuvre = ({
                             });
                           });
                           setOptions(options);
+                          setOptionsMessage('Choose waypoint');
                         }
                         setOpenManeuvre(null);
                       },
@@ -291,17 +261,16 @@ const Maneuvre = ({
                   }
                 });
                 setOptions(options);
+                setOptionsMessage('Choose routine');
               }}
-            >
-              Add After
-            </div>
+            />
           </div>
         )}
       </div>
       <div
         style={{
           width: '20%',
-          height: '100%',
+          height: open ? '100%' : '2em',
           borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
@@ -311,7 +280,7 @@ const Maneuvre = ({
       <div
         style={{
           width: '20%',
-          height: '100%',
+          height: open ? '100%' : '2em',
           borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
@@ -321,12 +290,12 @@ const Maneuvre = ({
       <div
         style={{
           width: '20%',
-          height: '100%',
+          height: open ? '100%' : '2em',
           borderRight: '2px dotted #000000',
           padding: '0.5em',
         }}
       >
-        {accumulatedDurationDisplay}
+        {accumulatedDuration}
       </div>
     </div>
   );

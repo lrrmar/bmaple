@@ -10,6 +10,8 @@ import {
   useAppSelector as useSelector,
 } from '../../../hooks';
 
+import { selectAppStyle } from '../sortieSlice';
+
 const ClickModeMenu = ({
   modes,
 }: {
@@ -17,35 +19,87 @@ const ClickModeMenu = ({
 }) => {
   const clickMode = useSelector(selectClickMode);
   const clickEvent = useSelector(selectClickEvent);
+  const appStyle = useSelector(selectAppStyle);
+  const [components, setComponents] = useState<React.ReactNode[]>([]);
 
   useEffect(() => {
-    console.log(clickEvent);
-    console.log(clickMode);
-  }, [clickEvent]);
+    setComponents(
+      modes.map((mode) => {
+        const backgroundColor =
+          mode.name == clickMode
+            ? appStyle.secondaryColor
+            : appStyle.primaryColor;
+        const color =
+          mode.name == clickMode
+            ? appStyle.primaryColor
+            : appStyle.secondaryColor;
+        return (
+          <ClickMode
+            key={mode.name}
+            mode={mode.name}
+            icon={mode.icon}
+            color={color}
+            backgroundColor={backgroundColor}
+          />
+        );
+      }),
+    );
+  }, [clickMode]);
+
   return (
-    <div>
-      {modes.map((mode) => (
-        <ClickMode mode={mode.name} icon={mode.icon} />
-      ))}
+    <div
+      style={{
+        borderRadius: '0.5em',
+        height: 'fit-content',
+        width: 'fit-content',
+        display: 'flex',
+      }}
+    >
+      {components}
     </div>
   );
 };
 
-const ClickMode = ({ mode, icon }: { mode: string; icon?: SemanticICONS }) => {
+const ClickMode = ({
+  mode,
+  icon,
+  color,
+  backgroundColor,
+}: {
+  mode: string;
+  icon?: SemanticICONS;
+  color: string;
+  backgroundColor: string;
+}) => {
   const dispatch = useDispatch();
   const [component, setComponent] = useState<React.ReactNode>();
 
   useEffect(() => {
     if (icon) {
       setComponent(
-        <Icon onClick={() => dispatch(updateClickMode(mode))} name={icon} />,
+        <Icon
+          onClick={() => dispatch(updateClickMode(mode))}
+          name={icon}
+          size={'large'}
+          bordered={false}
+          circular={true}
+        />,
       );
     } else {
       setComponent(<p>{mode}</p>);
     }
   }, []);
 
-  return component;
+  return (
+    <div
+      style={{
+        color: color,
+        backgroundColor: backgroundColor,
+      }}
+    >
+      {component}
+    </div>
+  );
 };
 
 export default ClickModeMenu;

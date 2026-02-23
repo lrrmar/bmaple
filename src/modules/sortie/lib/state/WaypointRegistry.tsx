@@ -1,4 +1,4 @@
-import type { WaypointJson } from './types';
+import type { WaypointJson } from '../io/types';
 import CompositeRoutine from '../routines/CompositeRoutine';
 import Waypoint from './Waypoint';
 import { type State } from './types';

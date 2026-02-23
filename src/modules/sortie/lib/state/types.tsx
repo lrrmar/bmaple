@@ -25,8 +25,11 @@ export interface Waypoint {
   name: string;
   latitude: LatLonMeasure;
   longitude: LatLonMeasure;
+  setName(value: string): void;
   getLatitude(unit?: string): number;
+  setLatitude(value: number): void;
   getLongitude(unit?: string): number;
+  setLongitude(value: number): void;
   toJson(): WaypointJson;
 }
 

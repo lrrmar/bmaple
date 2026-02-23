@@ -27,6 +27,10 @@ export default class Waypoint implements _Waypoint {
     };
   }
 
+  setName(value: string) {
+    this.name = value;
+  }
+
   getLatitude(unit = 'dd') {
     if (unit == 'dd') {
       return this.latitude.value;
@@ -41,5 +45,13 @@ export default class Waypoint implements _Waypoint {
     }
     /// IMPLEMENT DMS!
     return this.longitude.value;
+  }
+
+  setLatitude(value: number) {
+    this.latitude = { unit: 'dd', value: value };
+  }
+
+  setLongitude(value: number) {
+    this.longitude = { unit: 'dd', value: value };
   }
 }

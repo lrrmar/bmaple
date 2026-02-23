@@ -9,8 +9,16 @@ export const Option = ({ display, onClick }: OptionProp) => {
   return <div onClick={onClick}>{display}</div>;
 };
 
-export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
+export const OptionsMenu = ({ options, message, height, width }: { 
+  options: OptionProp[];
+  message?: string;
+  width?: string;
+  height?: string;
+}) => {
   const [optionComponents, setOptionComponents] = useState<React.ReactNode[]>(
+    [],
+  );
+  const [optionMessage, setOptionMessage] = useState<string | undefined>(
     [],
   );
 
@@ -23,7 +31,11 @@ export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
       return Option({ ...option, onClick: wrappedOnClick });
     });
     setOptionComponents(comps);
-  }, [options]);
+    setOptionMessage(message)
+  }, [options, message]);
+
+  const displayWidth = width ? width : '100vw';
+  const displayHeight = height ? height : '100vh';
 
   return (
     <div
@@ -31,11 +43,12 @@ export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
         backgroundColor: 'rgba(55,55,55,0.4)',
         position: 'absolute',
         left: '0px',
-        width: optionComponents.length == 0 ? '0px' : '50vw',
-        height: optionComponents.length == 0 ? '0px' : '100vh',
+        width: optionComponents.length == 0 ? '0px' : displayWidth,
+        height: optionComponents.length == 0 ? '0px' : displayHeight,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        zIndex: 20,
       }}
     >
       <div
@@ -45,6 +58,11 @@ export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
           height: '20%',
         }}
       >
+        {message && optionComponents.length > 0 &&
+      <div>
+        <h4>{message}</h4>
+      </div>
+        }
         <div
           style={{
             overflow: 'scroll',
@@ -58,6 +76,7 @@ export const OptionsMenu = ({ options }: { options: OptionProp[] }) => {
             style={{ backgroundColor: 'white' }}
             onClick={() => {
               setOptionComponents([]);
+              setOptionMessage(undefined);
             }}
           >
             Cancel

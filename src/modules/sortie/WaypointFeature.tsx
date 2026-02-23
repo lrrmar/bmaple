@@ -55,21 +55,31 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
   const mapUtils = new OpenLayersMap();
   const initialised = useRef<boolean>(false);
+  const coordsRef = useRef<{ latitude: number; longitude: number }>();
 
   useEffect(() => {
     const featureData = cache[id];
-    if (featureData && !initialised.current && map) {
+    if (
+      featureData &&
+      map &&
+      (!initialised.current ||
+        (coordsRef.current &&
+          featureData.latitude !== coordsRef.current.latitude) ||
+        (coordsRef.current &&
+          featureData.longitude !== coordsRef.current.longitude))
+    ) {
       const layer = map.get(layerId);
       if (layer) {
+        const oldFeature = map.get(id);
+        if (oldFeature) layer.getSource().removeFeature(oldFeature);
         const latitude = featureData.latitude;
         const longitude = featureData.longitude;
         if (typeof latitude == 'number' && typeof longitude == 'number') {
           const feature = new Feature({
-            geometry: new Point(fromLonLat([-longitude, latitude])),
+            geometry: new Point(fromLonLat([longitude, latitude])),
           });
           layer.getSource().addFeature(feature);
-          //feature.on('click', alert(featureData.name) )
-                    feature.set('id', id);
+          feature.set('id', id);
           map.set(id, feature);
           dispatch(
             ingest({
@@ -78,13 +88,21 @@ const WaypointFeature = ({ id, layerId }: { id: string; layerId: string }) => {
             }),
           );
           initialised.current = true;
+          coordsRef.current = { latitude: latitude, longitude: longitude };
         }
       }
+    } else if (
+      featureData &&
+      map &&
+      coordsRef.current &&
+      (featureData.latitude !== coordsRef.current.latitude ||
+        featureData.longitude !== coordsRef.current.longitude)
+    ) {
+      const feature = map.get(id);
     }
   }, [cache]);
 
   return <div></div>;
 };
-
 
 export default WaypointFeature;

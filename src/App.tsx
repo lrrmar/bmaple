@@ -25,13 +25,17 @@ import regionsReducer from './modules/regions/regionsSlice';
 import RegionsSource from './modules/regions/RegionsSource';
 import RegionsProfile from './modules/regions/RegionsProfile';
 
+import notamReducer from './modules/notam/notamSlice';
+import NotamSource from './modules/notam/NotamSource';
+import NotamProfile from './modules/notam/NotamProfile';
+
 import WaypointSource from './modules/sortie/WaypointSource';
 import WaypointProfile from './modules/sortie/WaypointProfile';
 
 import TrackSource from './modules/sortie/TrackSource';
 import TrackProfile from './modules/sortie/TrackProfile';
 
-import FlightPlan from './modules/sortie/components/FlightPlan';
+import Sortie from './modules/sortie/components/Sortie';
 import ClickModeMenu from './modules/sortie/components/ClickMode';
 import sortieReducer from './modules/sortie/sortieSlice';
 export const store = configureStore({
@@ -39,6 +43,7 @@ export const store = configureStore({
     map: mapReducer,
     cache: cacheReducer,
     regions: regionsReducer,
+    notam: notamReducer,
     sortie: sortieReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -69,7 +74,7 @@ const App = () => {
             overflow: 'scroll',
           }}
         >
-          <FlightPlan />
+          <Sortie />
         </div>
         <div
           style={{
@@ -81,10 +86,14 @@ const App = () => {
             <Profiles>
               <WaypointProfile sourceIdentifier={'waypoint'} />
               <TrackProfile sourceIdentifier={'track'} />
+              <RegionsProfile />
+              <NotamProfile />
             </Profiles>
             <Sources>
               <WaypointSource sourceIdentifier={'waypoint'} />
               <TrackSource sourceIdentifier={'track'} />
+              <RegionsSource sourceIdentifier={'regions'} />
+              <NotamSource sourceIdentifier={'notam'} />
             </Sources>
             <BaseMaps>
               <LightBaseMap id={'light'} />
@@ -104,10 +113,10 @@ const App = () => {
           orientation={'vertical'}
         />
       </FloatingBox>
-      <FloatingBox style={{ top: '20px', left: '50%' }}>
+      <FloatingBox style={{ top: '2em', left: '51wv' }}>
         <ErrorMessage />
       </FloatingBox>
-      <FloatingBox style={{ bottom: '20px', left: '50%' }}>
+      <FloatingBox style={{ left: '50%', padding: '0px', margin: '0px' }}>
         <ClickModeMenu
           modes={[
             { name: 'append SLR', icon: 'pencil' },

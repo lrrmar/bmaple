@@ -7,7 +7,7 @@ import {
   useAppSelector as useSelector,
   useAppDispatch as useDispatch,
 } from '../../hooks';
-import { selectCache, request } from '../../mapping/cacheSlice';
+import { selectCache, request, update } from '../../mapping/cacheSlice';
 import { v4 as uuidv4 } from 'uuid';
 
 const WaypointSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
@@ -46,6 +46,20 @@ const WaypointSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
             source: sourceIdentifier,
           };
           dispatch(request(toRequest));
+        } else if (
+          (cacheEntry.latitude &&
+            cacheEntry.latitude !== waypoint.latitude.value) ||
+          (cacheEntry.longitude &&
+            cacheEntry.longitude !== waypoint.longitude.value) ||
+          (cacheEntry.name && cacheEntry.name !== waypoint.name)
+        ) {
+          const toUpdate = {
+            name: waypoint.name,
+            latitude: waypoint.latitude.value,
+            longitude: waypoint.longitude.value,
+            id: id,
+          };
+          dispatch(update(toUpdate));
         }
       });
     }

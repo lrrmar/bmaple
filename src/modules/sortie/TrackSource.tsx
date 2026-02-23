@@ -37,7 +37,7 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     const layerCacheEntry = cache[layerId];
     if (layerCacheEntry && layerCacheEntry.ol_uid) {
-      const tracks: {id: string, waypoints: string[]}[] = [];
+      const tracks: { id: string; waypoints: string[] }[] = [];
       flightPlan.forEach((routine: RoutineJson) => {
         const waypoint0 = routine.waypoint0;
         const waypoint1 = routine.waypoint1;
@@ -45,13 +45,15 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           waypoint0 &&
           waypoint1 &&
           waypoint0 != waypoint1 &&
-          routine.routine != 'NullRoutine') {
+          routine.routine != 'NullRoutine' &&
+          routine.id
+        ) {
           tracks.push({
             id: routine.id,
-            waypoints: [waypoint0, waypoint1]
-          })
+            waypoints: [waypoint0, waypoint1],
+          });
         } else {
-          void(0);// no waypoints
+          void 0; // no waypoints
         }
       });
       tracks.forEach((track) => {
@@ -63,11 +65,11 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           };
           dispatch(request(toRequest));
         }
-      })
+      });
 
       const newIds = tracks.map((track) => track.id);
-      const idsToRemove = featureIds.filter((id) => !newIds.includes(id))
-      idsToRemove.forEach((id) => dispatch(remove({id: id})))
+      const idsToRemove = featureIds.filter((id) => !newIds.includes(id));
+      idsToRemove.forEach((id) => dispatch(remove({ id: id })));
       setFeatureIds(newIds);
     }
   }, [flightPlan, layerId]);
@@ -87,6 +89,10 @@ const TrackSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [cache]);
 
   // render layers
-  return <TrackLayer key={layerId} id={layerId}>{features}</TrackLayer>;
+  return (
+    <TrackLayer key={layerId} id={layerId}>
+      {features}
+    </TrackLayer>
+  );
 };
 export default TrackSource;

@@ -10,7 +10,8 @@ abstract class Turn extends BearingChangeRoutine {
 
   stateCheck() {
     return (
-      super.stateCheck() && this.entryState.getAltitude() == this.exitState.getAltitude()
+      super.stateCheck() &&
+      this.entryState.getAltitude() == this.exitState.getAltitude()
     );
   }
 

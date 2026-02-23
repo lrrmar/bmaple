@@ -1,10 +1,10 @@
-export type AutoSortieFormKey  =
+export type AutoSortieFormKey =
   | 'Departure Airport'
   | 'Landing Airport'
   | 'Planned T/O Time'
-  | 'FIRS / Zones'
+  | 'FIRS / Zones';
 
-export type EditSortieFormKey = 
+export type EditSortieFormKey =
   | 'Mission Scientist'
   | 'Author'
   | 'Approver'
@@ -22,7 +22,7 @@ export const AutosortieFormKeys: AutoSortieFormKey[] = [
   'Departure Airport',
   'Landing Airport',
   'FIRS / Zones',
-]
+];
 
 export const EditSortieFormKeys: EditSortieFormKey[] = [
   'Mission Scientist',
@@ -32,7 +32,7 @@ export const EditSortieFormKeys: EditSortieFormKey[] = [
   'Weather Conditions',
   'Instrument Servicability',
   'Special Notes ',
-]
+];
 
 export const SortieFormKeys: SortieFormKey[] = [
   'Planned T/O Time',
@@ -46,10 +46,9 @@ export const SortieFormKeys: SortieFormKey[] = [
   'Weather Conditions',
   'Instrument Servicability',
   'Special Notes ',
-]
+];
 
 export type TextInputSubmitProps = {
   onSubmit: (value: string) => void;
   defaultValue?: string;
 };
-

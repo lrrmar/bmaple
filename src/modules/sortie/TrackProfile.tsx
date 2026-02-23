@@ -4,16 +4,19 @@ import {
   useAppDispatch as useDispatch,
 } from '../../hooks';
 import { selectCache } from '../../mapping/cacheSlice';
-import { selectHighlightedRoutines } from './sortieSlice';
+import { selectHighlightedFeatures, selectAppStyle } from './sortieSlice';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 
 import Stroke from 'ol/style/Stroke.js';
 import Style from 'ol/style/Style.js';
 
+import Map from 'ol/Map';
+
 const TrackProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const cache = useSelector(selectCache);
   const [map, setMap] = useState<Map | null>(OpenLayersMap.map);
-  const highlightedRoutines = useSelector(selectHighlightedRoutines);
+  const highlightedFeatures = useSelector(selectHighlightedFeatures);
+  const appStyle = useSelector(selectAppStyle);
 
   useEffect(() => {
     if (map) {
@@ -22,10 +25,11 @@ const TrackProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         const source = element.source;
         return source === sourceIdentifier;
       });
-      const layer = map.get(sourceIdentifier +'-layer');
       filteredIds.forEach((id) => {
-        const color = highlightedRoutines.includes(id) ? '#afa0ff': '#f0a040' 
-        const feature =  map.get(id);
+        const color = !highlightedFeatures.includes(id)
+          ? appStyle.secondaryColor
+          : appStyle.primaryColor;
+        const feature = map.get(id);
         if (feature) {
           feature.setStyle(
             new Style({
@@ -36,13 +40,13 @@ const TrackProfile = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 lineJoin: 'round',
               }),
             }),
-          )
+          );
         }
-      })
+      });
     }
-  }, [cache, highlightedRoutines])
+  }, [cache, highlightedFeatures]);
 
   return <div></div>;
-}
+};
 
 export default TrackProfile;

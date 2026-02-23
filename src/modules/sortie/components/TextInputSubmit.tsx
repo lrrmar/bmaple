@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { TextInputSubmitProps } from './types';
+import type { TextInputSubmitProps } from '../types';
 export const TextInputSubmit = ({
   onSubmit,
   defaultValue = '',
@@ -18,7 +18,11 @@ export const TextInputSubmit = ({
   }, [defaultValue]);
   return (
     <input
-      style={{ width: '100%' }}
+      style={{
+        width: '100%',
+        borderStyle: 'dotted',
+        backgroundColor: 'rgba(0,0,0,0)',
+      }}
       type="text"
       value={value}
       onChange={(e) => setValue(e.target.value)}

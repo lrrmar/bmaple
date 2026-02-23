@@ -1,7 +1,7 @@
 import Routine from './Routine';
 import WaypointRegistry from '../state/WaypointRegistry';
 import State from '../state/State';
-import { type StateConstructor } from '../state/types';
+import { type StateConstructor, type State as _State } from '../state/types';
 import { RoutineJson } from '../io/types';
 
 export class WaypointChangeRoutine extends Routine {
