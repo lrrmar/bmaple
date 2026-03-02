@@ -234,17 +234,10 @@ export const selectOutlineContours = (state: RootState) =>
 export const selectVerticalLevel = (state: RootState) =>
   state.map.verticalLevel;
 export const selectVerticalLevels = (state: RootState) => {
-  const levels: number[] = [];
-  for (let i = 0; i < 40; i++) {
-    levels.push(i * 1000);
-  }
-  return levels;
-};
-/*{
   return verticalLevelOrder.filter((level) =>
     state.map.verticalLevels.includes(level),
   );
-};*/
+];
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
 export const selectDisplayTimesIntersection = (state: RootState) => {
