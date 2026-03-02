@@ -130,7 +130,7 @@ const Sortie = () => {
       download: <Download />,
       overlays: <Overlays />,
     });
-  }, []);
+  }, [sortieInfo]);
 
   useEffect(() => {
     if (pageComponents && pages) {
@@ -144,7 +144,7 @@ const Sortie = () => {
       }
       setPageComponents(newPageComponents);
     }
-  }, [pages, openPage]);
+  }, [pages, openPage, sortieInfo]);
 
   return (
     <div

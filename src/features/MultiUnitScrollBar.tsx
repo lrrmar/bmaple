@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Slider from '@mui/material/Slider';
+import { Icon } from 'semantic-ui-react';
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
@@ -10,12 +11,6 @@ interface Mark {
   value: number;
   label: string;
 }
-
-/////////////////
-import {
- selectAppStyle
-} from '../modules/sortie/sortieSlice';
-///////////
 
 interface Props<T, U> {
   selectValue: Selector<string | null>;
@@ -42,9 +37,6 @@ const MultiUnitScrollBar = <T, U>({
   const [lastKey, setLastKey] = useState<string | null>(null);
   const [keyPress, setKeyPress] = useState<number>(0);
 
-  ////////
-  const appStyle = useSelector(selectAppStyle);
-
   useEffect(() => {
     const newMarks: Mark[] = values.map((val, i) => {
       return { value: i, label: `${val}` }; //`${val}${units}` <- swap back to this eventually
@@ -52,10 +44,17 @@ const MultiUnitScrollBar = <T, U>({
     if (newMarks.length > 0) setMarks(newMarks);
   }, [values, value]);
 
+  const keyDown = (key: string) => {
+    const throttle = 200; //ms
+    if (Date.now() - keyPress > throttle) {
+      setLastKey(key);
+      setKeyPress(Date.now());
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      setLastKey(event.key);
-      setKeyPress(Date.now());
+      keyDown(event.key);
     };
 
     // Add global keydown listener
@@ -122,27 +121,53 @@ const MultiUnitScrollBar = <T, U>({
   }, [marks, value]);
 
   if (Object.keys(values).length === 0) {
-    dispatch(updateValue(''));
     return <div></div>;
   }
   const style: { [key: string]: string } = {
-    padding: '0px 40px',
+    padding: '10px 40px',
     color: '#f1f1f1',
-    backgroundColor: appStyle.primaryColor,
+    backgroundColor: '#252243',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   };
 
   if (Object.keys(values).length === 1) {
-    dispatch(updateValue(values[0]));
     return <div style={style}>{values[0]}</div>;
   }
 
   if (orientation === 'vertical') {
-    style['height'] = '50vh';
+    style['height'] = '70vh';
     style['padding'] = '8px 15px';
+    style['flexDirection'] = 'column';
   } else {
     style['width'] = '80vw';
+    style['flexDirection'] = 'vertical';
   }
-  return <div style={style}>{content}</div>;
+  return (
+    <div style={style}>
+      {content}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          margin: '15px 0px 0px',
+        }}
+      >
+        <Icon
+          name={'angle up'}
+          size="large"
+          onClick={() => keyDown('ArrowUp')}
+        />
+        <Icon
+          name={'angle down'}
+          size="large"
+          onClick={() => keyDown('ArrowDown')}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default MultiUnitScrollBar;

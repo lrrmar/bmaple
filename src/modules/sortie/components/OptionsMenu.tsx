@@ -9,7 +9,12 @@ export const Option = ({ display, onClick }: OptionProp) => {
   return <div onClick={onClick}>{display}</div>;
 };
 
-export const OptionsMenu = ({ options, message, height, width }: { 
+export const OptionsMenu = ({
+  options,
+  message,
+  height,
+  width,
+}: {
   options: OptionProp[];
   message?: string;
   width?: string;
@@ -18,9 +23,7 @@ export const OptionsMenu = ({ options, message, height, width }: {
   const [optionComponents, setOptionComponents] = useState<React.ReactNode[]>(
     [],
   );
-  const [optionMessage, setOptionMessage] = useState<string | undefined>(
-    [],
-  );
+  const [optionMessage, setOptionMessage] = useState<string | undefined>();
 
   useEffect(() => {
     const comps = options.map((option) => {
@@ -31,7 +34,7 @@ export const OptionsMenu = ({ options, message, height, width }: {
       return Option({ ...option, onClick: wrappedOnClick });
     });
     setOptionComponents(comps);
-    setOptionMessage(message)
+    setOptionMessage(message);
   }, [options, message]);
 
   const displayWidth = width ? width : '100vw';
@@ -58,11 +61,11 @@ export const OptionsMenu = ({ options, message, height, width }: {
           height: '20%',
         }}
       >
-        {message && optionComponents.length > 0 &&
-      <div>
-        <h4>{message}</h4>
-      </div>
-        }
+        {message && optionComponents.length > 0 && (
+          <div>
+            <h4>{message}</h4>
+          </div>
+        )}
         <div
           style={{
             overflow: 'scroll',

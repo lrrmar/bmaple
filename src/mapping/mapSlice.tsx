@@ -246,9 +246,9 @@ export const selectOutlineContours = (state: RootState) =>
 export const selectVerticalLevel = (state: RootState) =>
   state.map.verticalLevel;
 export const selectVerticalLevels = (state: RootState) => {
-  const levels: number[] = [];
+  const levels: string[] = [];
   for (let i = 0; i < 40; i++) {
-    levels.push(i * 1000);
+    levels.push((i * 1000).toString());
   }
   return levels;
 };

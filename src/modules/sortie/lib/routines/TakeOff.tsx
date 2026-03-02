@@ -1,6 +1,7 @@
 import { ProfileAscent } from './Profiles';
 import Routine from './Routine';
 import State from '../state/State';
+import type { RoutineConstructor } from './types';
 import WaypointRegistry from '../state/WaypointRegistry';
 export const cranfieldTakeOffEntryState = new State({
   waypoint: WaypointRegistry.getWaypoint('ECTG'),
@@ -26,8 +27,9 @@ export class CranfieldTakeOff extends TakeOff {
     PT5: ['the West via the Daventry Corridor', 35],
   };
 
-  constructor(exit: State) {
-    super({ entry: cranfieldTakeOffEntryState, exit: exit });
+  constructor(args: RoutineConstructor) {
+    // botch
+    super({ entry: cranfieldTakeOffEntryState, exit: args.entry }); // botch
   }
 
   swappableRoutines(): Routine[] {
@@ -35,12 +37,12 @@ export class CranfieldTakeOff extends TakeOff {
   }
 
   static all: Routine[] = Object.keys(this.takeOffendpoints).map((key) => {
-    const takeoff = new CranfieldTakeOff(
-      new State({
+    const takeoff = new CranfieldTakeOff({
+      entry: new State({
         waypoint: WaypointRegistry.getWaypoint(key),
         altitude: 10000,
       }),
-    );
+    });
     takeoff.init();
     takeoff.setDisplay(
       `Takeoff and transit to ${takeOffendpoints[key][0]} (${takeoff.getExitState().getWaypoint().name})`,
