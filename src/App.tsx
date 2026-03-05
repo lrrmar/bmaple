@@ -14,45 +14,24 @@ import BaseMaps from './mapping/BaseMaps';
 import LightBaseMap from './mapping/LightBaseMap';
 import OSMBaseMap from './mapping/OSMBaseMap';
 import Themes from './mapping/Themes';
-import waypointReducer from './modules/waypoints/waypointSlice';
-import WaypointsSource from './modules/waypoints/WaypointSource';
-import WaypointsMenu from './modules/waypoints/WaypointsMenu';
-import trajectoriesReducer from './modules/trajectories/trajectoriesSlice';
-import TrajectoriesSource from './modules/trajectories/TrajectoriesSource';
-import TrajectoriesMenu from './modules/trajectories/TrajectoriesMenu';
-import TimeVerticalSensitiveWaypointsProfile from './modules/waypoints/TimeVerticalSensitiveWaypointProfile';
-import TimeVerticalSensitiveTrajectoryProfile from './modules/trajectories/TimeVerticalSensitiveTrajectoryProfile';
-import fwsTileReducer from './modules/fws-tiles/fwsTileSlice';
-import FwsTileSource from './modules/fws-tiles/FwsTileSource';
-import FwsTileProfile from './modules/fws-tiles/FwsTileProfile';
+import simpleTileReducer from './modules/simple-tiles/simpleTileSlice';
+import SimpleTileSource from './modules/simple-tiles/SimpleTileSource';
+import SimpleTileProfile from './modules/simple-tiles/SimpleTileProfile';
 
-import regionsReducer from './modules/regions/regionsSlice';
-import RegionsSource from './modules/regions/RegionsSource';
-import RegionsProfile from './modules/regions/RegionsProfile';
-
-import faamPhysicsReducer from './modules/faam-physics/faamPhysicsSlice';
-import FaamPhysicsSource from './modules/faam-physics/FaamPhysicsSource';
-import FaamPhysicsProfile from './modules/faam-physics/FaamPhysicsProfile';
-
-import Info from './modules/info/Info';
 import FloatingBox from './features/FloatingBox';
 import ErrorMessage from './features/ErrorMessage';
+import MapInfo from './features/MapInfo';
 import { FoldOutMenu, FoldOutItem } from './features/FoldOutMenu/FoldOutMenu';
 import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
-import DiscreteMetaDataMenu from './features/DiscreteMetaDataMenu';
-import RegionsMenu from './modules/regions/RegionsMenu';
+import SimpleTileMenu from './features/SimpleTileMenu';
 import './App.css';
 
 export const store = configureStore({
   reducer: {
     map: mapReducer,
     cache: cacheReducer,
-    waypoint: waypointReducer,
-    trajectories: trajectoriesReducer,
-    fwsTile: fwsTileReducer,
-    regions: regionsReducer,
-    faamPhysics: faamPhysicsReducer,
+    simpleTile: simpleTileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -70,56 +49,25 @@ const App = () => {
     <div className="App">
       <Map>
         <Profiles>
-          <TimeVerticalSensitiveWaypointsProfile />
-          <TimeVerticalSensitiveTrajectoryProfile />
-          <FwsTileProfile />
-          <RegionsProfile />
-          <FaamPhysicsProfile />
+          <SimpleTileProfile />
         </Profiles>
         <Sources>
-          <WaypointsSource cache={{}} sourceIdentifier={'waypoints'} />
-          <TrajectoriesSource cache={{}} sourceIdentifier={'trajectories'} />
-          <FwsTileSource sourceIdentifier={'tiles'} />
-          <RegionsSource sourceIdentifier={'regions'} />
-          <FaamPhysicsSource sourceIdentifier={'faam-physics'} />
+          <SimpleTileSource sourceIdentifier={'tiles'} />
         </Sources>
         <BaseMaps>
           <LightBaseMap id={'light'} />
           <OSMBaseMap id={'Open Street Map'} />
         </BaseMaps>
       </Map>
-      <FloatingBox style={{ bottom: '20px', borderWidth: '0px' }}>
-        <TimeScrollBar />
-      </FloatingBox>
-      <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
-        <MultiUnitScrollBar
-          selectValue={selectVerticalLevel}
-          selectValues={selectVerticalLevels}
-          updateValue={updateVerticalLevel}
-          orientation={'vertical'}
-        />
-      </FloatingBox>
-      <FloatingBox style={{ top: '20px', left: '50%' }}>
-        <ErrorMessage />
-      </FloatingBox>
-      <FoldOutMenu align={'left'} theme={'glassTablet'}>
-        <FoldOutItem id={'Info'} icon={'info'}>
-          <Info />
-        </FoldOutItem>
-        <FoldOutItem id={'Waypoints'} icon={'map marker alternate'}>
-          <WaypointsMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'Trajectories'} icon={'map signs'}>
-          <TrajectoriesMenu />
-        </FoldOutItem>
-        <FoldOutItem id={'Live Data'} icon={'image'}>
-          <DiscreteMetaDataMenu id={0} apiUrl={'http://localhost:8989'} />
-        </FoldOutItem>
-        <FoldOutItem id={'Layers'} icon={'object group'}>
-          <RegionsMenu />
+      <FoldOutMenu theme={'light'} align={'left'}>
+        <FoldOutItem id={'Tiles'} icon={'image'}>
+          <SimpleTileMenu />
         </FoldOutItem>
       </FoldOutMenu>
       <Themes></Themes>
+      <FloatingBox>
+        <MapInfo />
+      </FloatingBox>
     </div>
   );
 };

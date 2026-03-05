@@ -12,7 +12,7 @@ import {
 } from '../../hooks';
 
 import { ingest, Ingest, selectCache } from '../../mapping/cacheSlice';
-import { selectApiUrl, selectOpacity } from './fwsTileSlice';
+import { selectApiUrl, selectOpacity } from './simpleTileSlice';
 
 import proj4 from 'proj4';
 import { register } from 'ol/proj/proj4';
@@ -29,7 +29,7 @@ interface Props {
   id: string;
   sourceIdentifier: string;
 }
-const FwsTileLayer = ({ id, sourceIdentifier }: Props) => {
+const SimpleTileLayer = ({ id, sourceIdentifier }: Props) => {
   const dispatch = useDispatch();
   const apiUrl = useSelector(selectApiUrl);
   const [tileUrl, setTileUrl] = useState<string | null>(null);
@@ -82,4 +82,4 @@ const FwsTileLayer = ({ id, sourceIdentifier }: Props) => {
   return null;
 };
 
-export default FwsTileLayer;
+export default SimpleTileLayer;

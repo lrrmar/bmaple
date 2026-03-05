@@ -146,6 +146,9 @@ export const mapSlice = createSlice({
     updateErrorMessage: (state, errorMessage: PayloadAction<string | null>) => {
       state.errorMessage = errorMessage.payload;
     },
+    updateZoom: (state, zoom: PayloadAction<number>) => {
+      state.zoom = zoom.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(updateExtent.fulfilled, (state, action) => {
@@ -199,6 +202,7 @@ export const {
   updateVerticalLevels,
   updateVerticalLevelUnits,
   updateErrorMessage,
+  updateZoom,
 } = mapSlice.actions;
 
 export const selectIsoDisplayTime = (state: RootState) => {
@@ -237,7 +241,7 @@ export const selectVerticalLevels = (state: RootState) => {
   return verticalLevelOrder.filter((level) =>
     state.map.verticalLevels.includes(level),
   );
-];
+};
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
 export const selectDisplayTimesIntersection = (state: RootState) => {

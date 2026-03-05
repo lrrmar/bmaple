@@ -10,6 +10,7 @@ import { getUid } from 'ol/util';
 import {
   selectCenter,
   selectZoom,
+  updateZoom,
   updateClickEvent,
   updateFeaturesAtClick,
   FeatureAtClick,
@@ -59,10 +60,21 @@ const Map = ({ children }: Props) => {
     mapToMount.setTarget(mapRef.current);
     mapToMount.updateSize();
     setMap(mapToMount);
+
     return () => {
       map === null ? null : map.setTarget(undefined);
     };
   }, [map, mapRef]);
+
+  useEffect(() => {
+    /* LISTENERS */
+
+    if (map)
+      map.on('moveend', (e) => {
+        const zoom = map.getView().getZoom();
+        if (zoom && zoom !== mapZoom) dispatch(updateZoom(zoom));
+      });
+  }, [map]);
 
   // zoom change handler
   useEffect(() => {
@@ -91,6 +103,7 @@ const Map = ({ children }: Props) => {
 
   const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
     if (mouseIsDragging) {
+      void 0;
     } else {
       handleClick(event);
     }
@@ -106,21 +119,18 @@ const Map = ({ children }: Props) => {
     const clickEvent: ClickEvent = {
       longitude: lonLat[0],
       latitude: lonLat[1],
+      features: [],
     };
     const featuresAtPixel: (Feature<Geometry> | FeatureLike)[] =
       map.getFeaturesAtPixel([e.clientX, e.clientY]);
     if (!featuresAtPixel) return;
-    const featuresAtClick: (string | undefined)[] = featuresAtPixel.map(
-      (feature: Feature<Geometry> | FeatureLike) => {
-        if (!feature) return;
-        const ol_uid = getUid(feature);
-        return ol_uid;
-      },
-    );
-    const filteredFeaturesAtClick: string[] = featuresAtClick.filter(
-      (f) => f !== undefined,
-    ); // cut undefined
-    clickEvent['features'] = filteredFeaturesAtClick;
+    const featuresAtClick: string[] = [];
+    featuresAtPixel.forEach((feature: Feature<Geometry> | FeatureLike) => {
+      if (!feature) return;
+      const ol_uid = getUid(feature);
+      if (ol_uid) featuresAtClick.push(ol_uid);
+    });
+    clickEvent['features'] = featuresAtClick;
     dispatch(updateClickEvent(clickEvent));
   }
 

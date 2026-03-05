@@ -17,12 +17,12 @@ class OpenLayersMap {
       const options = {
         view: new ol.View({
           center: fromLonLat([-3.0, 54.0]),
-          extent: [...fromLonLat([-11.0, 50.0]), ...fromLonLat([4.0, 60.0])],
+          //extent: [...fromLonLat([-11.0, 50.0]), ...fromLonLat([4.0, 60.0])],
           smoothExtentConstraint: false,
           zoom: 5,
           projection: 'EPSG:3857',
-          minZoom: 7,
-          maxZoom: 10,
+          //minZoom: 7,
+          //maxZoom: 10,
         }),
         zIndex: 0,
         controls: [],

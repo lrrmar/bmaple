@@ -1,23 +1,17 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
 
-export type DiscreteHeader = 'domain' | 'field' | 'start_time';
+export type DiscreteHeader = 'file';
 export interface BackendDiscreteMetaData {
-  headers: DiscreteHeader[];
-  values: { [key in DiscreteHeader]: string[] };
-  tables: { [key in DiscreteHeader]: { [key: string]: (0 | 1)[][] } };
+  file: string[];
 }
 export interface DiscreteMetaData {
   [key: string]: string | null;
-  domain: string | null;
-  field: string | null;
-  start_time: string | null;
+  file: string | null;
 }
 
 export interface ContinuousMetaData {
   [key: string]: string | null;
-  valid_time: string | null;
-  level: string | null;
 }
 
 interface InitialState {
@@ -25,6 +19,8 @@ interface InitialState {
   profileIds: { [key: string]: string | null };
   hashesFlag: number;
   opacity: number;
+  strokeColour: string;
+  strokeWidth: number;
   apiUrl: string;
   startTime: string;
   level: number | null;
@@ -44,7 +40,7 @@ let GEOJSON_API_URL: string | undefined | null = null;
 GEOJSON_API_URL = process.env.GEOJSON_API_URL;
 const apiUrl = GEOJSON_API_URL
   ? GEOJSON_API_URL
-  : 'https://force.ncas.ac.uk/tile-server';
+  : 'https://staging.force.ncas.ac.uk/tile-server';
 /*const apiUrl = GEOJSON_API_URL ? GEOJSON_API_URL : 'https://localhost:8989';*/
 
 const initialState: InitialState = {
@@ -52,6 +48,8 @@ const initialState: InitialState = {
   profileIds: {},
   hashesFlag: 0,
   opacity: 1,
+  strokeColour: '#000000',
+  strokeWidth: 0.5,
   apiUrl: apiUrl,
   startTime: '',
   level: null,
@@ -65,8 +63,8 @@ const initialState: InitialState = {
   selectedResources: {},
 };
 
-export const fwsTileSlice = createSlice({
-  name: 'fwsTile',
+export const simpleTileSlice = createSlice({
+  name: 'simpleTile',
   initialState,
   reducers: {
     updateSelectedId: (state, id: PayloadAction<string | null>) => {
@@ -87,6 +85,12 @@ export const fwsTileSlice = createSlice({
     },
     updateOpacity: (state, opacity: PayloadAction<number>) => {
       state.opacity = opacity.payload;
+    },
+    updateStrokeColour: (state, colour: PayloadAction<string>) => {
+      state.strokeColour = colour.payload;
+    },
+    updateStrokeWidth: (state, width: PayloadAction<number>) => {
+      state.strokeWidth = width.payload;
     },
     updateStartTime: (state, startTime: PayloadAction<string>) => {
       state.startTime = startTime.payload;
@@ -140,6 +144,8 @@ export const {
   updateSelectedResources,
   updateProfileIds,
   updateOpacity,
+  updateStrokeColour,
+  updateStrokeWidth,
   //updateField,
   updateStartTime,
   //updateRegion,
@@ -150,29 +156,35 @@ export const {
   updateReadableNames,
   updateDiscreteMetaDataSelections,
   updateContinuousMetaDataLocks,
-} = fwsTileSlice.actions;
+} = simpleTileSlice.actions;
 
-export const selectSelectedId = (state: RootState) => state.fwsTile.selectedId;
+export const selectSelectedId = (state: RootState) =>
+  state.simpleTile.selectedId;
 export const selectSelectedResources = (state: RootState) =>
-  state.fwsTile.selectedResources;
-export const selectProfileIds = (state: RootState) => state.fwsTile.profileIds;
-export const selectOpacity = (state: RootState) => state.fwsTile.opacity;
-export const selectApiUrl = (state: RootState) => state.fwsTile.apiUrl;
-export const selectStartTime = (state: RootState) => state.fwsTile.startTime;
-export const selectVerticalLevel = (state: RootState) => state.fwsTile.level;
+  state.simpleTile.selectedResources;
+export const selectProfileIds = (state: RootState) =>
+  state.simpleTile.profileIds;
+export const selectOpacity = (state: RootState) => state.simpleTile.opacity;
+export const selectStrokeColour = (state: RootState) =>
+  state.simpleTile.strokeColour;
+export const selectStrokeWidth = (state: RootState) =>
+  state.simpleTile.strokeWidth;
+export const selectApiUrl = (state: RootState) => state.simpleTile.apiUrl;
+export const selectStartTime = (state: RootState) => state.simpleTile.startTime;
+export const selectVerticalLevel = (state: RootState) => state.simpleTile.level;
 export const selectVerticalLevels = (state: RootState) => [
   0, 1000, 2000, 3000, 4000, 5000, 8000, 12000, 20000, 30000,
-]; // state.fwsTile.levels;
+]; // state.simpleTile.levels;
 export const selectVerticalLevelUnits = (state: RootState) =>
-  state.fwsTile.levelUnits;
+  state.simpleTile.levelUnits;
 export const selectBackendDiscreteMetaData = (state: RootState) =>
-  state.fwsTile.backendDiscreteMetaData;
+  state.simpleTile.backendDiscreteMetaData;
 export const selectReadableNames = (state: RootState) =>
-  state.fwsTile.readableNames;
+  state.simpleTile.readableNames;
 export const selectDiscreteMetaDataSelections = (state: RootState) =>
-  state.fwsTile.discreteMetaDataSelections;
+  state.simpleTile.discreteMetaDataSelections;
 export const selectContinuousMetaDataLocks = (state: RootState) =>
-  state.fwsTile.continuousMetaDataLocks;
+  state.simpleTile.continuousMetaDataLocks;
 export const selectSetMapExtent = (state: RootState) =>
-  state.fwsTile.setMapExtent;
-export default fwsTileSlice.reducer;
+  state.simpleTile.setMapExtent;
+export default simpleTileSlice.reducer;
