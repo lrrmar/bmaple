@@ -22,7 +22,7 @@ import PopUpListener from './modules/cumulus/PopUpListener';
 
 import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
 import Slider from './modules/cumulus/Slider';
-import SliderStartDate from './modules/cumulus/SliderStartDate';
+import DropdownStartDate from './modules/cumulus/DropdownStartDate';
 import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
 
 export const store = configureStore({
@@ -64,7 +64,7 @@ const App = () => {
         <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
 
         <DateNavigationMenu>
-          <SliderStartDate></SliderStartDate>
+          <DropdownStartDate></DropdownStartDate>
           <Slider></Slider>
         </DateNavigationMenu>
       </Map>

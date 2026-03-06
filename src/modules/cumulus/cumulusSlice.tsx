@@ -18,7 +18,8 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'dev.fastaweather.com',
+  baseUrl: 'cumulusstorageaccount1.blob.core.windows.net/data/2025_Ghana_onset',
+  //baseUrl: 'dev.fastaweather.com',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedOnsetVariable: 'doy',
   selectedDayOfYear: '2025/02/01',

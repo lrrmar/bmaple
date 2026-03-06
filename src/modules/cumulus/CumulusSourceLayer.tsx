@@ -24,9 +24,45 @@ const CumulusSourceLayer = ({ id, sourceIdentifier }: Props) => {
   //const fastaToken = useSelector(selectToken);
   const layerCache = useSelector(selectCache);
 
+  // Map from: https://dev.fastaweather.com/api/v1/onset/doy/2025/02/04/44/
+  // To: https://cumulusstorageaccount1.blob.core.windows.net/data/2025_Ghana_onset/20250501/forecast_status_20250501_onset_day_of_year_entry039.geojson
+
+  // doy/2025/02/04/44/
+  // 20250501/forecast_status_20250501_onset_day_of_year_entry039.geojson
+
+  console.log('CumulusSourceLayer id: ' + id);
+
   const urlParams = id.split('?');
-  const [url, setUrl] = useState(
-    `https://${cumulusBaseUrl}/api/v1/onset/${urlParams[0]}/${urlParams[1]}/${urlParams[2]}/`,
+
+  console.log('CumulusSourceLayer urlParams: ' + urlParams);
+
+  // Map API-style parameters to an Azure blob subpath and full blob URL.
+  // Example input `urlParams` array: ["doy", "2025/02/01", "25"]
+  // Produces subpath: "20250201/forecast_status_20250201_onset_day_of_year_entry_025.geojson"
+  // If the 3rd element is exactly "0" then the filename uses "onset_status" instead of "forecast_status".
+  const mapParamsToBlobUrl = (
+    params: string[],
+    storageHost: string,
+    // optional prefix path inside the container (e.g. "data/2025_Ghana_onset")
+    containerPrefix = '',
+  ) => {
+    const [type, datePart, entryPart] = params;
+    // Normalize date like "2025/02/01" -> "20250201"
+    const ymd = (datePart || '').replace(/\//g, '');
+    const entry = (entryPart || '0').toString().padStart(3, '0');
+    const prefix = entryPart === '0' ? 'onset_status' : 'forecast_status';
+    const infix = type === 'days' ? 'rain_days_ago' : 'onset_day_of_year';
+    const filename = `${prefix}_${ymd}_${infix}_entry${entry}.geojson`;
+    const subpath = `${ymd}/${filename}`;
+    // Build full URL. `storageHost` may already include container/prefix.
+    const host = storageHost.replace(/\/+$/g, '');
+    const cp = containerPrefix.replace(/^\/+|\/+$/g, '');
+    const path = cp ? `${cp}/${subpath}` : subpath;
+    return `https://${host}/${path}`;
+  };
+
+  const [url, setUrl] = useState(() =>
+    mapParamsToBlobUrl(urlParams, cumulusBaseUrl),
   );
 
   const hasFetched = useRef(false);
