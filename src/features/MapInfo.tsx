@@ -8,6 +8,6 @@ import { selectZoom } from '../mapping/mapSlice';
 
 const MapInfo = () => {
   const zoom = useSelector(selectZoom);
-  return <div>{`Zoom level: ${zoom}`}</div>;
+  return <div>{`Zoom level: ${zoom - 1}`}</div>;
 };
 export default MapInfo;

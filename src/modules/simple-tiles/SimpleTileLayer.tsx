@@ -48,8 +48,8 @@ const SimpleTileLayer = ({ id, sourceIdentifier }: Props) => {
       source: new VectorTileSource({
         format: new MVT(),
         url: `${apiUrl}/${id}/{z}/{x}/{y}.pbf`,
-        minZoom: 0,
-        maxZoom: 4,
+		minZoom: 5,
+		maxZoom: 8,
       }),
       visible: true,
       /*style: function (feature, resolution) {
