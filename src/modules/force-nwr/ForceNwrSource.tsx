@@ -40,12 +40,14 @@ interface ContinuousMetaData {
 }
 
 interface Hash {
-  [key: string]: string;
+  [key: string]: string | null;
   id: string;
   domain: string;
   field: string;
   valid_time: string;
   start_time: string;
+  plot: string;
+  location: string | null;
   level: string;
 }
 interface Query {
@@ -54,6 +56,8 @@ interface Query {
   valid_time: string | null;
   start_time: string | null;
   level: string | null;
+  plot: string | null;
+  location?: string | null | undefined;
 }
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const dispatch = useDispatch();
@@ -102,16 +106,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     hostId: string,
     selection: DiscreteMetaData,
   ) => {
+    const body: DiscreteMetaData = {
+      field: selection.field,
+      domain: selection.domain,
+      start_time: selection.start_time,
+      plot: selection.plot,
+    }
+    if (selection.location) {
+     body['location'] = selection.location
+    } 
     const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify({
-        field: selection.field,
-        domain: selection.domain,
-        start_time: selection.start_time,
-      }),
+      body: JSON.stringify(body),
     });
     const json = await response.json();
     const updatedHashes = { ...currentHashes };

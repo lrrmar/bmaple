@@ -120,6 +120,8 @@ const ImageViewerWithMenu = ({
     domain: null,
     field: null,
     start_time: null,
+    plot: null,
+    location: null,
   });
   const verticalLevelsRef = useRef<string[]>([]);
   const [validTimeLocked, setValidTimeLocked] = useState<Locked>({
@@ -137,6 +139,8 @@ const ImageViewerWithMenu = ({
     domain: [],
     field: [],
     start_time: [],
+    plot: [],
+    location: [],
   });
 
   const fetchDiscreteAggregates = async (selection: DiscreteMetaData) => {
