@@ -6,7 +6,7 @@ export type BackendDiscreteMetaData = {
   [key in DiscreteHeader]: string[];
 };
 export interface DiscreteMetaData {
-  [key: string]: string | null | undefined;
+  [key: DiscreteHeader]: string | null | undefined;
   domain: string | null;
   field: string | null;
   start_time: string | null;

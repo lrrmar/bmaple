@@ -153,11 +153,11 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
 
   useEffect(() => {
     Object.keys(discreteMetaDataSelections).forEach((id) => {
-      const selection = discreteMetaDataSelections[id];
+      let selection = discreteMetaDataSelections[id];
       const prevSelection = previousSelections.current[id];
       if (
         selection && // selection is not null
-        Object.values(selection).every((val) => !!val) && // each option is not null
+        Object.values(selection).every((val) => val !== null || val !== undefined ) && // each option is not null
         (!prevSelection || // previous selection for this id has not been made
           (prevSelection &&
             Object.keys(selection).some(
