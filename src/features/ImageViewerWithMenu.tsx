@@ -30,6 +30,7 @@ import {
   updateDiscreteMetaDataSelections,
   updateSelectedResources,
   selectProfileIds,
+  selectApiUrl,
 } from '../modules/force-nwr/forceNwrSlice';
 
 type ContinuousHeader = 'valid_time' | 'level';

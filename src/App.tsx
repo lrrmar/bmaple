@@ -83,7 +83,7 @@ const App = () => {
           alignItems: 'centre',
         }}
       >
-        <Tiles apiUrl={'https://force.ncas.ac.uk/hash-table'} />
+        <Tiles apiUrl={'http://localhost:8989'} />
       </div>
       <FloatingBox
         style={{
