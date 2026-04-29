@@ -24,6 +24,7 @@ import {
   selectProfileIds,
   selectSelectedResources,
   BackendDiscreteMetaData,
+  DiscreteHeader,
   updateBackendDiscreteMetaData,
   updateReadableNames,
   DiscreteMetaData,
@@ -57,7 +58,7 @@ interface Query {
   start_time: string | null;
   level: string | null;
   plot: string | null;
-  location?: string | null | undefined;
+  location: string | null;
 }
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const dispatch = useDispatch();
@@ -71,7 +72,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     selectDiscreteMetaDataSelections,
   );
   const continuousMetaDataLocks = useSelector(selectContinuousMetaDataLocks);
-  const previousSelections = useRef<{ [key: string]: DiscreteMetaData | null }>(
+  const previousSelections = useRef<{ [key: string]: Partial<DiscreteMetaData> | null }>(
     {},
   );
   const displayTime = useSelector(selectIsoDisplayTime);
@@ -102,27 +103,33 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     dispatch(updateBackendDiscreteMetaData(json));
   };
 
+  const fetchPreloadIds = async (preloadId: string, resourceId: string) => {
+    const response = await fetch(`${apiUrl}/preloadIds/?id=${resourceId}&buffer=3`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+    const json = await response.json();
+    const preload = {...preloadIds};
+    preload[preloadId] = json;
+    setPreloadIds(preload);
+  };
+
+
   const fetchContinuousHashes = async (
     hostId: string,
-    selection: DiscreteMetaData,
+    selection: Partial<DiscreteMetaData>,
   ) => {
-    const body: DiscreteMetaData = {
-      field: selection.field,
-      domain: selection.domain,
-      start_time: selection.start_time,
-      plot: selection.plot,
-    }
-    if (selection.location) {
-     body['location'] = selection.location
-    } 
     const response = await fetch(`${apiUrl}/continuousQueryHashes/`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify(selection),
     });
     const json = await response.json();
+    console.log(hostId, json);
     const updatedHashes = { ...currentHashes };
     updatedHashes[hostId] = json;
     setCurrentHashes(updatedHashes);
@@ -153,19 +160,24 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
 
   useEffect(() => {
     Object.keys(discreteMetaDataSelections).forEach((id) => {
-      let selection = discreteMetaDataSelections[id];
-      const prevSelection = previousSelections.current[id];
-      if (
-        selection && // selection is not null
-        Object.values(selection).every((val) => val !== null || val !== undefined ) && // each option is not null
-        (!prevSelection || // previous selection for this id has not been made
-          (prevSelection &&
-            Object.keys(selection).some(
-              // prev seletion has been made
-              (key: string) => selection[key] !== prevSelection[key], // prev and current selection mismatch
-            )))
-      ) {
-        fetchContinuousHashes(id.toString(), selection);
+      const discreteMetaDataSelection = discreteMetaDataSelections[id];
+      if (discreteMetaDataSelection) {
+        const selection: Partial<DiscreteMetaData> =  {};
+        for (const key of Object.keys(discreteMetaDataSelection) as DiscreteHeader[]) {
+          const val = discreteMetaDataSelection[key];
+          if (val) selection[key] = val;
+        }
+        const prevSelection = previousSelections.current[id];
+        if (
+          !prevSelection || // previous selection for this id has not been made
+            (prevSelection &&
+              Object.keys(selection).some(
+                // prev seletion has been made
+                (key: string) => selection[key] !== prevSelection[key], // prev and current selection mismatch
+              ))
+        ) {
+          fetchContinuousHashes(id.toString(), selection);
+        }
       }
     });
   }, [discreteMetaDataSelections]);
@@ -173,6 +185,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     // Populate sliders with continuous variable values
     if (currentHashes) {
+      console.log(currentHashes);
       Object.keys(currentHashes).forEach((key) => {
         const hashes = currentHashes[key];
         if (hashes) {
@@ -236,46 +249,54 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     // request image url
 
     Object.keys(discreteMetaDataSelections).forEach((id) => {
-      const selection = discreteMetaDataSelections[id];
-      const locks = continuousMetaDataLocks[id];
-      let valid_time: string | null = displayTime;
-      let level: string | null = verticalLevel;
-      if (locks) {
-        valid_time = locks.valid_time ? locks.valid_time : valid_time;
-        level = locks.level ? locks.level : level;
-      }
-      let newId: string | null = null;
-      if (selection) {
-        const query: Query = {
-          ...selection,
-          valid_time: valid_time,
-          level: level,
-        };
-        if (Object.values(query).every((val) => !!val)) {
-          const theseHashes = currentHashes[id];
-          if (theseHashes) {
-            // Get single profile id
-            const profileHash = theseHashes.find((dict: Hash) =>
-              Object.entries(query).every(([key, value]) => {
-                const match = dict[key];
-                if (match) return match == value;
-              }),
-            );
-            if (profileHash) {
-              // If a profileHash does exists for our selection we need to update
-              // the profileId if it is not equal to that currently set;
-              // however if it is the same (which happens quite frequently due to
-              // the many bits of state this useEffect subscribes to) then just do
-              // nothing and keep it the same as it was previously.
-                newId = profileHash.id;
+      const discreteMetaDataSelection = discreteMetaDataSelections[id];
+      if (discreteMetaDataSelection) {
+        const selection: Partial<DiscreteMetaData> =  {};
+        for (const key of Object.keys(discreteMetaDataSelection) as DiscreteHeader[]) {
+          const val = discreteMetaDataSelection[key];
+          if (val) selection[key] = val;
+        }
+  
+        const locks = continuousMetaDataLocks[id];
+        let valid_time: string | null = displayTime;
+        let level: string | null = verticalLevel;
+        if (locks) {
+          valid_time = locks.valid_time ? locks.valid_time : valid_time;
+          level = locks.level ? locks.level : level;
+        }
+        let newId: string | null = null;
+        if (selection) {
+          const query = {...selection}
+          if (valid_time) query['valid_time'] = valid_time;
+          if (level) query['level'] = level;
+          if (Object.values(query).every((val) => !!val)) {
+            const theseHashes = currentHashes[id];
+            console.log('query not null');
+            if (theseHashes) {
+              console.log('these hashes exist');
+              // Get single profile id
+              const profileHash = theseHashes.find((dict: Hash) =>
+                Object.entries(query).every(([key, value]) => {
+                  const match = dict[key];
+                  if (match) return match == value;
+                }),
+              );
+              if (profileHash) {
+                // If a profileHash does exists for our selection we need to update
+                // the profileId if it is not equal to that currently set;
+                // however if it is the same (which happens quite frequently due to
+                // the many bits of state this useEffect subscribes to) then just do
+                // nothing and keep it the same as it was previously.
+                  newId = profileHash.id;
+              }
             }
           }
         }
+        // If profileHash does not exist then we express that there is no
+        // valid profileId available for this host
+  
+        dispatch(updateProfileIds({ host: id, resource: newId }));
       }
-      // If profileHash does not exist then we express that there is no
-      // valid profileId available for this host
-
-      dispatch(updateProfileIds({ host: id, resource: newId }));
     });
   }, [
     discreteMetaDataSelections,
@@ -286,7 +307,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     cache,
   ]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     // Preload all along vertical axis
 
     const updatedLevelHashes: { [key: string]: string[] } = {};
@@ -322,9 +343,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       }
     });
     setPreloadIds(updatedLevelHashes);
-  }, [verticalLevel, currentHashes]);
+  }, [verticalLevel, currentHashes]);*/
 
-  useEffect(() => {
+  /*useEffect(() => {
     // Preload all along time axis
 
     const updatedTimeHashes: { [key: string]: string[] } = {};
@@ -359,7 +380,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
            */
 
           // Filter hashes that have a time outside of display times
-          thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
+  /*thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
             displayTimesIntersection.includes(
               new Date(hash.valid_time).getTime(),
             ),
@@ -398,7 +419,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       }
     });
     setPreloadIds(updatedTimeHashes);
-  }, [displayTime, currentHashes]);
+  }, [displayTime, currentHashes]);*/
 
   useEffect(() => {
     const resourceIds: string[] = Object.values(profileIds).filter(
@@ -424,6 +445,16 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
 
     setLoadedResources(updatedLoadedResources);
   }, [profileIds, preloadIds]);
+
+  useEffect(() => {
+    if (profileIds) {
+      Object.entries(profileIds).forEach((profile) => {
+        const key = profile[0];
+        const val = profile[1];
+        if (key && val) fetchPreloadIds(key, val);
+      } )
+    }
+  }, [profileIds])
 
   useEffect(() => {
     const components = loadedResources.map((id) => (

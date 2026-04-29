@@ -5,14 +5,16 @@ export type DiscreteHeader = 'domain' | 'field' | 'start_time' | 'plot' | 'locat
 export type BackendDiscreteMetaData = {
   [key in DiscreteHeader]: string[];
 };
-export interface DiscreteMetaData {
-  [key: DiscreteHeader]: string | null | undefined;
-  domain: string | null;
-  field: string | null;
-  start_time: string | null;
-  plot: string | null;
+/*export interface DiscreteMetaData {
+  [key: string]: string | null | undefined;
+  domain?: string | null | undefined;
+  field?: string | null | undefined;
+  start_time?: string | null | undefined;
+  plot?: string | null | undefined;
   location?: string | null | undefined;
-}
+}*/
+
+export type DiscreteMetaData = Record<DiscreteHeader, string | null>;
 
 export interface ContinuousMetaData {
   [key: string]: string | null;

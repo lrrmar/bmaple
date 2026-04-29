@@ -233,17 +233,26 @@ export const selectVerticalLevels = (state: RootState) => {
 export const selectVerticalLevelUnits = (state: RootState) =>
   state.map.verticalLevelUnits;
 export const selectDisplayTimesIntersection = (state: RootState) => {
-  let times = Object.values(state.map.displayTimes)[0];
+  const displayTimesArrays = Object.values(state.map.displayTimes).filter(
+    (arr) => arr.length > 1,
+  );
+  if (displayTimesArrays.length < 1) return [];
+  // The line below gives us or first list of display times to create our total
+  // intersection of all times from AND gets them in the right order
+  if (displayTimesArrays.length == 1) return displayTimesArrays[0]; // No need for intersection
+  let times = Object.values(displayTimesArrays)[0];
   if (times) {
-    for (let i = 1; i < Object.keys(state.map.displayTimes).length; i++) {
-      const nextTimes = Object.values(state.map.displayTimes)[i];
+    for (let i = 1; i < displayTimesArrays.length; i++) {
+      const nextTimes = Object.values(displayTimesArrays)[i];
       if (nextTimes.length > 0) {
         times = times.filter((time) => nextTimes.includes(time));
       }
     }
+    return times;
   }
-  return times;
+  return [];
 };
+;
 export const selectVerticalLevelsIntersection = (state: RootState) => {
   const levelsArrays = Object.values(state.map.verticalLevels).filter(
     (arr) => arr.length > 1,

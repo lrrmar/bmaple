@@ -133,7 +133,7 @@ const ImageViewerWithMenu = ({
     strong: false,
   });
   const [menus, setMenus] = useState<React.ReactNode | null>(null);
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
+  const [menuOpen, setMenuOpen] = useState<boolean>(true);
   const [resourceLoaded, setResourceLoaded] = useState<boolean>(false);
   const [aggregates, setAggregates] = useState<BackendDiscreteMetaData>({
     domain: [],
@@ -143,7 +143,7 @@ const ImageViewerWithMenu = ({
     location: [],
   });
 
-  const fetchDiscreteAggregates = async (selection: DiscreteMetaData) => {
+  const fetchDiscreteAggregates = async (selection: Partial<DiscreteMetaData>) => {
     const body: Record<string, string> = {};
     Object.entries(selection).map(([key, val]) => {
       if (val) body[key] = val;
@@ -164,6 +164,7 @@ const ImageViewerWithMenu = ({
     // on initial render, see if a previous selection has been saved in
     // selectionRef
     setSelection(selectionRef.current);
+    fetchDiscreteAggregates({});
   }, []);
 
   useEffect(() => {
@@ -216,7 +217,7 @@ const ImageViewerWithMenu = ({
           }
         }
         const select = (
-          <div key={header}>
+          aggregates[header].length > 0 ? <div key={header}>
             <InputLabel style={{ color: '#0f0f0f' }} id={`${header} label`}>
               {readableNames && readableNames[header]
                 ? readableNames[header]
@@ -243,7 +244,7 @@ const ImageViewerWithMenu = ({
             >
               {menuItems}
             </Select>
-          </div>
+          </div> : <></>
         );
         selects.push(
           <div key={header}>
