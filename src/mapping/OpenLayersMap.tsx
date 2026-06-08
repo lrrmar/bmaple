@@ -16,7 +16,7 @@ class OpenLayersMap {
     if (!OpenLayersMap.#map) {
       const options = {
         view: new ol.View({
-          center: fromLonLat([-3.0, 54.0]),
+          center: fromLonLat([24.216666, 68.024190]),
           //extent: [...fromLonLat([-11.0, 50.0]), ...fromLonLat([4.0, 60.0])],
           smoothExtentConstraint: false,
           zoom: 5,

@@ -25,9 +25,9 @@ import regionsReducer from './modules/regions/regionsSlice';
 import RegionsSource from './modules/regions/RegionsSource';
 import RegionsProfile from './modules/regions/RegionsProfile';
 
-import notamReducer from './modules/notam/notamSlice';
-import NotamSource from './modules/notam/NotamSource';
-import NotamProfile from './modules/notam/NotamProfile';
+//import notamReducer from './modules/notam/notamSlice';
+//import NotamSource from './modules/notam/NotamSource';
+//import NotamProfile from './modules/notam/NotamProfile';
 
 import WaypointSource from './modules/sortie/WaypointSource';
 import WaypointProfile from './modules/sortie/WaypointProfile';
@@ -43,7 +43,7 @@ export const store = configureStore({
     map: mapReducer,
     cache: cacheReducer,
     regions: regionsReducer,
-    notam: notamReducer,
+    //notam: notamReducer,
     sortie: sortieReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -87,13 +87,13 @@ const App = () => {
               <WaypointProfile sourceIdentifier={'waypoint'} />
               <TrackProfile sourceIdentifier={'track'} />
               <RegionsProfile />
-              <NotamProfile />
+              {/*<NotamProfile />*/}
             </Profiles>
             <Sources>
               <WaypointSource sourceIdentifier={'waypoint'} />
               <TrackSource sourceIdentifier={'track'} />
               <RegionsSource sourceIdentifier={'regions'} />
-              <NotamSource sourceIdentifier={'notam'} />
+              {/*<NotamSource sourceIdentifier={'notam'} />*/}
             </Sources>
             <BaseMaps>
               <LightBaseMap id={'light'} />

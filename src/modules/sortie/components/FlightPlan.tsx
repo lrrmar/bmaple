@@ -33,7 +33,7 @@ import {
 } from '../lib/routines/TakeOff';
 import { selectClickEvent, selectClickMode } from '../../../mapping/mapSlice';
 
-import printSortie from '../doc/PrintSortie';
+//import printSortie from '../doc/PrintSortie';
 
 import Maneuvre from './Maneuvre';
 const FlightPlan = ({
@@ -218,11 +218,11 @@ const FlightPlan = ({
   // Handle print request
   useEffect(() => {
     if (composite) {
-      printSortie(
+      /*printSortie(
         sortieInfo,
         composite.docxWaypoints(),
         composite.docxRoutines(),
-      );
+      );*/
     }
   }, [docxPrintFlag]);
 

@@ -8,10 +8,10 @@ import {
   selectVisible as selectRegionsVisible,
   toggleVisible as toggleRegionsVisible,
 } from '../../regions/regionsSlice';
-import {
+/*import {
   selectVisible as selectNotamVisible,
   toggleVisible as toggleNotamVisible,
-} from '../../notam/notamSlice';
+} from '../../notam/notamSlice';*/
 
 import { selectAppStyle } from '../sortieSlice';
 
@@ -19,7 +19,7 @@ import { flagDocxPrint } from '../sortieSlice';
 const Overlays = () => {
   const dispatch = useDispatch();
   const regionsVisible = useSelector(selectRegionsVisible);
-  const notamVisible = useSelector(selectNotamVisible);
+  //const notamVisible = useSelector(selectNotamVisible);
   const appStyle = useSelector(selectAppStyle);
 
   return (
@@ -37,7 +37,7 @@ const Overlays = () => {
       >
         NATS Danger Areas
       </div>
-      <div
+      {/*<div
         style={{
           margin: '0.2em',
           padding: '0.2em',
@@ -48,7 +48,7 @@ const Overlays = () => {
         onClick={() => dispatch(toggleNotamVisible())}
       >
         NOTAM Areas
-      </div>
+      </div>*/}
     </div>
   );
 };

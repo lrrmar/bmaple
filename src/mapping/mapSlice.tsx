@@ -56,8 +56,8 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  center: [-3, 54],
-  zoom: 5,
+  center: [24.216666, 68.024190],
+  zoom: 10,
   extent: null,
   projection: 'force_nwr_projection',
   units: null,

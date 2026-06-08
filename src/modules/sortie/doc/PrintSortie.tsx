@@ -1,4 +1,4 @@
-import * as edit from './EditorFunctions';
+/*import * as edit from './EditorFunctions';
 import { SortieFormKey, SortieFormKeys } from '../types';
 import JSZip from 'jszip';
 import { XMLParser, XMLBuilder } from 'fast-xml-parser';
@@ -59,4 +59,4 @@ async function printSortie(
   URL.revokeObjectURL(url);
 }
 
-export default printSortie;
+export default printSortie;*/
