@@ -2,18 +2,13 @@ import type { State } from '../state/types';
 import type { RoutineJson } from '../io/types';
 
 export type UserRoutineClassName =
-  | 'CranfieldTakeOff'
-  | 'SLR'
-  | 'Transit'
-  | 'ProfileAscent'
-  | 'ProfileDescent'
-  | 'NullRoutine';
+  | 'NullRoutine'
+  | 'TakeOff'
+  | 'CompositeRoutine'
+  | 'ToWaypoint';
 
 export type RoutineClassName =
-  | UserRoutineClassName
-  | 'OutsideTurn'
-  | 'InsideTurn'
-  | 'RaceTrackTurn';
+  | UserRoutineClassName;
 
 export type UserRoutineClassNames = Array<UserRoutineClassName>;
 export type RoutineClassNames = Array<RoutineClassName>;

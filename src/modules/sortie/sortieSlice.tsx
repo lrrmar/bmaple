@@ -45,6 +45,7 @@ interface InitialState {
   highlightedFeatures: string[];
   docxPrintFlag: number;
   appStyle: AppStyle;
+  hasTakeOff: boolean;
 }
 const initialState: InitialState = {
   flightPlan: [],
@@ -66,9 +67,10 @@ const initialState: InitialState = {
   docxPrintFlag: 0,
   appStyle: {
     backgroundColor: 'rgba(255, 255, 255, 255)',
-    primaryColor: '#252243',
-    secondaryColor: '#0abbef',
+    primaryColor: '#03aa30',
+    secondaryColor: '#9aaaef',
   },
+  hasTakeOff: false,
 };
 
 export const sortieSlice = createSlice({
@@ -87,6 +89,9 @@ export const sortieSlice = createSlice({
     flagDocxPrint: (state) => {
       state.docxPrintFlag += 1;
     },
+    updateHasTakeOff: (state, hasTakeOff: PayloadAction<boolean>) => {
+      state.hasTakeOff = hasTakeOff.payload;
+    }
   },
 });
 
@@ -94,6 +99,7 @@ export const {
   updateFlightPlan,
   updateWaypoints,
   updateHighlightedFeatures,
+  updateHasTakeOff,
   flagDocxPrint,
 } = sortieSlice.actions;
 
@@ -117,4 +123,22 @@ export const selectDocxPrintFlag = (state: RootState): number => {
 export const selectAppStyle = (state: RootState): AppStyle => {
   return state.sortie.appStyle;
 };
+export const selectClickModes = (state: RootState) => {
+  if (state.sortie.hasTakeOff) { 
+    return [
+      { name: 'takeoff', icon: 'arrow up' },
+      { name: 'to waypoint', icon: 'pencil' },
+      { name: 'new waypoint', icon: 'pin' },
+      { name: 'inspect', icon: 'mouse pointer' },
+    ];
+  } else {
+    return [
+      { name: 'takeoff', icon: 'arrow up' },
+      { name: 'to waypoint', icon: 'pencil' },
+      { name: 'new waypoint', icon: 'pin' },
+      { name: 'inspect', icon: 'mouse pointer' },
+    ]
+  }
+
+}
 export default sortieSlice.reducer;

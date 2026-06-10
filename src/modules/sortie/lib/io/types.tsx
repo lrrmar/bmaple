@@ -7,14 +7,9 @@ export interface WaypointJson {
 }
 
 type RoutineName =
-  | 'SLR'
-  | 'Transit'
-  | 'OutsideTurn'
-  | 'InsideTurn'
-  | 'RaceTrackTurn'
-  | 'ProfileAscent'
-  | 'CranfieldTakeOff'
-  | 'ProfileDescent'
+  | 'CompositeRoutine'
+  | 'ToWaypoint'
+  | 'TakeOff'
   | 'NullRoutine';
 
 export type RoutineJson = {
@@ -32,15 +27,10 @@ export type RoutineJson = {
 export type RoutineSequence = RoutineJson[];
 
 const routineNames: readonly RoutineName[] = [
-  'SLR',
-  'Transit',
-  'OutsideTurn',
-  'InsideTurn',
-  'RaceTrackTurn',
-  'ProfileAscent',
-  'ProfileDescent',
-  'CranfieldTakeOff',
+  'ToWaypoint',
   'NullRoutine',
+  'TakeOff',
+  'CompositeRoutine'
 ];
 
 export function isRoutineName(value: unknown): value is RoutineName {

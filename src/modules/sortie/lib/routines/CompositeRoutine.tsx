@@ -292,7 +292,7 @@ export default class CompositeRoutine extends Routine {
       // Clean up
       this.pullRoutines();
       this.pruneRoutines();
-      this.injectMissingTurns();
+      //this.injectMissingTurns(); REMOVED FOR DRONES
       this.injectNullRoutines();
       return;
     }
@@ -364,7 +364,7 @@ export default class CompositeRoutine extends Routine {
 
     this.pullRoutines();
     this.pruneRoutines();
-    this.injectMissingTurns();
+    //this.injectMissingTurns(); REMOVD FOR DRONES
     this.injectNullRoutines();
   }
 
@@ -588,7 +588,7 @@ export default class CompositeRoutine extends Routine {
     this.injectNullRoutines();
     this.pullRoutines();
     this.pruneRoutines();
-    this.injectMissingTurns();
+    //this.injectMissingTurns();
     this.injectNullRoutines();
   }
 

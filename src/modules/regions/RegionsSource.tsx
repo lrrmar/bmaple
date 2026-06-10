@@ -52,7 +52,7 @@ const RegionsSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     }
   }, []);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     // initialise features in cache
     if (layerId && !featuresInitialised.current) {
       const components: React.ReactNode[] = [];
@@ -76,7 +76,7 @@ const RegionsSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           setFeatures(components);
         });
     }
-  }, [layerId]);
+  }, [layerId]);*/
 
   return (
     <RegionsLayer key={layerId} id={layerId}>

@@ -21,6 +21,14 @@ export default class State implements _State {
     if (init['bearing'] != null) this.setBearing(init['bearing']);
   }
 
+  copy() {
+    const copy = Object.assign(
+      Object.create(Object.getPrototypeOf(this)),
+      this,
+    );
+    return copy;
+  }
+
   public setWaypoint(waypoint: Waypoint): void {
     this.waypoint = waypoint;
   }

@@ -16,40 +16,29 @@ const takeOffendpoints: { [key: string]: [string, number] } = {
   PT5: ['the West via the Daventry Corridor', 35],
 };
 
-class TakeOff extends ProfileAscent {}
-
-export class CranfieldTakeOff extends TakeOff {
-  private static takeOffendpoints: { [key: string]: [string, number] } = {
-    PT1: ['North Sea and the North', 65],
-    PT2: ['North Sea South', 50],
-    PT4: ['North Sea South and East Anglian coast', 40],
-    PT8: ['Thames and the South Coast', 30],
-    PT5: ['the West via the Daventry Corridor', 35],
-  };
+export class TakeOff extends ProfileAscent {
 
   constructor(args: RoutineConstructor) {
-    // botch
-    super({ entry: cranfieldTakeOffEntryState, exit: args.entry }); // botch
+    const entry = args.entry.copy();
+    entry.setAltitude(0);
+    super({ entry: entry, exit: args.entry });
   }
 
   swappableRoutines(): Routine[] {
     return [];
+  }  
+
+  toString() {
+    let s = this.displayName();
+    const exitWaypoint = this.getExitState().getWaypoint().id;
+    if (exitWaypoint && !exitWaypoint.includes('null')) {
+      s += ` at ${exitWaypoint}`;
+    }
+    return s;
   }
 
-  static all: Routine[] = Object.keys(this.takeOffendpoints).map((key) => {
-    const takeoff = new CranfieldTakeOff({
-      entry: new State({
-        waypoint: WaypointRegistry.getWaypoint(key),
-        altitude: 10000,
-      }),
-    });
-    takeoff.init();
-    takeoff.setDisplay(
-      `Takeoff and transit to ${takeOffendpoints[key][0]} (${takeoff.getExitState().getWaypoint().name})`,
-    );
-    takeoff.setDuration(takeOffendpoints[key][1]);
-    return takeoff;
-  });
+
+
 }
 
-Routine.register('CranfieldTakeOff', CranfieldTakeOff);
+Routine.register('TakeOff', TakeOff);

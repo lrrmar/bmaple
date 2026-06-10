@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
+import { useAppSelector as useSelector } from './hooks';
 import mapReducer, {
   selectVerticalLevel,
   selectVerticalLevels,
@@ -37,7 +38,9 @@ import TrackProfile from './modules/sortie/TrackProfile';
 
 import Sortie from './modules/sortie/components/Sortie';
 import ClickModeMenu from './modules/sortie/components/ClickMode';
-import sortieReducer from './modules/sortie/sortieSlice';
+import sortieReducer, {
+  selectClickModes,
+} from './modules/sortie/sortieSlice';
 export const store = configureStore({
   reducer: {
     map: mapReducer,
@@ -55,6 +58,7 @@ export const store = configureStore({
 });
 
 const App = () => {
+  const modes = useSelector(selectClickModes);
   useEffect(() => {
     sessionStorage.clear();
   }, []);
@@ -118,11 +122,7 @@ const App = () => {
       </FloatingBox>
       <FloatingBox style={{ left: '50%', padding: '0px', margin: '0px' }}>
         <ClickModeMenu
-          modes={[
-            { name: 'append SLR', icon: 'pencil' },
-            { name: 'new waypoint', icon: 'pin' },
-            { name: 'inspect', icon: 'mouse pointer' },
-          ]}
+          modes={modes}
         />
       </FloatingBox>
     </div>

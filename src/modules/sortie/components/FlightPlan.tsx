@@ -12,6 +12,7 @@ import {
 } from '../../../hooks';
 import {
   updateFlightPlan,
+  updateHasTakeOff,
   selectWaypoints,
   updateWaypoints,
   selectHighlightedFeatures,
@@ -26,7 +27,8 @@ import State from '../lib/state/State';
 import WaypointRegistry from '../lib/state/WaypointRegistry';
 import Waypoint from '../lib/state/Waypoint';
 import CompositeRoutine from '../lib/routines/CompositeRoutine';
-import { SLR } from '../lib/routines/Runs';
+import { ToWaypoint } from '../lib/routines/ToWaypoint';
+import { TakeOff } from '../lib/routines/TakeOff';
 import {
   cranfieldTakeOffEntryState,
   CranfieldTakeOff,
@@ -145,7 +147,7 @@ const FlightPlan = ({
     }
   }, [clickEvent]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (maneuvres.length == 0 && composite) {
       setOptions(
         CranfieldTakeOff.all.map((takeoff) => {
@@ -161,11 +163,31 @@ const FlightPlan = ({
       );
       setOptionsMessage('Choose take off');
     }
-  }, [maneuvres]);
+  }, [maneuvres]);*/
 
   useEffect(() => {
     if (clickEvent && composite) {
-      if (clickMode == 'append SLR') {
+      if (clickMode == 'takeoff' && maneuvres.length == 0) {
+        const clickedFeatures = clickEvent.features;
+        const clickedWaypointId = clickedFeatures.find((id) => {
+          return id.includes('waypoint');
+        });
+        if (clickedWaypointId) {
+          const waypoint = WaypointRegistry.getWaypoint(
+            clickedWaypointId.split('-')[1],
+          );
+          if (waypoint) {
+            const comp = new CompositeRoutine(
+              new TakeOff({
+                entry: new State({ waypoint: waypoint }),
+              })
+            );
+            compositeRef.current = comp;
+            setComposite(comp.copy());
+            dispatch(updateHasTakeOff(true))
+          }
+        }
+      } else if (clickMode == 'to waypoint' && maneuvres.length != 0) {
         const clickedFeatures = clickEvent.features;
         const clickedWaypointId = clickedFeatures.find((id) => {
           return id.includes('waypoint');
@@ -176,12 +198,13 @@ const FlightPlan = ({
           );
           if (waypoint) {
             composite.appendRoutine(
-              new SLR({
+              new ToWaypoint({
                 entry: composite.getExitState(),
                 exit: new State({ waypoint: waypoint }),
               }),
             );
             setComposite(composite.copy());
+            console.log(composite.getRoutines());
           }
         }
       } else if (

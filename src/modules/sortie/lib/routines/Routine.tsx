@@ -24,22 +24,17 @@ import {
 } from './types';
 
 const routineClassNames: RoutineClassName[] = [
-  'SLR',
-  'Transit',
-  'OutsideTurn',
-  'InsideTurn',
-  'RaceTrackTurn',
-  'ProfileAscent',
-  'ProfileDescent',
+  'ToWaypoint',
+  'CompositeRoutine',
   'NullRoutine',
+  'TakeOff',
 ];
 
 const userRoutineClassNames: UserRoutineClassName[] = [
-  'SLR',
-  'Transit',
-  'ProfileAscent',
-  'ProfileDescent',
+  'ToWaypoint',
   'NullRoutine',
+  'CompositeRoutine',
+  'TakeOff',
 ];
 
 export default class Routine implements _Routine {
@@ -66,21 +61,19 @@ export default class Routine implements _Routine {
   }
 
   static registry: Record<RoutineClassName, RoutineClass | null> = {
-    CranfieldTakeOff: null,
-    SLR: null,
-    Transit: null,
-    OutsideTurn: null,
-    InsideTurn: null,
-    RaceTrackTurn: null,
-    ProfileAscent: null,
-    ProfileDescent: null,
+    ToWaypoint: null,
     NullRoutine: null,
+    TakeOff: null,
+    CompositeRoutine: null,
   };
 
   static register(key: RoutineClassName, subclass: RoutineClass) {
     this.registry[key] = subclass;
   }
 
+  displayName() {
+    return this.constructor.name.replace(/([a-z])([A-Z])/g, '$1 $2');
+  }
   copy() {
     const copy = Object.assign(
       Object.create(Object.getPrototypeOf(this)),
@@ -176,11 +169,11 @@ export default class Routine implements _Routine {
       }
 
       if (altitude0 != null) {
-        json['altitude0'] = { value: altitude0, unit: 'ft' };
+        json['altitude0'] = { value: altitude0, unit: 'm' };
       }
 
       if (altitude1 != null && altitude0 != altitude1) {
-        json['altitude1'] = { value: altitude1, unit: 'ft' };
+        json['altitude1'] = { value: altitude1, unit: 'm' };
       }
 
       if (flags && flags.bearing && bearing0 != null) {

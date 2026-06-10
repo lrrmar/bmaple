@@ -8,6 +8,8 @@ import WaypointRegistry from '../lib/state/WaypointRegistry';
 import { Routine } from '../lib/routines/types';
 import { SLR } from '../lib/routines/Runs';
 import { Profile } from '../lib/routines/Profiles';
+import { ToWaypoint } from '../lib/routines/ToWaypoint';
+import { TakeOff } from '../lib/routines/TakeOff';
 import State from '../lib/state/State';
 import Waypoint from '../lib/state/Waypoint';
 import { Measure } from '../lib/state/types';
@@ -82,44 +84,35 @@ const Maneuvre = ({
   }, [composite]);
 
   useEffect(() => {
-    if (routine instanceof SLR && open) {
-      const defaultValue = entryAltitude
-        ? entryAltitude.value.toString()
+    if ((routine instanceof ToWaypoint || routine instanceof TakeOff) && open) {
+      const defaultValue = exitAltitude
+        ? exitAltitude.value.toString()
         : '...';
       setAltitudeComponents(
         <TextInputSubmit
           onSubmit={(value: string) =>
-            setEntryAltitude({ value: parseInt(value), unit: 'ft' })
+            setExitAltitude({ value: parseInt(value), unit: 'm' })
           }
           defaultValue={defaultValue}
         />,
       );
-    } else if (routine instanceof Profile) {
-      let defaultValue = '';
-      defaultValue += entryAltitude
-        ? `${entryAltitude.value.toString()}`
-        : '...';
-      defaultValue += ' -> ';
-      defaultValue += exitAltitude ? `${exitAltitude.value.toString()}` : '...';
-      setAltitudeComponents(defaultValue);
     } else if (routine.isNull()) {
       setAltitudeComponents('');
     } else {
-      const defaultValue = entryAltitude
-        ? entryAltitude.value.toString()
+      const defaultValue = exitAltitude
+        ? exitAltitude.value.toString()
         : '...';
       setAltitudeComponents(defaultValue);
     }
   }, [entryAltitude, exitAltitude, open, composite]);
 
   useEffect(() => {
-    if (routine instanceof SLR) {
-      if (entryAltitude) {
+    if (routine instanceof TakeOff || routine instanceof ToWaypoint) {
+      if (exitAltitude) {
         if (
-          entryAltitude.value &&
-          entryAltitude.value !== routine.getAltitude()
+          exitAltitude.value // remove check
         ) {
-          routine.setAltitude(entryAltitude.value);
+          routine.setExitAltitude(exitAltitude.value);
           setComposite(composite.copy());
           setDisplay(routine.toString());
           setDuration(routine.calculateDuration());
@@ -134,7 +127,7 @@ const Maneuvre = ({
         }
       }
     }
-  }, [entryAltitude]);
+  }, [exitAltitude]);
 
   return (
     <div
