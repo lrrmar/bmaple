@@ -40,7 +40,7 @@ interface ContinuousMetaData {
   level: string[];
 }
 
-interface Hash {
+  /*interface Hash {
   [key: string]: string | null;
   id: string;
   domain: string;
@@ -50,8 +50,9 @@ interface Hash {
   plot: string;
   location: string | null;
   level: string;
-}
+}*/
 interface Query {
+  [key: string]: string | null;
   domain: string | null;
   field: string | null;
   valid_time: string | null;
@@ -59,6 +60,10 @@ interface Query {
   level: string | null;
   plot: string | null;
   location: string | null;
+}
+
+interface Hash extends Query {
+  id: string | null;
 }
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const dispatch = useDispatch();
@@ -129,7 +134,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       body: JSON.stringify(selection),
     });
     const json = await response.json();
-    console.log(hostId, json);
     const updatedHashes = { ...currentHashes };
     updatedHashes[hostId] = json;
     setCurrentHashes(updatedHashes);
@@ -174,7 +178,8 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
               Object.keys(selection).some(
                 // prev seletion has been made
                 (key: string) => selection[key] !== prevSelection[key], // prev and current selection mismatch
-              ))
+              )) ||
+          Object.keys(selection).length !== Object.keys(prevSelection).length
         ) {
           fetchContinuousHashes(id.toString(), selection);
         }
@@ -185,7 +190,6 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   useEffect(() => {
     // Populate sliders with continuous variable values
     if (currentHashes) {
-      console.log(currentHashes);
       Object.keys(currentHashes).forEach((key) => {
         const hashes = currentHashes[key];
         if (hashes) {
@@ -248,8 +252,8 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     // On ANY metadata change, check cache and if not present
     // request image url
 
-    Object.keys(discreteMetaDataSelections).forEach((id) => {
-      const discreteMetaDataSelection = discreteMetaDataSelections[id];
+    Object.keys(discreteMetaDataSelections).forEach((hostId) => {
+      const discreteMetaDataSelection = discreteMetaDataSelections[hostId];
       if (discreteMetaDataSelection) {
         const selection: Partial<DiscreteMetaData> =  {};
         for (const key of Object.keys(discreteMetaDataSelection) as DiscreteHeader[]) {
@@ -257,23 +261,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           if (val) selection[key] = val;
         }
   
-        const locks = continuousMetaDataLocks[id];
+        const locks = continuousMetaDataLocks[hostId];
         let valid_time: string | null = displayTime;
         let level: string | null = verticalLevel;
         if (locks) {
           valid_time = locks.valid_time ? locks.valid_time : valid_time;
           level = locks.level ? locks.level : level;
         }
-        let newId: string | null = null;
+        let profileIds: string | null = null;
         if (selection) {
           const query = {...selection}
           if (valid_time) query['valid_time'] = valid_time;
           if (level) query['level'] = level;
           if (Object.values(query).every((val) => !!val)) {
-            const theseHashes = currentHashes[id];
-            console.log('query not null');
+            const theseHashes = currentHashes[hostId];
             if (theseHashes) {
-              console.log('these hashes exist');
               // Get single profile id
               const profileHash = theseHashes.find((dict: Hash) =>
                 Object.entries(query).every(([key, value]) => {
@@ -287,7 +289,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 // however if it is the same (which happens quite frequently due to
                 // the many bits of state this useEffect subscribes to) then just do
                 // nothing and keep it the same as it was previously.
-                  newId = profileHash.id;
+                  profileIds = profileHash.id;
               }
             }
           }
@@ -295,7 +297,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         // If profileHash does not exist then we express that there is no
         // valid profileId available for this host
   
-        dispatch(updateProfileIds({ host: id, resource: newId }));
+        dispatch(updateProfileIds({ host: hostId, resource: profileIds }));
       }
     });
   }, [

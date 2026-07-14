@@ -73,11 +73,11 @@ const CanvasImgViewPort = ({
         const parentHeight = parent.getClientRects()[0].height;
         const parentAspectRatio = parentWidth / parentHeight;
         if (parentAspectRatio <= 1) {
-          // portrait
+          // landscape
           canvasWidth = canvasSize;
           canvasHeight = canvasSize / parentAspectRatio;
         } else {
-          // landscape
+          // portrait
           canvasHeight = canvasSize;
           canvasWidth = canvasSize * parentAspectRatio;
         }
@@ -109,7 +109,7 @@ const CanvasImgViewPort = ({
             } else {
               // 'more' landscape
               imageWidth = canvasWidth;
-              imageHeight = image.height / imageAspectRatio;
+              imageHeight = imageWidth / imageAspectRatio;
               heightOffset = (canvasHeight - imageHeight) / 2;
             }
             ctx.drawImage(

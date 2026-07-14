@@ -19,6 +19,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import IconButton from '@mui/material/IconButton';
 
 import {
   BackendDiscreteMetaData,
@@ -33,7 +34,6 @@ import {
   selectApiUrl,
 } from '../modules/force-nwr/forceNwrSlice';
 
-type ContinuousHeader = 'valid_time' | 'level';
 /*interface MetaData {
   headers: DiscreteHeader[];
   values: { [key in DiscreteHeader]: string[] };
@@ -217,7 +217,7 @@ const ImageViewerWithMenu = ({
           }
         }
         const select = (
-          aggregates[header].length > 0 ? <div key={header}>
+          (aggregates[header].length > 0 || (selection && selection[header]))  ? <div key={header}>
             <InputLabel style={{ color: '#0f0f0f' }} id={`${header} label`}>
               {readableNames && readableNames[header]
                 ? readableNames[header]
@@ -241,6 +241,26 @@ const ImageViewerWithMenu = ({
                 }
               }}
               input={<OutlinedInput value={displayName} />}
+              endAdornment={
+                selection && selection[header] && (
+                  <IconButton
+                    size="small"
+                    sx={{ mr: 2 }}
+                    onMouseDown={(e) => e.stopPropagation()} // prevents dropdown opening
+                    onClick={() => {
+                      if (selection) {
+                        const newSelection = {
+                          ...selection,
+                        };
+                        delete newSelection[header];
+                        setSelection(newSelection);
+                      }
+                    }}
+            >
+              x
+            </IconButton>
+          )
+        }
             >
               {menuItems}
             </Select>
