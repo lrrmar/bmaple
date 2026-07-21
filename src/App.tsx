@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 
 import mapReducer, {
+  selectDisplayTime,
+  selectDisplayTimesIntersection,
+  updateDisplayTime,
   selectVerticalLevel,
   selectVerticalLevelsIntersection,
   updateVerticalLevel,
@@ -119,7 +122,13 @@ const App = () => {
         }}
       ></FloatingBox>
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
-        <TimeScrollBar />
+        {/*<TimeScrollBar />*/}
+        <MultiUnitScrollBar
+          selectValue={selectDisplayTime}
+          selectValues={selectDisplayTimesIntersection}
+          updateValue={updateDisplayTime}
+          orientation={'horizontal'}
+        />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <MultiUnitScrollBar

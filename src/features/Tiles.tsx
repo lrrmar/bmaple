@@ -10,7 +10,7 @@ type TileConfigurations = 'single' | 'duo' | 'trio' | 'quad' | 'bottom bar';
 const isTileConfigurations = (e: any): e is TileConfigurations => {
   return ['single', 'duo', 'trio', 'quad', 'bottom bar'].includes(e);
 };
-const Tiles = ({ apiUrl }: { apiUrl: string; }) => {
+const Tiles = ({ apiUrl }: { apiUrl: string }) => {
   const [tileIndex, setTileIndex] = useState<{
     0: number;
     1: number;

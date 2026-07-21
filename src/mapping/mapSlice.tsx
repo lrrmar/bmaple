@@ -33,7 +33,7 @@ interface InitialState {
   extent: number[] | null;
   projection: string;
   units: string | null;
-  displayTime: number;
+  displayTime: string | null;
   clickEvent: { longitude: number; latitude: number } | null;
   featuresAtClick: FeatureAtClick[]; // Need to tackle the values / properties object from features to filter out undefined!
   baseMaps: string[];
@@ -41,7 +41,7 @@ interface InitialState {
   themes: string[];
   themeId: string;
   displayTimes: {
-    [source: string]: number[];
+    [source: string]: string[];
   };
   outlineContours: boolean;
   verticalLevel: string | null;
@@ -57,7 +57,7 @@ const initialState: InitialState = {
   extent: null,
   projection: 'force_nwr_projection',
   units: null,
-  displayTime: 0,
+  displayTime: null,
   clickEvent: null,
   featuresAtClick: [],
   baseMaps: [],
@@ -85,7 +85,7 @@ export const mapSlice = createSlice({
     updateUnits: (state, units: PayloadAction<string | null>) => {
       state.units = units.payload;
     },
-    updateDisplayTime: (state, displayTime: PayloadAction<number>) => {
+    updateDisplayTime: (state, displayTime: PayloadAction<string>) => {
       state.displayTime = displayTime.payload;
     },
     updateClickEvent: (
@@ -114,7 +114,7 @@ export const mapSlice = createSlice({
     },
     updateDisplayTimes: (
       state,
-      update: PayloadAction<{ source: string; times: number[] }>,
+      update: PayloadAction<{ source: string; times: string[] }>,
     ) => {
       state.displayTimes[update.payload.source] = update.payload.times;
     },
@@ -252,7 +252,6 @@ export const selectDisplayTimesIntersection = (state: RootState) => {
   }
   return [];
 };
-;
 export const selectVerticalLevelsIntersection = (state: RootState) => {
   const levelsArrays = Object.values(state.map.verticalLevels).filter(
     (arr) => arr.length > 1,

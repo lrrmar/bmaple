@@ -1,10 +1,11 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../App';
 
-export type DiscreteHeader = 'domain' | 'field' | 'start_time' | 'plot' | 'location';
-export type BackendDiscreteMetaData = {
-  [key in DiscreteHeader]: string[];
-};
+import type {
+  ContinuousMetaData,
+  DiscreteMetaData,
+  BackendDiscreteMetaData,
+} from './types';
 /*export interface DiscreteMetaData {
   [key: string]: string | null | undefined;
   domain?: string | null | undefined;
@@ -13,14 +14,6 @@ export type BackendDiscreteMetaData = {
   plot?: string | null | undefined;
   location?: string | null | undefined;
 }*/
-
-export type DiscreteMetaData = Record<DiscreteHeader, string | null>;
-
-export interface ContinuousMetaData {
-  [key: string]: string | null;
-  valid_time: string | null;
-  level: string | null;
-}
 
 interface InitialState {
   selectedId: string | null;

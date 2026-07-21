@@ -23,24 +23,22 @@ import {
   updateProfileIds,
   selectProfileIds,
   selectSelectedResources,
-  BackendDiscreteMetaData,
-  DiscreteHeader,
   updateBackendDiscreteMetaData,
   updateReadableNames,
-  DiscreteMetaData,
 } from './forceNwrSlice';
+
+import {
+  ContinuousMetaData,
+  DiscreteMetaData,
+  DiscreteHeader,
+  Hash,
+} from './types';
 
 import { selectCache, request } from '../../mapping/cacheSlice';
 
 import ForceNwrImage from './ForceNwrImage';
 
-interface ContinuousMetaData {
-  valid_time: string[];
-  start_time: string[];
-  level: string[];
-}
-
-  /*interface Hash {
+/*interface Hash {
   [key: string]: string | null;
   id: string;
   domain: string;
@@ -51,20 +49,6 @@ interface ContinuousMetaData {
   location: string | null;
   level: string;
 }*/
-interface Query {
-  [key: string]: string | null;
-  domain: string | null;
-  field: string | null;
-  valid_time: string | null;
-  start_time: string | null;
-  level: string | null;
-  plot: string | null;
-  location: string | null;
-}
-
-interface Hash extends Query {
-  id: string | null;
-}
 const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const dispatch = useDispatch();
   const cache = useSelector(selectCache);
@@ -77,9 +61,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     selectDiscreteMetaDataSelections,
   );
   const continuousMetaDataLocks = useSelector(selectContinuousMetaDataLocks);
-  const previousSelections = useRef<{ [key: string]: Partial<DiscreteMetaData> | null }>(
-    {},
-  );
+  const previousSelections = useRef<{
+    [key: string]: Partial<DiscreteMetaData> | null;
+  }>({});
   const displayTime = useSelector(selectIsoDisplayTime);
   const displayTimesIntersection = useSelector(selectDisplayTimesIntersection);
   const verticalLevel = useSelector(selectVerticalLevel);
@@ -109,18 +93,20 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   };
 
   const fetchPreloadIds = async (preloadId: string, resourceId: string) => {
-    const response = await fetch(`${apiUrl}/preloadIds/?id=${resourceId}&buffer=3`, {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
+    const response = await fetch(
+      `${apiUrl}/preloadIds/?id=${resourceId}&buffer=3`,
+      {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
       },
-    });
+    );
     const json = await response.json();
-    const preload = {...preloadIds};
+    const preload = { ...preloadIds };
     preload[preloadId] = json;
     setPreloadIds(preload);
   };
-
 
   const fetchContinuousHashes = async (
     hostId: string,
@@ -166,19 +152,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     Object.keys(discreteMetaDataSelections).forEach((id) => {
       const discreteMetaDataSelection = discreteMetaDataSelections[id];
       if (discreteMetaDataSelection) {
-        const selection: Partial<DiscreteMetaData> =  {};
-        for (const key of Object.keys(discreteMetaDataSelection) as DiscreteHeader[]) {
+        const selection: Partial<DiscreteMetaData> = {};
+        for (const key of Object.keys(
+          discreteMetaDataSelection,
+        ) as DiscreteHeader[]) {
           const val = discreteMetaDataSelection[key];
           if (val) selection[key] = val;
         }
         const prevSelection = previousSelections.current[id];
         if (
           !prevSelection || // previous selection for this id has not been made
-            (prevSelection &&
-              Object.keys(selection).some(
-                // prev seletion has been made
-                (key: string) => selection[key] !== prevSelection[key], // prev and current selection mismatch
-              )) ||
+          (prevSelection &&
+            (Object.keys(selection) as (keyof DiscreteMetaData)[]).some(
+              // prev seletion has been made
+              (key) => selection[key] !== prevSelection[key], // prev and current selection mismatch
+            )) ||
           Object.keys(selection).length !== Object.keys(prevSelection).length
         ) {
           fetchContinuousHashes(id.toString(), selection);
@@ -199,11 +187,11 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           const levels = [...new Set(hashes.map((hash) => hash.level))];
           if (timeStrings && levels) {
             const times = timeStrings
-              .map(
+              /*.map(
                 (timeString) =>
                   new Date(timeString).getTime() -
                   new Date().getTimezoneOffset() * 60 * 1000,
-              )
+              )*/
               .sort();
             if (times && levels) {
               dispatch(
@@ -255,12 +243,14 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
     Object.keys(discreteMetaDataSelections).forEach((hostId) => {
       const discreteMetaDataSelection = discreteMetaDataSelections[hostId];
       if (discreteMetaDataSelection) {
-        const selection: Partial<DiscreteMetaData> =  {};
-        for (const key of Object.keys(discreteMetaDataSelection) as DiscreteHeader[]) {
+        const selection: Partial<DiscreteMetaData> = {};
+        for (const key of Object.keys(
+          discreteMetaDataSelection,
+        ) as DiscreteHeader[]) {
           const val = discreteMetaDataSelection[key];
           if (val) selection[key] = val;
         }
-  
+
         const locks = continuousMetaDataLocks[hostId];
         let valid_time: string | null = displayTime;
         let level: string | null = verticalLevel;
@@ -270,7 +260,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         }
         let profileIds: string | null = null;
         if (selection) {
-          const query = {...selection}
+          const query = { ...selection };
           if (valid_time) query['valid_time'] = valid_time;
           if (level) query['level'] = level;
           if (Object.values(query).every((val) => !!val)) {
@@ -289,14 +279,14 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
                 // however if it is the same (which happens quite frequently due to
                 // the many bits of state this useEffect subscribes to) then just do
                 // nothing and keep it the same as it was previously.
-                  profileIds = profileHash.id;
+                profileIds = profileHash.id;
               }
             }
           }
         }
         // If profileHash does not exist then we express that there is no
         // valid profileId available for this host
-  
+
         dispatch(updateProfileIds({ host: hostId, resource: profileIds }));
       }
     });
@@ -381,7 +371,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
            * w.r.t. displayTimes array, we want to load the the images 10-N to 10 + N
            */
 
-          // Filter hashes that have a time outside of display times
+  // Filter hashes that have a time outside of display times
   /*thesePreloadHashes = thesePreloadHashes.filter((hash: Hash) =>
             displayTimesIntersection.includes(
               new Date(hash.valid_time).getTime(),
@@ -454,9 +444,9 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
         const key = profile[0];
         const val = profile[1];
         if (key && val) fetchPreloadIds(key, val);
-      } )
+      });
     }
-  }, [profileIds])
+  }, [profileIds]);
 
   useEffect(() => {
     const components = loadedResources.map((id) => (

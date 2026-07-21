@@ -10,6 +10,7 @@ import {
   selectIsoDisplayTime,
   selectVerticalLevel,
   selectVerticalLevels,
+  selectDisplayTimes,
   updateVerticalLevels,
 } from '../mapping/mapSlice';
 
@@ -25,6 +26,10 @@ import {
   BackendDiscreteMetaData,
   DiscreteHeader,
   DiscreteMetaData,
+  continuousHeaders,
+} from '../modules/force-nwr/types';
+
+import {
   selectBackendDiscreteMetaData,
   selectReadableNames,
   updateContinuousMetaDataLocks,
@@ -34,32 +39,6 @@ import {
   selectApiUrl,
 } from '../modules/force-nwr/forceNwrSlice';
 
-/*interface MetaData {
-  headers: DiscreteHeader[];
-  values: { [key in DiscreteHeader]: string[] };
-  tables: { [key in DiscreteHeader]: { [key: string]: (0 | 1)[][] } };
-}
-interface Hash {
-  [key: string]: string;
-  id: string;
-  domain: string;
-  field: string;
-  valid_time: string;
-  start_time: string;
-  level: string;
-}
-
-interface Selection {
-  [key: string]: number;
-}
-
-interface Query {
-  domain: string | null;
-  field: string | null;
-  valid_time: string | null;
-  start_time: string | null;
-  level: string | null;
-}*/
 type Locked = { value: string | null; strong: boolean };
 
 const HeaderLock = ({
@@ -107,12 +86,14 @@ const ImageViewerWithMenu = ({
 }) => {
   const dispatch = useDispatch();
   const displayTime = useSelector(selectIsoDisplayTime);
+  const displayTimes = useSelector(selectDisplayTimes);
   const verticalLevel = useSelector(selectVerticalLevel);
   const verticalLevels = useSelector(selectVerticalLevels);
   const profileIds = useSelector(selectProfileIds);
   const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
   const readableNames = useSelector(selectReadableNames);
   const cache = useSelector(selectCache);
+
 
   const [profileId, setProfileId] = useState<string | null>(null);
   const [selection, setSelection] = useState<DiscreteMetaData | null>(null);
@@ -124,6 +105,7 @@ const ImageViewerWithMenu = ({
     location: null,
   });
   const verticalLevelsRef = useRef<string[]>([]);
+  const displayTimesRef = useRef<number[]>([]);
   const [validTimeLocked, setValidTimeLocked] = useState<Locked>({
     value: null,
     strong: false,
@@ -142,8 +124,9 @@ const ImageViewerWithMenu = ({
     plot: [],
     location: [],
   });
-
-  const fetchDiscreteAggregates = async (selection: Partial<DiscreteMetaData>) => {
+  const fetchDiscreteAggregates = async (
+    selection: Partial<DiscreteMetaData>,
+  ) => {
     const body: Record<string, string> = {};
     Object.entries(selection).map(([key, val]) => {
       if (val) body[key] = val;
@@ -216,56 +199,60 @@ const ImageViewerWithMenu = ({
             displayName = readableNames[selectionHeader];
           }
         }
-        const select = (
-          (aggregates[header].length > 0 || (selection && selection[header]))  ? <div key={header}>
-            <InputLabel style={{ color: '#0f0f0f' }} id={`${header} label`}>
-              {readableNames && readableNames[header]
-                ? readableNames[header]
-                : header}
-            </InputLabel>
-            <Select
-              labelId={`${header} label`}
-              //value={selection[thisDiscreteHeader]}
-              renderValue={(val: string) => {
-                return val;
-              }}
-              onChange={(e) => {
-                if (typeof e.target.value === 'number') {
-                  if (selection) {
-                    const newSelection = {
-                      ...selection,
-                    };
-                    newSelection[header] = values[e.target.value];
-                    setSelection(newSelection);
+        const select =
+          aggregates[header].length > 0 || (selection && selection[header]) ? (
+            <div key={header}>
+              <InputLabel style={{ color: '#0f0f0f' }} id={`${header} label`}>
+                {readableNames && readableNames[header]
+                  ? readableNames[header]
+                  : header}
+              </InputLabel>
+              <Select
+                labelId={`${header} label`}
+                //value={selection[thisDiscreteHeader]}
+                renderValue={(val: string) => {
+                  return val;
+                }}
+                onChange={(e) => {
+                  if (typeof e.target.value === 'number') {
+                    if (selection) {
+                      const newSelection = {
+                        ...selection,
+                      };
+                      newSelection[header] = values[e.target.value];
+                      setSelection(newSelection);
+                    }
                   }
+                }}
+                input={<OutlinedInput value={displayName} />}
+                endAdornment={
+                  selection &&
+                  selection[header] && (
+                    <IconButton
+                      size="small"
+                      sx={{ mr: 2 }}
+                      onMouseDown={(e) => e.stopPropagation()} // prevents dropdown opening
+                      onClick={() => {
+                        if (selection) {
+                          const newSelection = {
+                            ...selection,
+                          };
+                          delete newSelection[header];
+                          setSelection(newSelection);
+                        }
+                      }}
+                    >
+                      ×
+                    </IconButton>
+                  )
                 }
-              }}
-              input={<OutlinedInput value={displayName} />}
-              endAdornment={
-                selection && selection[header] && (
-                  <IconButton
-                    size="small"
-                    sx={{ mr: 2 }}
-                    onMouseDown={(e) => e.stopPropagation()} // prevents dropdown opening
-                    onClick={() => {
-                      if (selection) {
-                        const newSelection = {
-                          ...selection,
-                        };
-                        delete newSelection[header];
-                        setSelection(newSelection);
-                      }
-                    }}
-            >
-              x
-            </IconButton>
-          )
-        }
-            >
-              {menuItems}
-            </Select>
-          </div> : <></>
-        );
+              >
+                {menuItems}
+              </Select>
+            </div>
+          ) : (
+            <></>
+          );
         selects.push(
           <div key={header}>
             {select}
@@ -418,7 +405,6 @@ const ImageViewerWithMenu = ({
   useEffect(() => {
     // Save verticalLevels in Ref and
     // Auto lock if transferring from a single level to multi
-
     const levels = verticalLevels['force-nwr' + id];
     // The length > 0 below is to counteract the setting of these levels to []
     // below on change of 'hidden', i.e. stores the last valid levels
@@ -426,6 +412,20 @@ const ImageViewerWithMenu = ({
     if (levels && levels.length == 1)
       setLevelLocked({ value: levels[0], strong: true });
   }, [verticalLevels]);
+
+  useEffect(() => {
+    ///TIMES///
+    // Save verticalLevels in Ref and
+    // Auto lock if transferring from a single level to multi
+    const times = displayTimes['force-nwr' + id];
+    // The length > 0 below is to counteract the setting of these levels to []
+    // below on change of 'hidden', i.e. stores the last valid levels
+    if (times && times.length > 0) displayTimesRef.current = times;
+    if (times && times.length == 1)
+      setValidTimeLocked({ value: times[0], strong: true });
+  }, [displayTimes]);
+
+
 
   useEffect(() => {
     // Clean up on close
