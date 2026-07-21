@@ -12,6 +12,8 @@ import {
   selectVerticalLevels,
   selectDisplayTimes,
   updateVerticalLevels,
+  selectContinuousValue,
+  selectContinuousDataIntersections,
 } from '../mapping/mapSlice';
 
 import CanvasImgViewPortPreloaded from './CanvasImgViewPortPreloaded';
@@ -89,6 +91,10 @@ const ImageViewerWithMenu = ({
   const displayTimes = useSelector(selectDisplayTimes);
   const verticalLevel = useSelector(selectVerticalLevel);
   const verticalLevels = useSelector(selectVerticalLevels);
+
+  const continuousValue = useSelector(selectContinuousValue);
+  const continuousValues = useSelector(selectContinuousDataIntersections);
+
   const profileIds = useSelector(selectProfileIds);
   const backendDiscreteMetaData = useSelector(selectBackendDiscreteMetaData);
   const readableNames = useSelector(selectReadableNames);

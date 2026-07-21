@@ -12,6 +12,10 @@ import {
   selectDisplayTimesIntersection,
   selectVerticalLevel,
   selectVerticalLevelsIntersection,
+  selectContinuousDataIntersections,
+  selectContinuousValue,
+  updateContinuousValue,
+  updateContinuousValues,
 } from '../../mapping/mapSlice';
 
 import {
@@ -32,6 +36,9 @@ import {
   DiscreteMetaData,
   DiscreteHeader,
   Hash,
+  Query,
+  continuousHeaders,
+  ContinuousHeader,
 } from './types';
 
 import { selectCache, request } from '../../mapping/cacheSlice';
@@ -70,6 +77,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const verticalLevelsIntersection = useSelector(
     selectVerticalLevelsIntersection,
   );
+
   const [continuousMetaData, setContinuousMetaData] = useState<{
     [key: string]: ContinuousMetaData | null;
   }>({});
@@ -79,6 +87,10 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   const [layers, setLayers] = useState<React.ReactNode[]>([]);
   const [loadedResources, setLoadedResources] = useState<string[]>([]);
   const [preloadIds, setPreloadIds] = useState<{ [key: string]: string[] }>({});
+
+  const continuousDataIntersections = useSelector(selectContinuousDataIntersections);
+  const continuousValue = useSelector(selectContinuousValue);
+
 
   const fetchDiscreteMetaData = async () => {
     const response = await fetch(`${apiUrl}/getDiscreteMetaData/`, {
@@ -181,6 +193,23 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       Object.keys(currentHashes).forEach((key) => {
         const hashes = currentHashes[key];
         if (hashes) {
+
+          continuousHeaders.forEach((header: ContinuousHeader) => {
+            // Sort and filter null values from hashes
+            const values = [
+              ...new Set(hashes.map((hash) => hash[header])),
+            ].sort().filter((value) => value !== null);
+            if (values) {
+              dispatch(
+                updateContinuousValues({
+                  header: header,
+                  source: sourceIdentifier + key,
+                  values: values,
+                })
+              )
+            }
+          })
+
           const timeStrings = [
             ...new Set(hashes.map((hash) => hash.valid_time)),
           ];
@@ -213,6 +242,23 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
       });
     }
   }, [currentHashes]);
+
+  useEffect(() => {
+    // Auto change continuous value if current value null
+    // or no longer in the valid values intersection
+    continuousHeaders.forEach((header: ContinuousHeader) => {
+      const value = continuousValue[header];
+      const values = continuousDataIntersections[header];
+      if (
+        !value ||
+        (value &&
+          values &&
+          !values.includes(value))
+      ) {
+        dispatch(updateContinuousValue({header: header, value: value}));
+      }
+    })
+  }, [continuousDataIntersections]);
 
   useEffect(() => {
     if (
@@ -251,18 +297,21 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
           if (val) selection[key] = val;
         }
 
-        const locks = continuousMetaDataLocks[hostId];
-        let valid_time: string | null = displayTime;
-        let level: string | null = verticalLevel;
-        if (locks) {
-          valid_time = locks.valid_time ? locks.valid_time : valid_time;
-          level = locks.level ? locks.level : level;
-        }
-        let profileIds: string | null = null;
+                let profileIds: string | null = null;
         if (selection) {
-          const query = { ...selection };
-          if (valid_time) query['valid_time'] = valid_time;
-          if (level) query['level'] = level;
+          const query: Partial<Query> = { ...selection };
+          continuousHeaders.forEach((header: ContinuousHeader) => {
+            const locks = continuousMetaDataLocks[hostId];
+            /*********************/
+              if (locks) {
+                valid_time = locks.valid_time ? locks.valid_time : valid_time;
+                level = locks.level ? locks.level : level;
+              }
+
+            /*********************/
+            const value = continuousValue[header];
+            if (value != null) query[header] = value;
+          })
           if (Object.values(query).every((val) => !!val)) {
             const theseHashes = currentHashes[hostId];
             if (theseHashes) {
@@ -293,8 +342,7 @@ const ForceNwrSource = ({ sourceIdentifier }: { sourceIdentifier: string }) => {
   }, [
     discreteMetaDataSelections,
     continuousMetaDataLocks,
-    displayTime,
-    verticalLevel,
+    continuousValue,
     currentHashes,
     cache,
   ]);

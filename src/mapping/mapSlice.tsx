@@ -3,6 +3,11 @@ import type { RootState } from '../App';
 import View from 'ol/View';
 import { fromLonLat, transformExtent } from 'ol/proj';
 import OpenLayersMap from './OpenLayersMap';
+import {
+  continuousHeaders,
+  ContinuousHeader,
+  buildRecord
+} from '../modules/force-nwr/types';
 
 export interface FeatureAtClick {
   ol_uid: string;
@@ -40,6 +45,15 @@ interface InitialState {
   baseMapId: string;
   themes: string[];
   themeId: string;
+  continuousValue: Record<
+    ContinuousHeader, string | null
+  >,
+  continuousValues: Record<
+    ContinuousHeader, 
+    {
+      [source: string]: string[];
+    }
+  >;
   displayTimes: {
     [source: string]: string[];
   };
@@ -64,6 +78,8 @@ const initialState: InitialState = {
   baseMapId: 'Open Street Map',
   themes: [],
   themeId: 'Plain',
+  continuousValue: buildRecord(continuousHeaders, () => null),
+  continuousValues: buildRecord(continuousHeaders, () => {return {}}),
   displayTimes: {},
   outlineContours: false,
   verticalLevel: null,
@@ -136,6 +152,16 @@ export const mapSlice = createSlice({
     ) => {
       state.verticalLevelUnits = verticalLevelUnits.payload;
     },
+    updateContinuousValue: (state, value: PayloadAction<{ header: ContinuousHeader, value: string | null}>) => {
+      state.continuousValue[value.payload.header] = value.payload.value;
+    },
+    updateContinuousValues: (
+      state,
+      update: PayloadAction<{header: ContinuousHeader; source: string; values: string[] }>,
+    ) => {
+      state.continuousValues[update.payload.header][update.payload.source] = update.payload.values;
+    },
+
   },
   extraReducers: (builder) => {
     builder.addCase(updateExtent.fulfilled, (state, action) => {
@@ -188,6 +214,8 @@ export const {
   updateVerticalLevel,
   updateVerticalLevels,
   updateVerticalLevelUnits,
+  updateContinuousValue,
+  updateContinuousValues,
 } = mapSlice.actions;
 
 export const selectIsoDisplayTime = (state: RootState) => {
@@ -272,5 +300,40 @@ export const selectVerticalLevelsIntersection = (state: RootState) => {
     return levels;
   }
   return [];
+};
+export const selectContinuousValue = (state: RootState) => {
+  return state.map.continuousValue;
+}
+export const selectContinuousDataIntersections = (state: RootState) => {
+  const intersections: Record<ContinuousHeader, string[]> = buildRecord(continuousHeaders, () => []);
+
+  continuousHeaders.forEach((header: ContinuousHeader) => {
+    // dataArrays is a list of lists of values associated
+    // with the current header
+    const dataArrays = Object.values(state.map.continuousValues[header]).filter(
+      (arr) => arr.length > 1,
+    );
+    if (dataArrays.length < 1) return;
+    // The line below gives us or first list of fata to create our total
+    // intersection of all fata from AND gets them in the right order
+    /*let levels = verticalLevelOrder.filter((level) =>
+      levelsArrays[0].includes(level),
+    );*/
+    let values = dataArrays[0];
+    intersections[header] = values;
+    if (values) {
+      if (dataArrays.length === 1) {
+        return; // Need for intersection
+      } else {
+        for (let i = 1; i < dataArrays.length; i++) {
+          values = values.filter((value) =>
+            Object.values(dataArrays[i]).includes(value),
+          );
+          intersections[header] = values;
+        }
+      }
+    }
+  });
+  return intersections;
 };
 export default mapSlice.reducer;

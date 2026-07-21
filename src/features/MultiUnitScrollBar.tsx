@@ -7,17 +7,30 @@ import {
 } from '../hooks';
 import { Selector, Action } from '../App';
 
+import {
+  selectContinuousDataIntersections,
+  selectContinuousValue,
+  updateContinuousValue,
+} from '../mapping/mapSlice';
+
+import {
+  continuousHeaders,
+  ContinuousHeader,
+} from '../modules/force-nwr/types';
+
 interface Mark {
   value: number;
   label: string;
 }
 
+  /* OLD PROPS
 interface Props<T, U> {
   selectValue: Selector<string | null>;
   selectValues: Selector<string[]>;
   updateValue: Action<string>;
   orientation: 'horizontal' | 'vertical';
-}
+}*/
+
 
 /* Similar to scroll bar but just takes a list of strings rather than
  * getting into any numerics.
@@ -137,19 +150,24 @@ const handleTimeMarks = (timeStrings: string[]) => {
   return tempMarks
 }
 
-const MultiUnitScrollBar = <T, U>({
-  selectValue,
-  selectValues,
-  updateValue,
+const MultiUnitScrollBar = ({
+  header,
   orientation,
-}: Props<string[], string | null>) => {
+}: {header: ContinuousHeader; orientation: 'horizontal' | 'vertical'}) => {
   const dispatch = useDispatch();
-  const value: string | null = useSelector(selectValue);
-  const values: string[] = useSelector(selectValues);
+  const value: string | null = useSelector(selectContinuousValue)[header];
+  const continuousDataIntersections = useSelector(selectContinuousDataIntersections);
+  const [values, setValues] = useState<string[]>([]);
   const [marks, setMarks] = useState<Mark[]>([]);
   const [content, setContent] = useState<React.ReactNode>([]);
   const [lastKey, setLastKey] = useState<string | null>(null);
   const [keyPress, setKeyPress] = useState<number>(0);
+
+  useEffect(() => {
+    // avoid undefined error on start up
+    const v = continuousDataIntersections[header];
+    if (v) setValues(v);
+  }, [continuousDataIntersections]);
 
   useEffect(() => {
     const timeMarks = handleTimeMarks(values);
@@ -207,7 +225,7 @@ const MultiUnitScrollBar = <T, U>({
         if (newIndex < 0 || newIndex == values.length) {
           return;
         } else {
-          dispatch(updateValue(values[newIndex]));
+          dispatch(updateContinuousValue({header: header, value: values[newIndex]}));
         }
       }
     }

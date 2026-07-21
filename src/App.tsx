@@ -1,14 +1,7 @@
 import React, { useEffect } from 'react';
 import { configureStore, PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 
-import mapReducer, {
-  selectDisplayTime,
-  selectDisplayTimesIntersection,
-  updateDisplayTime,
-  selectVerticalLevel,
-  selectVerticalLevelsIntersection,
-  updateVerticalLevel,
-} from './mapping/mapSlice';
+import mapReducer from './mapping/mapSlice';
 import cacheReducer from './mapping/cacheSlice';
 import Map from './mapping/Map';
 import Profiles from './mapping/Profiles';
@@ -21,7 +14,6 @@ import forceNwrReducer from './modules/force-nwr/forceNwrSlice';
 import ForceNwrSource from './modules/force-nwr/ForceNwrSource';
 import ForceNwrProfile from './modules/force-nwr/ForceNwrProfile';
 import FloatingBox from './features/FloatingBox';
-import TimeScrollBar from './features/TimeScrollBar';
 import MultiUnitScrollBar from './features/MultiUnitScrollBar';
 import Tiles from './features/Tiles';
 import LoadingScreen from './modules/force-nwr/LoadingScreen';
@@ -124,17 +116,13 @@ const App = () => {
       <FloatingBox style={{ bottom: '20px', borderWidth: '0px', zIndex: '21' }}>
         {/*<TimeScrollBar />*/}
         <MultiUnitScrollBar
-          selectValue={selectDisplayTime}
-          selectValues={selectDisplayTimesIntersection}
-          updateValue={updateDisplayTime}
+          header={'valid_time'}
           orientation={'horizontal'}
         />
       </FloatingBox>
       <FloatingBox style={{ top: '20px', borderWidth: '0px' }}>
         <MultiUnitScrollBar
-          selectValue={selectVerticalLevel}
-          selectValues={selectVerticalLevelsIntersection}
-          updateValue={updateVerticalLevel}
+          header={'level'}
           orientation={'vertical'}
         />
       </FloatingBox>
