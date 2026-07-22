@@ -7,6 +7,7 @@ import {
 
 import {
   updateCrrChosenStyle,
+  updateOpacityROA,
   updateOpacityCRR,
   updateOpacityRDT,
   updateOpacityLightning,
@@ -95,6 +96,19 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
   return (
     <div style={style}>
       <h4 style={subHeading}>Weather Filters:</h4>
+      <div>
+        <label htmlFor="opacityROA">ROA Opacity: </label>
+        <input
+          type="range"
+          id="opacityROA"
+          min="0"
+          max="1"
+          step="0.1"
+          onChange={(element) =>
+            dispatch(updateOpacityROA(parseFloat(element.target.value)))
+          }
+        />
+      </div>
       <div>
         <label htmlFor="opacityCRR">CRR Opacity: </label>
         <input

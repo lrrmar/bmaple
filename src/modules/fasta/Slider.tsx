@@ -5,9 +5,11 @@ import './Slider.css';
 import {
   selectHashTables,
   selectLatestTimeslot,
+  updateSelectedRoaId,
   updateSelectedCrrId,
   updateSelectedRdtId,
   updateSelectedLightningId,
+  selectRoaVisible,
   selectCrrVisible,
   selectRdtVisible,
   selectLiVisible,
@@ -48,6 +50,7 @@ const Slider = () => {
   const [userMessageRdt, setUserMessageRdt] = useState<string | undefined>();
   const [userMessageLi, setUserMessageLi] = useState<string | undefined>();
 
+  const roaIsVisible = useSelector(selectRoaVisible);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
   const liIsVisible = useSelector(selectLiVisible);
@@ -106,6 +109,30 @@ const Slider = () => {
       //console.log("setSelectedTimeslot:" + strSelected);
 
       setTimeZoneString(timezoneDisplayString(selectedTimeslot));
+
+      // Find the ROA hash with matching effective_ts
+      const roaLayerHash = fastaHashes.find((hash: HashTable) => {
+        return hash.name === 'roa' && hash.effective_ts === selectedTimeslot;
+      });
+
+      if (roaLayerHash) {
+        if (roaLayerHash.is_available) {
+          const url = fastaHashTableToUrl(roaLayerHash);
+          const newRoaLayerHash = { apiRequest: url };
+          //setUserMessageCrr(undefined);
+          dispatch(updateSelectedRoaId(newRoaLayerHash.apiRequest));
+        } else {
+          setUserMessageCrr(
+            'ROA: data not available for ' +
+              timeDisplayString(roaLayerHash.effective_ts) +
+              ' slot',
+          );
+          dispatch(updateSelectedRoaId(null));
+        }
+      } else {
+        setUserMessageCrr('ROA: data not available');
+        dispatch(updateSelectedRoaId(null));
+      }
 
       // Find the CRR hash with matching effective_ts
       const crrLayerHash = fastaHashes.find((hash: HashTable) => {

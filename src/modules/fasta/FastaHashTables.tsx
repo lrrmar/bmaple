@@ -87,14 +87,14 @@ const FastaHashTablesServer = () => {
 
     const latest = observationHashes[0];
 
-    // Filter forecast hashes, keeping only the CRR forecasts for the latest observation
+    // Filter forecast hashes, keeping only the CRR/ROA forecasts for the latest observation
     // (upto 10 forecasts per timeslot currently returned by API, i.e. 2.5 hours).
     const forecastHashes = hashes
       .filter((hash) => {
         return (
           hash.timeslot === latest.timeslot &&
           hash.name === product &&
-          product === 'crr' &&
+          (product === 'crr' || product === 'roa') &&
           hash.forecast_slot !== ''
         );
       })
@@ -135,6 +135,7 @@ const FastaHashTablesServer = () => {
 
   const fetchFastaHashes = async () => {
     const productCodes: { [index: string]: string } = {
+      'Rain over Africa Rainfall Rate': 'roa',
       'Convective Rainfall Rate': 'crr',
       'Rapidly Developing Thunderstorms': 'rdt',
       Lightning: 'li',
@@ -150,7 +151,7 @@ const FastaHashTablesServer = () => {
 
     json.tilesets.forEach((product: any) => {
       const name = productCodes[product.name];
-      if (name === 'crr') {
+      if (name === 'roa') {
         // The UI will need to know latest available timeslot to calibrate selector controls.
         // CRR and RDT may differ but CRR takes priority.
         latestTs = new Date(product.latest_timeslot)?.getTime();
@@ -181,14 +182,14 @@ const FastaHashTablesServer = () => {
       });
     });
     appendFastaHashes(hashes);
-
-    const keepers = filterFastaHashes(hashes, 'crr')
+    console.log('fastaHashes:', hashes);
+    const keepers = filterFastaHashes(hashes, 'roa')
+      .concat(filterFastaHashes(hashes, 'crr'))
       .concat(filterFastaHashes(hashes, 'rdt'))
       .concat(filterFastaHashes(hashes, 'li'));
 
     setHashTablesToKeep(keepers);
     console.log('keepers:');
-    console.log(keepers);
 
     setLatestTimeslot(latestTs);
   };

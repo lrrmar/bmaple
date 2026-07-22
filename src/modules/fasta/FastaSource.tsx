@@ -5,10 +5,12 @@ import {
 } from '../../hooks';
 import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
 import {
+  selectSelectedRoaId,
   selectSelectedCrrId,
   selectSelectedRdtId,
   selectSelectedLightningId,
   selectHashTables,
+  updateProfileRoaId,
   updateProfileCrrId,
   updateProfileRdtId,
   updateProfileLightningId,
@@ -25,6 +27,7 @@ interface Props {
 
 const FastaSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
+  const roaRequestId: string | null = useSelector(selectSelectedRoaId);
   const crrRequestId: string | null = useSelector(selectSelectedCrrId);
   const rdtRequestId: string | null = useSelector(selectSelectedRdtId);
   const liRequestId: string | null = useSelector(selectSelectedLightningId);
@@ -50,6 +53,14 @@ const FastaSource = ({ sourceIdentifier, cache }: Props) => {
     //console.log(newCacheRequests);
     dispatch(request(newCacheRequests));
   }, [hashTables]);
+
+  useEffect(() => {
+    if (roaRequestId && !cache[roaRequestId]) {
+      dispatch(request({ id: roaRequestId, source: 'fasta' }));
+    } else {
+      dispatch(updateProfileRoaId(roaRequestId));
+    }
+  }, [roaRequestId]);
 
   useEffect(() => {
     if (crrRequestId && !cache[crrRequestId]) {

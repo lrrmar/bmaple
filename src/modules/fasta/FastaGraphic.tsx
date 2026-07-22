@@ -10,13 +10,16 @@ import { Geometry } from 'ol/geom';
 import { getUid } from 'ol/util';
 import { get } from 'ol/proj';
 import {
+  selectProfileRoaId,
   selectProfileCrrId,
   selectProfileRdtId,
   selectProfileLightningId,
   selectFastaProducts,
+  selectRoaVisible,
   selectCrrVisible,
   selectRdtVisible,
   FastaProduct,
+  selectOpacityROA,
   selectOpacityCRR,
   selectOpacityRDT,
   selectOpacityLightning,
@@ -96,19 +99,25 @@ const Graphics = () => {
     ],
   };
   const map = openLayersMap.map;
+  const roaLayerId = useSelector(selectProfileRoaId);
   const crrLayerId = useSelector(selectProfileCrrId);
   const rdtLayerId = useSelector(selectProfileRdtId);
   const lightningLayerId = useSelector(selectProfileLightningId);
 
   const layerCache = useSelector(selectCache);
   const [currentOlUidCrr, setCurrentOlUidCrr] = useState<string | null>(null);
+  const [currentOlUidRoa, setCurrentOlUidRoa] = useState<string | null>(null);
   const [currentOlUidRdt, setCurrentOlUidRdt] = useState<string | null>(null);
   const [currentOlUidLi, setCurrentOlUidLi] = useState<string | null>(null);
+  const roaIsVisible = useSelector(selectRoaVisible);
   const crrIsVisible = useSelector(selectCrrVisible);
   const rdtIsVisible = useSelector(selectRdtVisible);
+
+  const opacityROA = useSelector(selectOpacityROA);
   const opacityCRR = useSelector(selectOpacityCRR);
   const opacityRDT = useSelector(selectOpacityRDT);
   const opacityLightning = useSelector(selectOpacityLightning);
+
   const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
   const currentCrrStyle = useSelector(selectCrrChosenStyle);
@@ -135,6 +144,52 @@ const Graphics = () => {
 
   function createStyle(hexVal: string) {
     return new Style({ fill: new Fill({ color: hexVal }) });
+  }
+
+  function createRoaStyleFunction(theme: string) {
+    const tempArr = styles[theme];
+    const styleArr = tempArr.map((hexVal) => {
+      return createStyle(hexVal);
+    });
+    const cnv = document.createElement('canvas');
+    const ctx = cnv.getContext('2d');
+    const img = new Image();
+    img.src = missingDataImage;
+    let pattern;
+    if (ctx) {
+      pattern = ctx.createPattern(img, 'repeat');
+    }
+    const missingDataStyle = new Style({ fill: new Fill({ color: pattern }) });
+    const crrArr = [
+      '0.2_1.0',
+      '1.0_2.0',
+      '2.0_3.0',
+      '3.0_5.0',
+      '5.0_7.0',
+      '7.0_10.0',
+      '10.0_15.0',
+      '15.0_20.0',
+      '20.0_30.0',
+      '30.0_50.0',
+      '50.0_200.0',
+    ];
+
+    return (feature: FeatureLike) => {
+      const objectType = feature.get('object_type');
+      if (objectType === 'ROA-missing-data') {
+        return missingDataStyle;
+      } else {
+        const rate = feature.get('level_value');
+        const index = crrArr.findIndex((x) => {
+          return x === rate;
+        });
+        if (index === -1) {
+          return styleArr[styleArr.length - 1];
+        } else {
+          return styleArr[index];
+        }
+      }
+    };
   }
 
   function createCrrStyleFunction(theme: string) {
@@ -230,6 +285,46 @@ const Graphics = () => {
 
     return styleFunction;
   }
+
+  useEffect(() => {
+    /* get OL vector layers using layer cache and set / remove styling
+     * for new and old layers
+     */
+
+    const roaStyle = createRoaStyleFunction(currentCrrStyle);
+
+    let newOlUidRoa: string | null = null;
+
+    let layer: Entry | null = null;
+    if (roaLayerId) {
+      const layerId = roaLayerId;
+      layer = layerCache[roaLayerId] as Entry;
+    }
+
+    if (layer) {
+      newOlUidRoa = layer.ol_uid;
+    }
+
+    const oldLayer = getLayer(currentOlUidRoa);
+    const newLayer = getLayer(newOlUidRoa);
+
+    if (oldLayer) {
+      oldLayer.setVisible(false);
+      oldLayer.setStyle(invisibleStyle);
+    }
+
+    if (newLayer) {
+      if (roaIsVisible) {
+        newLayer.setVisible(true);
+        newLayer.setStyle(roaStyle);
+      } else {
+        newLayer.setVisible(false);
+        newLayer.setStyle(invisibleStyle);
+      }
+    }
+    newLayer?.setZIndex(5);
+    setCurrentOlUidRoa(newOlUidRoa);
+  }, [roaLayerId, products, currentCrrStyle]);
 
   useEffect(() => {
     /* get OL vector layers using layer cache and set / remove styling
@@ -409,7 +504,10 @@ const Graphics = () => {
       let id: string | null;
       let opacity: number;
 
-      if (p.name === 'CRR') {
+      if (p.name === 'ROA') {
+        id = roaLayerId;
+        opacity = opacityROA;
+      } else if (p.name === 'CRR') {
         id = crrLayerId;
         opacity = opacityCRR;
       } else if (p.name === 'RDT') {
@@ -437,9 +535,11 @@ const Graphics = () => {
       }
     });
   }, [
+    roaLayerId,
     crrLayerId,
     rdtLayerId,
     lightningLayerId,
+    opacityROA,
     opacityCRR,
     opacityRDT,
     opacityLightning,

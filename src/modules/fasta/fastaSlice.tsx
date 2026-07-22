@@ -7,9 +7,11 @@ import { Root } from 'react-dom/client';
 interface InitialState {
   baseUrl: string;
   token: string;
+  selectedRoaId: string | null;
   selectedCrrId: string | null;
   selectedRdtId: string | null;
   selectedLiId: string | null;
+  profileRoaId: string | null;
   profileCrrId: string | null;
   profileRdtId: string | null;
   profileLiId: string | null;
@@ -18,6 +20,7 @@ interface InitialState {
   fastaProducts: FastaProduct[];
   zmFlag: boolean;
   mzFlag: boolean;
+  opacityROA: number;
   opacityCRR: number;
   opacityRDT: number;
   opacityLightning: number;
@@ -31,11 +34,13 @@ export interface FastaProduct {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'fastaweather.com',
+  baseUrl: 'dev.fastaweather.com',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
+  selectedRoaId: null,
   selectedCrrId: null,
   selectedRdtId: null,
   selectedLiId: null,
+  profileRoaId: null,
   profileCrrId: null,
   profileRdtId: null,
   profileLiId: null,
@@ -44,22 +49,28 @@ const initialState: InitialState = {
   fastaProducts: [
     {
       order: 0,
-      name: 'CRR',
+      name: 'ROA',
       visible: true,
     },
     {
       order: 1,
-      name: 'RDT',
+      name: 'CRR',
       visible: true,
     },
     {
       order: 2,
+      name: 'RDT',
+      visible: true,
+    },
+    {
+      order: 3,
       name: 'LI',
       visible: true,
     },
   ],
   zmFlag: false,
   mzFlag: false,
+  opacityROA: 0.2,
   opacityCRR: 1,
   opacityRDT: 1,
   opacityLightning: 1,
@@ -70,6 +81,9 @@ export const fastaSlice = createSlice({
   name: 'fasta',
   initialState,
   reducers: {
+    updateSelectedRoaId: (state, id: PayloadAction<string | null>) => {
+      state.selectedRoaId = id.payload;
+    },
     updateSelectedCrrId: (state, id: PayloadAction<string | null>) => {
       state.selectedCrrId = id.payload;
     },
@@ -78,6 +92,9 @@ export const fastaSlice = createSlice({
     },
     updateSelectedLightningId: (state, id: PayloadAction<string | null>) => {
       state.selectedLiId = id.payload;
+    },
+    updateProfileRoaId: (state, id: PayloadAction<string | null>) => {
+      state.profileRoaId = id.payload;
     },
     updateProfileCrrId: (state, id: PayloadAction<string | null>) => {
       state.profileCrrId = id.payload;
@@ -103,6 +120,9 @@ export const fastaSlice = createSlice({
     updateMzFlag: (state, flag: PayloadAction<boolean>) => {
       state.mzFlag = flag.payload;
     },
+    updateOpacityROA: (state, opacityLevel: PayloadAction<number>) => {
+      state.opacityROA = opacityLevel.payload;
+    },
     updateOpacityCRR: (state, opacityLevel: PayloadAction<number>) => {
       state.opacityCRR = opacityLevel.payload;
     },
@@ -119,12 +139,15 @@ export const fastaSlice = createSlice({
 });
 
 export const {
+  updateOpacityROA,
   updateOpacityRDT,
   updateOpacityCRR,
   updateOpacityLightning,
+  updateSelectedRoaId,
   updateSelectedCrrId,
   updateSelectedRdtId,
   updateSelectedLightningId,
+  updateProfileRoaId,
   updateProfileCrrId,
   updateProfileRdtId,
   updateProfileLightningId,
@@ -138,12 +161,16 @@ export const {
 
 export const selectBaseUrl = (state: RootState) => state.fasta.baseUrl;
 export const selectToken = (state: RootState) => state.fasta.token;
+export const selectSelectedRoaId = (state: RootState) =>
+  state.fasta.selectedRoaId;
 export const selectSelectedCrrId = (state: RootState) =>
   state.fasta.selectedCrrId;
 export const selectSelectedRdtId = (state: RootState) =>
   state.fasta.selectedRdtId;
 export const selectSelectedLightningId = (state: RootState) =>
   state.fasta.selectedLiId;
+export const selectProfileRoaId = (state: RootState) =>
+  state.fasta.profileRoaId;
 export const selectProfileCrrId = (state: RootState) =>
   state.fasta.profileCrrId;
 export const selectProfileRdtId = (state: RootState) =>
@@ -155,6 +182,8 @@ export const selectLatestTimeslot = (state: RootState) =>
   state.fasta.latestTimeslot;
 export const selectFastaProducts = (state: RootState) =>
   state.fasta.fastaProducts;
+export const selectRoaVisible = (state: RootState) =>
+  isProductVisible(state, 'ROA');
 export const selectCrrVisible = (state: RootState) =>
   isProductVisible(state, 'CRR');
 export const selectRdtVisible = (state: RootState) =>
@@ -162,6 +191,7 @@ export const selectRdtVisible = (state: RootState) =>
 export const selectLiVisible = (state: RootState) => true; //isProductVisible(state, 'RDT');
 export const selectZmFlag = (state: RootState) => state.fasta.zmFlag;
 export const selectMzFlag = (state: RootState) => state.fasta.mzFlag;
+export const selectOpacityROA = (state: RootState) => state.fasta.opacityROA;
 export const selectOpacityCRR = (state: RootState) => state.fasta.opacityCRR;
 export const selectCrrChosenStyle = (state: RootState) =>
   state.fasta.crrChosenStyle;
