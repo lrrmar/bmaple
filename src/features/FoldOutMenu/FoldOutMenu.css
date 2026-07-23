@@ -50,6 +50,14 @@ ul {
   padding: 0;
 }
 
+label {
+  font-size: 0.9rem;
+}
+
+div.menuItem {
+  margin-top: 6px;
+}
+
 .FoldOutMenu {
   display: flex;
   flex-direction: row;
@@ -175,7 +183,7 @@ ul {
 }
 
 .FoldOut.right {
-  width: 300px;
+  width: 200px;
   height: 60vh;
   margin-top: 9vh;
   justify-content: flex-start;

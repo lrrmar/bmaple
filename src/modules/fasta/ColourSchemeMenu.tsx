@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   useAppDispatch as useDispatch,
@@ -62,6 +62,9 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
   //const colourPaletteId: string = useSelector(selectColourPaletteId);
   //const opacity: number = useSelector(selectOpacity);
 
+  const [rainfallOpacityBalance, setRainfallOpacityBalance] = useState(1.0); // 0 = Full CRR, 1 = Full ROA
+  const [rainfallOpacityMaster, setRainfallOpacityMaster] = useState(1.0); // 0 = Invisible, 1 = Full brightness
+
   const style: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -93,9 +96,17 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
 
   const countryList = useSelector(selectCountryList);
 
+  useEffect(() => {
+    dispatch(updateOpacityROA(rainfallOpacityBalance * rainfallOpacityMaster));
+    dispatch(
+      updateOpacityCRR((1 - rainfallOpacityBalance) * rainfallOpacityMaster),
+    );
+  }, [rainfallOpacityBalance, rainfallOpacityMaster]);
+
   return (
     <div style={style}>
       <h4 style={subHeading}>Weather Filters:</h4>
+      {/*
       <div>
         <label htmlFor="opacityROA">ROA Opacity: </label>
         <input
@@ -122,34 +133,117 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
           }
         />
       </div>
-      <div>
+      */}
+      <div className="menuItem">
+        <label htmlFor="opacityRainfallMaster">Rainfall Opacity: </label>
+        <div>
+          <input
+            type="range"
+            id="opacityRainfall"
+            min="0"
+            max="1"
+            step="0.1"
+            onChange={(element) =>
+              setRainfallOpacityMaster(parseFloat(element.target.value))
+            }
+          />
+        </div>
+      </div>
+      <div className="menuItem">
+        <label htmlFor="opacityRainfallBalance">Rainfall source: </label>
+        <div
+          style={{
+            ...timescrollBarStyle,
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: '8px',
+          }}
+        >
+          <span style={{ fontSize: '10px' }}>CRR</span>
+          <label
+            style={{
+              position: 'relative',
+              display: 'inline-block',
+              width: '34px',
+              height: '18px',
+            }}
+          >
+            <input
+              type="checkbox"
+              id="opacityRainfallBalance"
+              checked={rainfallOpacityBalance === 1}
+              onChange={(element) =>
+                setRainfallOpacityBalance(element.target.checked ? 1 : 0)
+              }
+              style={{
+                opacity: 0,
+                width: 0,
+                height: 0,
+              }}
+            />
+            <span
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: '18px',
+                backgroundColor:
+                  rainfallOpacityBalance === 1 ? '#2196f3' : '#ccc',
+                transition: '0.2s',
+                cursor: 'pointer',
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  content: '""',
+                  height: '14px',
+                  width: '14px',
+                  left: rainfallOpacityBalance === 1 ? '18px' : '2px',
+                  bottom: '2px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  transition: '0.2s',
+                }}
+              />
+            </span>
+          </label>
+          <span style={{ fontSize: '10px' }}>ROA</span>
+        </div>
+      </div>
+      <div className="menuItem">
         <label htmlFor="opacityRDT">RDT Opacity: </label>
-        <input
-          type="range"
-          id="opacity"
-          min="0"
-          max="1"
-          step="0.1"
-          onChange={(element) =>
-            dispatch(updateOpacityRDT(parseFloat(element.target.value)))
-          }
-        />
+        <div>
+          <input
+            type="range"
+            id="opacity"
+            min="0"
+            max="1"
+            step="0.1"
+            onChange={(element) =>
+              dispatch(updateOpacityRDT(parseFloat(element.target.value)))
+            }
+          />
+        </div>
       </div>
-      <div>
+      <div className="menuItem">
         <label htmlFor="opacityLightning">Lightning Opacity: </label>
-        <input
-          type="range"
-          id="opacity"
-          min="0"
-          max="1"
-          step="0.1"
-          onChange={(element) =>
-            dispatch(updateOpacityLightning(parseFloat(element.target.value)))
-          }
-        />
+        <div>
+          <input
+            type="range"
+            id="opacity"
+            min="0"
+            max="1"
+            step="0.1"
+            onChange={(element) =>
+              dispatch(updateOpacityLightning(parseFloat(element.target.value)))
+            }
+          />
+        </div>
       </div>
-      <br />
-      <div>
+      <div className="menuItem">
         <label htmlFor="crrStyle">CRR Style: </label>
         <select
           id="crrStyle"
@@ -176,21 +270,23 @@ const ColourSchemeMenu = ({ name, id }: Props) => {
       <br />
 
       <h4 style={subHeading}>CAP Filters</h4>
-      <div>
+      <div className="menuItem">
         <label htmlFor="opacityCAP">CAP Opacity: </label>
-        <input
-          type="range"
-          id="opacity"
-          min="0"
-          max="1"
-          step="0.1"
-          defaultValue="0"
-          onChange={(element) =>
-            dispatch(updateOpacity(parseFloat(element.target.value)))
-          }
-        />
+        <div>
+          <input
+            type="range"
+            id="opacity"
+            min="0"
+            max="1"
+            step="0.1"
+            defaultValue="0"
+            onChange={(element) =>
+              dispatch(updateOpacity(parseFloat(element.target.value)))
+            }
+          />
+        </div>
       </div>
-      <div>
+      <div className="menuItem">
         <label htmlFor="miniCapTime">CAP Timescroll Bar:</label>
         <input
           type="range"

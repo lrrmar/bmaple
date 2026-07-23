@@ -34,7 +34,7 @@ export interface FastaProduct {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'dev.fastaweather.com',
+  baseUrl: 'fastaweather.com',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedRoaId: null,
   selectedCrrId: null,
@@ -70,8 +70,8 @@ const initialState: InitialState = {
   ],
   zmFlag: false,
   mzFlag: false,
-  opacityROA: 0.2,
-  opacityCRR: 1,
+  opacityROA: 1,
+  opacityCRR: 0,
   opacityRDT: 1,
   opacityLightning: 1,
   crrChosenStyle: 'rainbow',
