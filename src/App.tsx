@@ -61,6 +61,8 @@ const App = () => {
 
         <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
 
+        <OnsetVariableSelector />
+
         <DateNavigationMenu>
           <DropdownStartDate></DropdownStartDate>
           <Slider></Slider>

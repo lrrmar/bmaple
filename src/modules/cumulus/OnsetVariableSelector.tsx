@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import MapLegend, { MapLegendProps } from './MapLegend';
-import OnsetDayOfYearLegendData from './OnsetDayOfYearLegendData';
-import OnsetRainDaysAgoLegendData from './OnsetRainDaysAgoLegendData';
-import SegmentedControl from './SegmentedControl';
+import PrecipitationLegendData from './PrecipitationLegendData';
 import {
   selectSelectedOnsetVariable,
   updateSelectedOnsetVariable,
@@ -20,23 +18,14 @@ const OnsetVariableSelector = () => {
     dispatch(updateSelectedOnsetVariable(variable));
   };
 
-  const dayOfYearLegendData = OnsetDayOfYearLegendData.getInstance().data;
-  const rainDaysAgoLegendData = OnsetRainDaysAgoLegendData.getInstance().data;
+  const precipitationLegendData = PrecipitationLegendData.getInstance().data;
 
-  const mapLegendProps: MapLegendProps =
-    selectedLayer === 0
-      ? {
-          data: dayOfYearLegendData,
-          className: 'map-overlay-legend',
-          title: 'Key: onset day of year',
-          labelInterval: 5,
-        }
-      : {
-          data: rainDaysAgoLegendData,
-          className: 'map-overlay-legend',
-          title: 'Key: rain days ago',
-          labelInterval: 1,
-        };
+  const mapLegendProps: MapLegendProps = {
+    data: precipitationLegendData,
+    className: 'map-overlay-legend',
+    title: 'Key: accumulated 24h precipitation, mm',
+    labelInterval: 5,
+  };
 
   return (
     <div
@@ -52,11 +41,6 @@ const OnsetVariableSelector = () => {
       }}
     >
       <MapLegend key={selectedLayer} {...mapLegendProps} />
-      <SegmentedControl
-        options={['Onset Day of Year', 'Rain Days Ago']}
-        selectedIndex={selectedLayer}
-        onChange={handleLayerChange}
-      />
     </div>
   );
 };

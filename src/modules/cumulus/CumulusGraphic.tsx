@@ -29,7 +29,7 @@ import VectorLayer from 'ol/layer/Vector';
 import OpenLayersMap from '../../mapping/OpenLayersMap';
 import { Fill, Stroke } from 'ol/style';
 import { ColorLike } from 'ol/colorlike';
-import OnsetDayOfYearLegendData from './OnsetDayOfYearLegendData';
+import OnsetDayOfYearLegendData from './PrecipitationLegendData';
 import OnsetRainDaysAgoLegendData from './OnsetRainDaysAgoLegendData';
 
 const Picker = () => {
