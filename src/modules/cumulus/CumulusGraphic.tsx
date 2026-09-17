@@ -69,62 +69,15 @@ const Graphics = () => {
     return vectorLayer;
   };
 
-  function createStyle(hexVal: string) {
-    return new Style({ fill: new Fill({ color: hexVal }) });
-  }
-
-  // Define TypeScript interfaces for your GeoJSON structure
-  interface GeoJSONProperties {
-    ObjectType: string;
-    level: number;
-    level_value: string;
-    threshold: number;
-  }
-
   function createEmptyStyleFunction() {
     return (feature: FeatureLike) => {
       return new Style({});
     };
   }
 
-  function createStyleFunction(hexColours: string[]) {
-    const styleArr = hexColours.map((hexVal) => {
-      return createStyle(hexVal);
-    });
-
-    return (feature: FeatureLike) => {
-      const properties = feature.getProperties() as GeoJSONProperties;
-
-      // Check if this is a contour feature
-      if (properties.ObjectType !== 'data-contour') {
-        return new Style({}); // Return empty style for non-contour features
-      }
-
-      // Get the level from properties
-      const level = properties.level;
-
-      // Get color from palette, default to gray if not found
-      return styleArr[level];
-    };
-  }
-
-  function createDayOfYearStyleFunction() {
-    const legendData = OnsetDayOfYearLegendData.getInstance();
-    return createStyleFunction(legendData.getColorsArray());
-  }
-
-  function createRainDaysAgoStyleFunction() {
-    const legendData = OnsetRainDaysAgoLegendData.getInstance();
-    return createStyleFunction(legendData.getColorsArray());
-  }
-
   useEffect(() => {
     // get OL vector layers using layer cache and set / remove styling
     // for new and old layers
-
-    let styleFn: (feature: FeatureLike) => Style;
-    styleFn = createEmptyStyleFunction();
-
     let newOlUid: string | null = null;
 
     let layer: Entry | null = null;
@@ -132,13 +85,8 @@ const Graphics = () => {
       const id = layerId;
       layer = layerCache[layerId] as Entry;
       console.log('CumulusGraphic: found layer in cache for id: ' + id);
-      if (id.startsWith('days')) {
-        console.log('CumulusGraphic: using Rain Days Ago style function');
-        styleFn = createRainDaysAgoStyleFunction();
-      } else if (id.startsWith('doy')) {
-        console.log('CumulusGraphic: using Day of Year style function');
-        styleFn = createDayOfYearStyleFunction();
-      }
+      //if (id.startsWith('days')) {
+      //styleFn = createPrecipStyleFunction();
     }
 
     if (layer) {
@@ -152,13 +100,16 @@ const Graphics = () => {
     const newLayer = getLayer(newOlUid);
 
     if (oldLayer) {
+      console.log('Hiding old layer with OL UID: ' + currentOlUid);
       oldLayer.setVisible(false);
-      oldLayer.setStyle(invisibleStyle);
+      oldLayer.setOpacity(0);
+      //oldLayer.setStyle(invisibleStyle);
     }
 
     if (newLayer) {
       newLayer.setVisible(true);
-      newLayer.setStyle(styleFn);
+      newLayer.setOpacity(0.75);
+      //newLayer.setStyle(styleFn);
     }
     newLayer?.setZIndex(5);
 

@@ -8,8 +8,8 @@ interface InitialState {
   baseUrl: string;
   token: string;
   selectedOnsetVariable: string | null;
-  selectedDayOfYear: string | null;
-  selectedEntry: string | null;
+  selectedDayOfYear: string | null; // start date
+  selectedEntry: string | null; // lead time in hours eg "024h"
   profileLayerId: string | null;
   //hashTables: HashTable[];
   //latestTimeslot: number | null; // latest as a unix timestamp
@@ -18,12 +18,12 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  baseUrl: 'cumulusstorageaccount1.blob.core.windows.net/data/2025_Ghana_onset',
-  //baseUrl: 'dev.fastaweather.com',
+  baseUrl:
+    'cumulusstorageaccount1.blob.core.windows.net/data/downscaling-inference-outputs/png',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
-  selectedOnsetVariable: 'doy',
-  selectedDayOfYear: '2025/02/01',
-  selectedEntry: '0',
+  selectedOnsetVariable: 'precip_24h',
+  selectedDayOfYear: '2026-09-11',
+  selectedEntry: '024h',
   profileLayerId: null,
   //profileCrrId: null,
   //hashTables: [],

@@ -59,8 +59,6 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
 
-        <OnsetVariableSelector />
-
         <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
 
         <DateNavigationMenu>

@@ -32,12 +32,9 @@ const Slider = () => {
 
   const [sliderSlots, setSliderSlots] = useState<number[]>([]);
 
-  const [selectedSlot, setSelectedSlot] = useState<number>();
-
   const [selectedEntry, setSelectedEntry] = useState<number>();
 
-  const [selectedEntryString, setSelectedEntryString] =
-    useState('Forecast step:');
+  const [selectedEntryString, setSelectedEntryString] = useState('Lead time:');
 
   const [currentSliderValue, setCurrentSliderValue] =
     useState<number>(defaultSliderValue);
@@ -52,22 +49,18 @@ const Slider = () => {
   useEffect(() => {
     /* Initial selection / positioning
      */
-    //console.log('fastaLatestTimeslot:' + fastaLatestTimeslot);
-    // Start the slider 2 hours (8 slots) previous of latest slot:
-    //const firstMsecs = fastaLatestTimeslot - 8 * slot_ms;
-    //const slots = Array(nTimeslots)
-    //  .fill(0)
-    //  .map((_, i) => i);
-    //  .map((_, i) => firstMsecs + i * slot_ms);
-    //console.log('slots:');
-    //console.log(slots);
-    //console.log(timeslots);
-    //setSliderSlots(slots);
-    //console.log('sliderSlots:');
-    //console.log(sliderSlots);
-    //setSelectedTimeslot(timeslots[defaultSliderValue]);
 
-    setSelectedEntry(0);
+    // We have an array of slider slots, which are lead times,
+    // in hours, from 0 to 1108:
+    // So they go 24, 48, 72, ... , 1108
+    const slots = Array(nTimeslots)
+      .fill(0)
+      .map((_, i) => (i + 1) * 24);
+    setSliderSlots(slots);
+
+    console.log('sliderSlots: ' + slots);
+    console.log('sliderSlots[0]: ' + slots[0]);
+    setSelectedEntry(slots[0]);
   }, []);
 
   // Handle changes to slider selection
@@ -79,121 +72,14 @@ const Slider = () => {
       return;
     }
 
-    const strSelected = '' + selectedEntry;
+    // Format the selected entry as a lead time string in hours,
+    // padded with a leading zero if necessary
+    const strSelected = selectedEntry.toString().padStart(3, '0') + 'h';
 
-    setSelectedEntryString('Forecast step: +' + strSelected + ' days');
+    setSelectedEntryString('Lead time: +' + strSelected);
 
+    console.log('strSelected:' + strSelected);
     dispatch(updateSelectedEntry(strSelected));
-
-    /*
-    if (selectedTimeslot) {
-      const strSelected = dateTimeDisplayString(selectedTimeslot);
-      setSelectedTimeString(strSelected);
-
-      if (Date.now() - fastaLatestTimeslot >= 60 * 1000 * 60) {
-        setUserMessageGeneral('WARNING: latest data is from > 1 hour ago.');
-      }
-
-      //console.log("setSelectedTimeslot:" + strSelected);
-
-      setTimeZoneString(timezoneDisplayString(selectedTimeslot));
-
-      // Find the CRR hash with matching effective_ts
-      const crrLayerHash = fastaHashes.find((hash: HashTable) => {
-        return hash.name === 'crr' && hash.effective_ts === selectedTimeslot;
-      });
-
-      if (crrLayerHash) {
-        if (crrLayerHash.is_available) {
-          const url = fastaHashTableToUrl(crrLayerHash);
-          const newCrrLayerHash = { apiRequest: url };
-          setUserMessageCrr(undefined);
-          dispatch(updateSelectedCrrId(newCrrLayerHash.apiRequest));
-        } else {
-          setUserMessageCrr(
-            'CRR: data not available for ' +
-              timeDisplayString(crrLayerHash.effective_ts) +
-              ' slot',
-          );
-          dispatch(updateSelectedCrrId(null));
-        }
-      } else {
-        setUserMessageCrr('CRR: data not available');
-        dispatch(updateSelectedCrrId(null));
-      }
-
-      // Find the RDT hash with matching effective_ts
-      const rdtLayerHash = fastaHashes.find((hash: HashTable) => {
-        return hash.name === 'rdt' && hash.effective_ts === selectedTimeslot;
-      });
-
-      if (rdtLayerHash) {
-        if (rdtLayerHash.is_available) {
-          const url = fastaHashTableToUrl(rdtLayerHash);
-          console.log(url);
-          const newRdtLayerHash = { apiRequest: url };
-          dispatch(updateSelectedRdtId(newRdtLayerHash.apiRequest));
-
-          if (rdtLayerHash.completeness && rdtLayerHash.completeness < 92) {
-            setUserMessageRdt(
-              'RDT: data incomplete ' +
-                rdtLayerHash.completeness +
-                '% for ' +
-                timeDisplayString(rdtLayerHash.effective_ts) +
-                ' slot',
-            );
-          } else {
-            setUserMessageRdt(undefined);
-          }
-        } else {
-          setUserMessageRdt(
-            'RDT: data not available for ' +
-              timeDisplayString(rdtLayerHash.effective_ts) +
-              ' slot',
-          );
-          dispatch(updateSelectedRdtId(null));
-        }
-      } else {
-        // No forecasts for RDT
-        if (selectedTimeslot <= fastaLatestTimeslot) {
-          setUserMessageRdt('RDT: data not available');
-        }
-        dispatch(updateSelectedRdtId(null));
-      }
-
-      // Find the LI hash with matching effective_ts
-      const liLayerHash = fastaHashes.find((hash: HashTable) => {
-        return hash.name === 'li' && hash.effective_ts === selectedTimeslot;
-      });
-
-      if (liLayerHash) {
-        if (liLayerHash.is_available) {
-          const url = fastaHashTableToUrl(liLayerHash);
-          const newLiLayerHash = { apiRequest: url };
-          dispatch(updateSelectedLightningId(newLiLayerHash.apiRequest));
-          setUserMessageLi(undefined);
-        } else {
-          setUserMessageLi(
-            'LI: data not available for ' +
-              timeDisplayString(liLayerHash.effective_ts) +
-              ' slot',
-          );
-          dispatch(updateSelectedLightningId(null));
-        }
-      } else {
-        // No forecasts for LI
-        if (selectedTimeslot <= fastaLatestTimeslot) {
-          setUserMessageLi('LI: data not available');
-        }
-        dispatch(updateSelectedLightningId(null));
-      }
-
-      if (selectedTimeslot > fastaLatestTimeslot) {
-        setUserMessageRdt('Forecasts are not displayed for RDT and lightning');
-        setUserMessageLi(undefined);
-      }
-    }
-    */
   }, [selectedEntry]);
 
   return (
@@ -215,14 +101,11 @@ const Slider = () => {
               onChange={(value) => {
                 console.log('onChange value=' + value);
                 setCurrentSliderValue(value);
-                setSelectedEntry(value);
-                /*
                 console.log('sliderSlots: ' + sliderSlots.length);
                 if (value >= 0 && value <= sliderSlots.length) {
-                  console.log('setSelectedSlot(' + sliderSlots[value] + ')');
-                  setSelectedSlot(sliderSlots[value]);
+                  console.log('setSelectedEntry(' + sliderSlots[value] + ')');
+                  setSelectedEntry(sliderSlots[value]);
                 }
-                  */
               }}
               value={currentSliderValue}
               //defaultValue={defaultSliderValue}
