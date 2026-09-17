@@ -2,7 +2,7 @@ name: Build and deploy CRA to Azure Web App
 
 on:
   push:
-    branches: [ cumulus-onset ]
+    branches: [ cumulus-ml-precipitation ]
   workflow_dispatch: {}
 
 jobs:
