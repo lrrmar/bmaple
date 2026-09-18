@@ -71,7 +71,7 @@ const DropdownStartDate = () => {
   return (
     <div className="dropdown-container">
       <label htmlFor="start-date-dropdown" className="dropdown-label">
-        Forecast start date:
+        Model run date:
       </label>
       <select
         id="start-date-dropdown"
