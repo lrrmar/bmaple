@@ -21,7 +21,7 @@ const DropdownStartDate = () => {
     /* Array of selectable start dates */
     const startDates: Date[] = [];
     startDates.push(new Date('2026-09-11'));
-    startDates.push(new Date('2026-09-09'));
+    //startDates.push(new Date('2026-09-09')); // nc Files under here have a 2026-09-11 prefix
     startDates.push(new Date('2026-09-07'));
 
     const options = startDates.map((date) => {

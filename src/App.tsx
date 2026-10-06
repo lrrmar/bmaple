@@ -23,6 +23,7 @@ import PopUpListener from './modules/cumulus/PopUpListener';
 import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
 import Slider from './modules/cumulus/Slider';
 import DropdownStartDate from './modules/cumulus/DropdownStartDate';
+import DropdownAccumDays from './modules/cumulus/DropdownAccumDays';
 import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
 
 export const store = configureStore({
@@ -65,6 +66,7 @@ const App = () => {
 
         <DateNavigationMenu>
           <DropdownStartDate></DropdownStartDate>
+          <DropdownAccumDays></DropdownAccumDays>
           <Slider></Slider>
         </DateNavigationMenu>
       </Map>

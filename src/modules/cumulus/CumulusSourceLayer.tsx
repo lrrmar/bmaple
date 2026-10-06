@@ -47,8 +47,9 @@ const CumulusSourceLayer = ({ id, sourceIdentifier, extent }: Props) => {
     // optional prefix path inside the container (e.g. "data/2025_Ghana_onset")
     containerPrefix = '',
   ) => {
-    const [datePart, leadTimePart] = params;
-    const subpath = `${datePart}/model_unet_precip/precip_24h/data/${datePart}T00_lead${leadTimePart}.png`;
+    const [datePart, leadTimePart, accumDaysPart] = params;
+    //const subpath = `${datePart}/model_unet_precip/precip_24h/data/${datePart}T00_lead${leadTimePart}.png`;
+    const subpath = `${datePart}/${accumDaysPart}day/lead_${leadTimePart}.png`;
     // doyT00_lead2026-09-07.png
     // Build full URL. `storageHost` may already include container/prefix.
     const host = storageHost.replace(/\/+$/g, '');
