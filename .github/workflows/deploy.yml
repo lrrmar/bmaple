@@ -2,7 +2,7 @@ name: Build and deploy CRA to Azure Web App
 
 on:
   push:
-    branches: [ cumulus-ml-precipitation ]
+    branches: [ cumulus-ml-test ]
   workflow_dispatch: {}
 
 jobs:
@@ -77,7 +77,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ secrets.AZURE_CUMULUS_WEB_APP_ML_NAME }}
-          publish-profile: ${{ secrets.AZURE_CUMULUS_WEB_APP_ML_PUBLISH_PROFILE }}
+          app-name: ${{ secrets.AZURE_CUMULUS_WEB_APP_ML_NEW_NAME }}
+          publish-profile: ${{ secrets.AZURE_CUMULUS_WEB_APP_ML_NEW_PUBLISH_PROFILE }}
           package: ./app.zip
 
