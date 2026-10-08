@@ -55,7 +55,7 @@ const CumulusSourceLayer = ({ id, sourceIdentifier, extent }: Props) => {
     const host = storageHost.replace(/\/+$/g, '');
     const cp = containerPrefix.replace(/^\/+|\/+$/g, '');
     const path = cp ? `${cp}/${subpath}` : subpath;
-    return `https://${host}/${path}`;
+    return `${host}/${path}`;
   };
 
   const [url, setUrl] = useState(() =>
