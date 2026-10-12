@@ -20,7 +20,7 @@
     "subseasonal_model_name": "aurora",
     "subseasonal_model_head": "era5",
     "downscaled_model_name": "unet",
-    "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_unet_precip/ckpt-Unet_Training_Global-030000/total_precipitation_24h_acc_imerg/precip_24h/data/",
+    "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_unet_precip/ckpt-Unet_Training_Global-030000/total_precipitation_24h_acc_era5/precip_24h/data/",
     "output_relative_path": "aurora/[run_date]/model_unet/total_precipitation_24h_acc_era5/"
   },
   {
@@ -28,7 +28,7 @@
     "subseasonal_model_name": "aurora",
     "subseasonal_model_head": "imerg",
     "downscaled_model_name": "unet",
-    "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_diffusion_unet_precip_input_output_residual_shiftedlog_calibrated_silu_selfcond/ckpt-diffusion-edm-global-precip-input-output-residual-020000_heun_n20_cfg3_ens10/total_precipitation_24h_acc_imerg/precip_24h/data/",
+    "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_unet_precip/ckpt-Unet_Training_Global-030000/total_precipitation_24h_acc_imerg/precip_24h/data/",
     "output_relative_path": "aurora/[run_date]/model_unet/total_precipitation_24h_acc_imerg/"
   },
   {
@@ -37,7 +37,7 @@
     "subseasonal_model_head": "era5",
     "downscaled_model_name": "diffusion-mean",
     "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_diffusion_unet_precip_input_output_residual_shiftedlog_calibrated_silu_selfcond/ckpt-diffusion-edm-global-precip-input-output-residual-020000_heun_n20_cfg3_ens10/total_precipitation_24h_acc_era5/precip_24h/data/",
-    "output_relative_path": "aurora/[run_date]/model_diffusion-mean/total_precipitation_24h_acc_era5/"
+    "output_relative_path": "aurora/[run_date]/model_diffusion_mean/total_precipitation_24h_acc_era5/"
   },
   {
     "combination_name": "aurora-imerg_diffusion-mean",
@@ -45,7 +45,7 @@
     "subseasonal_model_head": "imerg",
     "downscaled_model_name": "diffusion-mean",
     "input_relative_path": "aurora/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_diffusion_unet_precip_input_output_residual_shiftedlog_calibrated_silu_selfcond/ckpt-diffusion-edm-global-precip-input-output-residual-020000_heun_n20_cfg3_ens10/total_precipitation_24h_acc_imerg/precip_24h/data/",
-    "output_relative_path": "aurora/[run_date]/model_diffusion-mean/total_precipitation_24h_acc_imerg/"
+    "output_relative_path": "aurora/[run_date]/model_diffusion_mean/total_precipitation_24h_acc_imerg/"
   },
   {
     "combination_name": "ifs_bilinear",
@@ -66,6 +66,6 @@
     "subseasonal_model_name": "ifs",
     "downscaled_model_name": "diffusion-mean",
     "input_relative_path": "ifs/east_africa-ghana-kenya-senegal-west_africa/[run_date]/model_diffusion_unet_precip_input_output_residual_shiftedlog_calibrated_silu_selfcond/ckpt-diffusion-edm-global-precip-input-output-residual-020000_heun_n20_cfg3_ens10/total_precipitation_24h_acc/precip_24h/data/",
-    "output_relative_path": "ifs/[run_date]/model_diffusion-mean/total_precipitation_24h_acc/"
+    "output_relative_path": "ifs/[run_date]/model_diffusion_mean/total_precipitation_24h_acc/"
   }
 ]
