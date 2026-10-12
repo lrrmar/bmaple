@@ -4,6 +4,7 @@ import ReactSlider from 'react-slider';
 import './Slider.css';
 import {
   //selectHashTables,
+  selectSelectedAccumDays,
   updateSelectedEntry,
 } from './cumulusSlice';
 //import type { HashTable } from './CumulusHashTables';
@@ -26,6 +27,10 @@ const Slider = () => {
   //const slot_ms = 15 * 60 * 1000; // duration of 1 timeslot in msecs
 
   const dispatch = useDispatch();
+  const accumDays = useSelector(selectSelectedAccumDays) ?? 1;
+
+  // An N-day accumulation only exists from lead time N*24h, i.e. slot index N-1
+  const minSliderValue = Math.min(accumDays, nTimeslots) - 1;
 
   //const fastaHashes: HashTable[] = useSelector(selectHashTables);
   //const fastaLatestTimeslot: number | null = useSelector(selectLatestTimeslot);
@@ -63,6 +68,15 @@ const Slider = () => {
     setSelectedEntry(slots[0]);
   }, []);
 
+  // Move the slider up if the accumulation period makes the current lead time invalid
+  useEffect(() => {
+    if (sliderSlots.length === 0 || currentSliderValue >= minSliderValue) {
+      return;
+    }
+    setCurrentSliderValue(minSliderValue);
+    setSelectedEntry(sliderSlots[minSliderValue]);
+  }, [minSliderValue, sliderSlots]);
+
   // Handle changes to slider selection
   useEffect(() => {
     //console.log("Slider::useEffect(), [selectedTimeslot]");
@@ -90,7 +104,14 @@ const Slider = () => {
         )}
       </div>
       <div className="slider">
-        <div className="slider-time-label">{selectedEntryString}</div>
+        <div className="slider-time-label">
+          {selectedEntryString}
+          {accumDays > 1 && (
+            <span className="slider-hint">
+              {accumDays}-day accumulation available from +{accumDays * 24}h
+            </span>
+          )}
+        </div>
         <div className="slider-controls">
           <div className="slider-container">
             <ReactSlider
@@ -102,7 +123,7 @@ const Slider = () => {
                 console.log('onChange value=' + value);
                 setCurrentSliderValue(value);
                 console.log('sliderSlots: ' + sliderSlots.length);
-                if (value >= 0 && value <= sliderSlots.length) {
+                if (value >= minSliderValue && value < sliderSlots.length) {
                   console.log('setSelectedEntry(' + sliderSlots[value] + ')');
                   setSelectedEntry(sliderSlots[value]);
                 }
@@ -110,7 +131,7 @@ const Slider = () => {
               value={currentSliderValue}
               //defaultValue={defaultSliderValue}
               markClassName="customSlider-mark"
-              min={0}
+              min={minSliderValue}
               max={nTimeslots - 1}
             />
             &nbsp;
