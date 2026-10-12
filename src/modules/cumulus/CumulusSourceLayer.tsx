@@ -140,6 +140,8 @@ const CumulusSourceLayer = ({ id, sourceIdentifier, extent }: Props) => {
         //projection: display_crs,
       }),
       opacity: 0.75,
+      // Visibility is managed by CumulusGraphic
+      visible: false,
     });
 
     hasFetched.current = true;

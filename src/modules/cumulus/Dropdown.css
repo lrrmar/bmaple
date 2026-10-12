@@ -39,3 +39,33 @@
 .dropdown-select option {
   padding: 8px;
 }
+
+.dropdown-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.dropdown-row .dropdown-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-step-button {
+  padding: 0 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+}
+
+.dropdown-step-button:hover:not(:disabled) {
+  border-color: #888;
+}
+
+.dropdown-step-button:disabled {
+  color: #bbb;
+  cursor: default;
+}

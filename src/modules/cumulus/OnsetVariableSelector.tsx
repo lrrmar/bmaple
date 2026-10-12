@@ -29,7 +29,7 @@ const OnsetVariableSelector = () => {
   };
 
   return (
-    <div>
+    <div className="map-legend-anchor">
       <MapLegend key={selectedLayer} {...mapLegendProps} />
     </div>
   );

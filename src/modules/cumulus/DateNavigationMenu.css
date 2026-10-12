@@ -2,7 +2,7 @@
   position: absolute;
   top: 5px;
   left: 5px;
-  width: 700px;
+  width: 355px; /* dropdowns stay at their previous ~340px width */
   max-width: calc(100vw - 20px);
   z-index: 10;
   display: flex;
@@ -15,7 +15,7 @@
   color: rgba(255, 255, 255, 1);
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 6px;
   padding: 6px;
   box-sizing: border-box;
@@ -26,11 +26,6 @@
   /*background-color: rgba(0,0,0,0.8);*/
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 3px;
-}
-
-/* Lead time slider spans both columns */
-.DateNavigationMenu .slider-wrapper {
-  grid-column: 1 / -1;
 }
 
 /*

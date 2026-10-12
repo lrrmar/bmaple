@@ -28,6 +28,7 @@ import {
   DropdownSubseasonalModel,
   DropdownDownscalingModel,
 } from './modules/cumulus/DropdownModels';
+import OpacitySlider from './modules/cumulus/OpacitySlider';
 import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
 
 export const store = configureStore({
@@ -73,10 +74,11 @@ const App = () => {
             <DropdownStartDate></DropdownStartDate>
             <DropdownAccumDays></DropdownAccumDays>
             <Slider></Slider>
+            <OpacitySlider></OpacitySlider>
           </DateNavigationMenu>
-
-          <OnsetVariableSelector />
         </div>
+
+        <OnsetVariableSelector />
       </Map>
     </div>
   );

@@ -1,3 +1,13 @@
+/* Bottom right, twice the width of the controls menu */
+.map-legend-anchor {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 710px;
+  max-width: calc(100vw - 40px);
+  z-index: 10;
+}
+
 .map-legend {
   background: white;
   border-radius: 6px;

@@ -20,6 +20,7 @@ interface InitialState {
   //latestTimeslot: number | null; // latest as a unix timestamp
   //opacityCRR: number;
   chosenStyle: string;
+  overlayOpacity: number; // 0 to 1
 }
 
 const initialState: InitialState = {
@@ -40,6 +41,7 @@ const initialState: InitialState = {
   //latestTimeslot: null,
   //opacityCRR: 1,
   chosenStyle: 'rainbow',
+  overlayOpacity: 0.75,
 };
 
 export const cumulusSlice = createSlice({
@@ -63,6 +65,9 @@ export const cumulusSlice = createSlice({
     },
     updateSelectedAccumDays: (state, id: PayloadAction<number | null>) => {
       state.selectedAccumDays = id.payload;
+    },
+    updateOverlayOpacity: (state, opacity: PayloadAction<number>) => {
+      state.overlayOpacity = Math.min(1, Math.max(0, opacity.payload));
     },
     updateRunDatesByCombo: (state, dates: PayloadAction<RunDatesByCombo>) => {
       state.runDatesByCombo = dates.payload;
@@ -94,10 +99,13 @@ export const {
   updateProfileLayerId,
   updateChosenStyle,
   updateRunDatesByCombo,
+  updateOverlayOpacity,
   updateSelectedSubseasonalModel,
   updateSelectedDownscalingModel,
 } = cumulusSlice.actions;
 
+export const selectOverlayOpacity = (state: RootState) =>
+  state.cumulus.overlayOpacity;
 export const selectRunDatesByCombo = (state: RootState) =>
   state.cumulus.runDatesByCombo;
 export const selectSelectedSubseasonalModel = (state: RootState) =>

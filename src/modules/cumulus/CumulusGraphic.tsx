@@ -10,7 +10,11 @@ import { Geometry } from 'ol/geom';
 import { getUid } from 'ol/util';
 import { get } from 'ol/proj';
 
-import { selectProfileLayerId, selectChosenStyle } from './cumulusSlice';
+import {
+  selectProfileLayerId,
+  selectChosenStyle,
+  selectOverlayOpacity,
+} from './cumulusSlice';
 import {
   Entry,
   Ingest,
@@ -43,8 +47,8 @@ const Graphics = () => {
 
   const layerId = useSelector(selectProfileLayerId);
   const layerCache = useSelector(selectCache);
+  const overlayOpacity = useSelector(selectOverlayOpacity);
 
-  const [currentOlUid, setCurrentOlUid] = useState<string | null>(null);
   //const products: FastaProduct[] = useSelector(selectFastaProducts);
   const invisibleStyle = (feature: any, resolution: any) => [];
 
@@ -76,45 +80,28 @@ const Graphics = () => {
   }
 
   useEffect(() => {
-    // get OL vector layers using layer cache and set / remove styling
-    // for new and old layers
-    let newOlUid: string | null = null;
+    // Show exactly one cumulus layer (the selected one) and hide all others.
+    // Derived from the cache on every change, so it is safe to re-run and
+    // corrects any layer that was missed earlier.
+    const selected = layerId ? layerCache[layerId] : undefined;
+    const selectedUid =
+      selected && isEntry(selected) ? (selected as Entry).ol_uid : null;
 
-    let layer: Entry | null = null;
-    if (layerId) {
-      const id = layerId;
-      layer = layerCache[layerId] as Entry;
-      console.log('CumulusGraphic: found layer in cache for id: ' + id);
-      //if (id.startsWith('days')) {
-      //styleFn = createPrecipStyleFunction();
-    }
+    Object.values(layerCache).forEach((element) => {
+      if (!isEntry(element) || element.source !== 'cumulus') return;
+      const layer = getLayer(element.ol_uid);
+      if (!layer) return;
 
-    if (layer) {
-      newOlUid = layer.ol_uid;
-    }
-
-    console.log('Graphic currentOlUidCrr: ' + currentOlUid);
-    console.log('Graphic newOlUidCrr: ' + newOlUid);
-
-    const oldLayer = getLayer(currentOlUid);
-    const newLayer = getLayer(newOlUid);
-
-    if (oldLayer) {
-      console.log('Hiding old layer with OL UID: ' + currentOlUid);
-      oldLayer.setVisible(false);
-      oldLayer.setOpacity(0);
-      //oldLayer.setStyle(invisibleStyle);
-    }
-
-    if (newLayer) {
-      newLayer.setVisible(true);
-      newLayer.setOpacity(0.75);
-      //newLayer.setStyle(styleFn);
-    }
-    newLayer?.setZIndex(5);
-
-    setCurrentOlUid(newOlUid);
-  }, [layerId]);
+      if (element.ol_uid === selectedUid) {
+        layer.setVisible(true);
+        layer.setOpacity(overlayOpacity);
+        layer.setZIndex(5);
+      } else {
+        layer.setVisible(false);
+        layer.setOpacity(0);
+      }
+    });
+  }, [layerId, layerCache, overlayOpacity]);
 
   /*
   // set opacity
