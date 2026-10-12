@@ -5,23 +5,51 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #d1d5db;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  min-width: 700px;
-  max-width: 900px;
-  margin: 0 auto;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.map-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 0 0 8px 0;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.map-legend-header[aria-expanded='false'] {
+  margin-bottom: 0;
 }
 
 .map-legend-title {
+  flex: 1;
   font-size: 14px;
   font-weight: 600;
   color: #374151;
-  margin: 0 0 8px 0;
   text-align: center;
-  padding: 0;
+}
+
+.map-legend-chevron {
+  font-size: 20px;
+  line-height: 1;
+  color: #374151;
 }
 
 .map-legend-content {
   position: relative;
   width: 100%;
+}
+
+.map-legend-content[hidden] {
+  display: none;
 }
 
 /* Color Bar */
@@ -83,8 +111,6 @@
 /* Responsive Design */
 @media (max-width: 1000px) {
   .map-legend {
-    min-width: 600px;
-    max-width: 700px;
     padding: 10px 14px;
   }
 
@@ -100,8 +126,7 @@
 
 @media (max-width: 700px) {
   .map-legend {
-    min-width: unset;
-    width: 95% !important;
+    width: 100% !important;
     padding: 8px 10px;
   }
 

@@ -83,7 +83,7 @@ const Slider = () => {
   }, [selectedEntry]);
 
   return (
-    <div>
+    <div className="slider-wrapper">
       <div className="slider-message">
         {userMessageGeneral && (
           <div className="slider-message-label">{userMessageGeneral}</div>

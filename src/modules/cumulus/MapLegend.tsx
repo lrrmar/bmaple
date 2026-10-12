@@ -14,7 +14,12 @@ export interface MapLegendProps {
   className?: string;
 }
 
-class MapLegend extends Component<MapLegendProps> {
+class MapLegend extends Component<MapLegendProps, { collapsed: boolean }> {
+  state = { collapsed: false };
+
+  private toggleCollapsed = () =>
+    this.setState((prev) => ({ collapsed: !prev.collapsed }));
+
   static defaultProps = {
     title: 'Key: precipitation, mm',
     labelInterval: 5,
@@ -59,9 +64,19 @@ class MapLegend extends Component<MapLegendProps> {
 
     return (
       <div className={`map-legend ${className}`} style={{ width: width }}>
-        {title && <div className="map-legend-title">{title}</div>}
+        <button
+          type="button"
+          className="map-legend-header"
+          onClick={this.toggleCollapsed}
+          aria-expanded={!this.state.collapsed}
+        >
+          <span className="map-legend-title">{title}</span>
+          <span className="map-legend-chevron">
+            {this.state.collapsed ? '▸' : '▾'}
+          </span>
+        </button>
 
-        <div className="map-legend-content">
+        <div className="map-legend-content" hidden={this.state.collapsed}>
           {/* Discrete Color Bins */}
           <div className="color-bar">
             {items.map((item) => (

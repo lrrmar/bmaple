@@ -12,6 +12,8 @@ import {
   selectSelectedEntry,
   updateProfileLayerId,
   selectBaseUrl,
+  selectSelectedSubseasonalModel,
+  selectSelectedDownscalingModel,
 } from './cumulusSlice';
 import CumulusSourceLayer from './CumulusSourceLayer';
 import { transformExtent } from 'ol/proj';
@@ -79,6 +81,10 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   const dayOfYear: string | null = useSelector(selectSelectedDayOfYear);
   const accumDays: number | null = useSelector(selectSelectedAccumDays);
   const entry: string | null = useSelector(selectSelectedEntry);
+  const subseasonalModel = useSelector(selectSelectedSubseasonalModel);
+  const downscalingModel = useSelector(selectSelectedDownscalingModel);
+  const buildRequestId = () =>
+    [dayOfYear, entry, accumDays, subseasonalModel, downscalingModel].join('?');
   //const liRequestId: string | null = useSelector(selectSelectedLightningId);
   //const hashTables: HashTable[] = useSelector(selectHashTables);
   const cumulusBaseUrl = useSelector(selectBaseUrl);
@@ -88,7 +94,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
 
   // Put initial entry into cache
   useEffect(() => {
-    const requestId = dayOfYear + '?' + entry + '?' + accumDays;
+    const requestId = buildRequestId();
     const newRequest = {
       id: requestId,
       source: 'cumulus',
@@ -101,7 +107,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   }, []);
 
   useEffect(() => {
-    const requestId = dayOfYear + '?' + entry + '?' + accumDays;
+    const requestId = buildRequestId();
     if (requestId && !cache[requestId]) {
       console.log('CACHE MISS');
       dispatch(request({ id: requestId, source: 'cumulus' }));
@@ -109,7 +115,14 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
       console.log('CACHE HIT');
       dispatch(updateProfileLayerId(requestId));
     }
-  }, [onsetVariable, dayOfYear, entry, accumDays]);
+  }, [
+    onsetVariable,
+    dayOfYear,
+    entry,
+    accumDays,
+    subseasonalModel,
+    downscalingModel,
+  ]);
 
   useEffect(() => {
     if (!runMeta) return;

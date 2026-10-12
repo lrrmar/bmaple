@@ -11,6 +11,7 @@ import {
 } from '../../hooks';
 import { selectCache, ingest, Ingest } from '../../mapping/cacheSlice';
 import { selectBaseUrl, updateProfileLayerId } from './cumulusSlice';
+import { getOutputRelativePath } from './modelPaths';
 import openLayersMap from '../../mapping/OpenLayersMap';
 import GeoJSON from 'ol/format/GeoJSON';
 //import FastaHashTablesServer from './FastaHashTables';
@@ -47,9 +48,25 @@ const CumulusSourceLayer = ({ id, sourceIdentifier, extent }: Props) => {
     // optional prefix path inside the container (e.g. "data/2025_Ghana_onset")
     containerPrefix = '',
   ) => {
-    const [datePart, leadTimePart, accumDaysPart] = params;
-    //const subpath = `${datePart}/model_unet_precip/precip_24h/data/${datePart}T00_lead${leadTimePart}.png`;
-    const subpath = `${datePart}/${accumDaysPart}day/lead_${leadTimePart}.png`;
+    const [
+      datePart,
+      leadTimePart,
+      accumDaysPart,
+      subseasonalModel,
+      downscalingModel,
+    ] = params;
+    const modelPath = getOutputRelativePath(
+      subseasonalModel,
+      downscalingModel,
+      datePart,
+    );
+    if (!modelPath) {
+      console.error(
+        `No model entry for ${subseasonalModel} / ${downscalingModel}`,
+      );
+      return '';
+    }
+    const subpath = `${modelPath}/${accumDaysPart}day/lead_${leadTimePart}.png`;
     // doyT00_lead2026-09-07.png
     // Build full URL. `storageHost` may already include container/prefix.
     const host = storageHost.replace(/\/+$/g, '');

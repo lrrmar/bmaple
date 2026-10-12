@@ -24,6 +24,10 @@ import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
 import Slider from './modules/cumulus/Slider';
 import DropdownStartDate from './modules/cumulus/DropdownStartDate';
 import DropdownAccumDays from './modules/cumulus/DropdownAccumDays';
+import {
+  DropdownSubseasonalModel,
+  DropdownDownscalingModel,
+} from './modules/cumulus/DropdownModels';
 import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
 
 export const store = configureStore({
@@ -62,13 +66,17 @@ const App = () => {
 
         <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
 
-        <OnsetVariableSelector />
+        <div className="cumulus-controls-stack">
+          <DateNavigationMenu>
+            <DropdownSubseasonalModel></DropdownSubseasonalModel>
+            <DropdownDownscalingModel></DropdownDownscalingModel>
+            <DropdownStartDate></DropdownStartDate>
+            <DropdownAccumDays></DropdownAccumDays>
+            <Slider></Slider>
+          </DateNavigationMenu>
 
-        <DateNavigationMenu>
-          <DropdownStartDate></DropdownStartDate>
-          <DropdownAccumDays></DropdownAccumDays>
-          <Slider></Slider>
-        </DateNavigationMenu>
+          <OnsetVariableSelector />
+        </div>
       </Map>
     </div>
   );

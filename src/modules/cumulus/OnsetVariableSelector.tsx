@@ -25,21 +25,11 @@ const OnsetVariableSelector = () => {
     className: 'map-overlay-legend',
     title: 'Key: accumulated 24h precipitation, mm',
     labelInterval: 5,
+    width: '100%',
   };
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '20px',
-        right: '20px',
-        zIndex: 1000,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        alignItems: 'flex-end',
-      }}
-    >
+    <div>
       <MapLegend key={selectedLayer} {...mapLegendProps} />
     </div>
   );
