@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import type { RootState } from '../../App';
 //import type { HashTable } from './CumulusHashTables';
+import type { RunDatesByCombo } from './modelPaths';
 import { Root } from 'react-dom/client';
 
 interface InitialState {
@@ -13,6 +14,7 @@ interface InitialState {
   selectedEntry: string | null; // lead time in hours eg "024h"
   selectedSubseasonalModel: string | null; // eg "aurora-imerg", "ifs"
   selectedDownscalingModel: string | null; // eg "bilinear", "unet"
+  runDatesByCombo: RunDatesByCombo | null; // discovered once from blob storage
   profileLayerId: string | null;
   //hashTables: HashTable[];
   //latestTimeslot: number | null; // latest as a unix timestamp
@@ -31,6 +33,7 @@ const initialState: InitialState = {
   selectedEntry: '024h',
   selectedSubseasonalModel: 'aurora-imerg',
   selectedDownscalingModel: 'unet',
+  runDatesByCombo: null,
   profileLayerId: null,
   //profileCrrId: null,
   //hashTables: [],
@@ -61,6 +64,9 @@ export const cumulusSlice = createSlice({
     updateSelectedAccumDays: (state, id: PayloadAction<number | null>) => {
       state.selectedAccumDays = id.payload;
     },
+    updateRunDatesByCombo: (state, dates: PayloadAction<RunDatesByCombo>) => {
+      state.runDatesByCombo = dates.payload;
+    },
     updateChosenStyle: (state, newStyle: PayloadAction<string>) => {
       state.chosenStyle = newStyle.payload;
     },
@@ -87,10 +93,13 @@ export const {
   //updateHashTables,
   updateProfileLayerId,
   updateChosenStyle,
+  updateRunDatesByCombo,
   updateSelectedSubseasonalModel,
   updateSelectedDownscalingModel,
 } = cumulusSlice.actions;
 
+export const selectRunDatesByCombo = (state: RootState) =>
+  state.cumulus.runDatesByCombo;
 export const selectSelectedSubseasonalModel = (state: RootState) =>
   state.cumulus.selectedSubseasonalModel;
 export const selectSelectedDownscalingModel = (state: RootState) =>

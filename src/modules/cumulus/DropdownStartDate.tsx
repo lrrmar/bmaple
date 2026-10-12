@@ -1,73 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import './Dropdown.css';
-import { updateSelectedDayOfYear } from './cumulusSlice';
 import {
-  dateDisplayString,
-  timestampAsUrlParamString,
-} from './dateFormatHelpers';
+  selectBaseUrl,
+  selectRunDatesByCombo,
+  selectSelectedDayOfYear,
+  selectSelectedDownscalingModel,
+  selectSelectedSubseasonalModel,
+  updateRunDatesByCombo,
+  updateSelectedDayOfYear,
+} from './cumulusSlice';
+import { dateDisplayString } from './dateFormatHelpers';
+import { discoverRunDates, findModelEntry } from './modelPaths';
 
 const DropdownStartDate = () => {
   const dispatch = useDispatch();
+  const baseUrl = useSelector(selectBaseUrl);
+  const runDatesByCombo = useSelector(selectRunDatesByCombo);
+  const selectedDate = useSelector(selectSelectedDayOfYear);
+  const subseasonalModel = useSelector(selectSelectedSubseasonalModel);
+  const downscalingModel = useSelector(selectSelectedDownscalingModel);
 
-  const [dateOptions, setDateOptions] = useState<
-    { value: number; label: string }[]
-  >([]);
-  const [selectedDate, setSelectedDate] = useState<string>();
-
+  // Discover available run dates once; later model changes use the cached result
   useEffect(() => {
-    /* Initial date setup */
-
-    /* Array of selectable start dates */
-    const startDates: Date[] = [];
-    startDates.push(new Date('2026-10-03'));
-    startDates.push(new Date('2026-10-05'));
-    startDates.push(new Date('2026-10-07'));
-    startDates.push(new Date('2026-10-09'));
-
-    const options = startDates.map((date) => {
-      const timestamp = date.getTime();
-      return {
-        value: timestamp,
-        label: dateDisplayString(timestamp),
-      };
-    });
-
-    setDateOptions(options);
-
-    // convert date to yyyy-mm-dd string
-    //const initialDate = new Date(options[0].value);
-    //const yyyy = initialDate.getFullYear();
-    //const mm = String(initialDate.getMonth() + 1).padStart(2, '0');
-    //const dd = String(initialDate.getDate()).padStart(2, '0');
-    //setSelectedDate(`${yyyy}-${mm}-${dd}`);
-    //setSelectedDate('2026-09-11');
+    discoverRunDates(baseUrl)
+      .then((dates) => dispatch(updateRunDatesByCombo(dates)))
+      .catch((error) =>
+        console.error('Failed to discover model run dates:', error),
+      );
   }, []);
 
-  const handleDateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const ts = parseInt(event.target.value, 10);
+  const comboName = findModelEntry(
+    subseasonalModel,
+    downscalingModel,
+  )?.combination_name;
+  const dates = (comboName && runDatesByCombo?.[comboName]) || [];
 
-    console.log('timestamp selected: ' + ts);
-    // convert date to yyyy-mm-dd string
-    const initialDate = new Date(ts);
-    const yyyy = initialDate.getFullYear();
-    const mm = String(initialDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(initialDate.getDate()).padStart(2, '0');
-
-    console.log('selected date string: ' + `${yyyy}-${mm}-${dd}`);
-    setSelectedDate(`${yyyy}-${mm}-${dd}`);
-  };
-
-  // Handle changes to date selection
+  // Keep the selected date valid for the chosen model combination
   useEffect(() => {
-    console.log('selectedDate:' + selectedDate);
-
-    if (!selectedDate) {
+    if (dates.length === 0 || (selectedDate && dates.includes(selectedDate))) {
       return;
     }
-
-    dispatch(updateSelectedDayOfYear(selectedDate));
-  }, [selectedDate]);
+    dispatch(updateSelectedDayOfYear(dates[0]));
+  }, [dates, selectedDate]);
 
   return (
     <div className="dropdown-container">
@@ -77,11 +52,17 @@ const DropdownStartDate = () => {
       <select
         id="start-date-dropdown"
         className="dropdown-select"
-        onChange={handleDateChange}
+        value={selectedDate ?? ''}
+        onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+          dispatch(updateSelectedDayOfYear(event.target.value))
+        }
       >
-        {dateOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+        {dates.length === 0 && selectedDate && (
+          <option value={selectedDate}>{selectedDate}</option>
+        )}
+        {dates.map((date) => (
+          <option key={date} value={date}>
+            {dateDisplayString(new Date(`${date}T12:00:00`).getTime())}
           </option>
         ))}
       </select>
