@@ -1,5 +1,25 @@
 [
     {
+        "combination_name": "ifs_coarse",
+        "subseasonal_model_name": "ifs",
+        "downscaled_model_name": "none",
+        "output_relative_path": "live_coarse_png/ifs/[run_date]/cf/total_precipitation_24h_acc/"
+    },
+    {
+        "combination_name": "aurora-era5_coarse",
+        "subseasonal_model_name": "aurora",
+        "subseasonal_model_head": "era5",
+        "downscaled_model_name": "none",
+        "output_relative_path": "live_coarse_png/aurora/[run_date]/cf/total_precipitation_24h_acc_era5/"
+    },
+    {
+        "combination_name": "aurora-imerg_coarse",
+        "subseasonal_model_name": "aurora",
+        "subseasonal_model_head": "imerg",
+        "downscaled_model_name": "none",
+        "output_relative_path": "live_coarse_png/aurora/[run_date]/cf/total_precipitation_24h_acc_imerg/"
+    },
+    {
         "combination_name": "aurora-era5_bilinear",
         "subseasonal_model_name": "aurora",
         "subseasonal_model_head": "era5",

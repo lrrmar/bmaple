@@ -46,8 +46,8 @@ export type RunDatesByCombo = Record<string, string[]>;
 
 const DATE_FOLDER = /^\d{4}-\d{2}-\d{2}$/;
 
-// Splits eg https://acct.blob.core.windows.net/data/live_downscaled_png into
-// the container URL and the prefix path inside the container.
+// Splits eg https://acct.blob.core.windows.net/data into the container URL
+// and any prefix path inside the container (empty when baseUrl is the container).
 const splitBaseUrl = (baseUrl: string) => {
   const url = new URL(baseUrl);
   const [container, ...rest] = url.pathname.split('/').filter(Boolean);
@@ -85,24 +85,26 @@ const listBlobs = async (
 };
 
 /* Discovers which run dates exist in blob storage for every model combination.
- * Lists the run date folders under each subseasonal model, then checks each
- * date actually contains the combination's output path. */
+ * Output paths are relative to the container and contain [run_date], e.g.
+ * live_coarse_png/ifs/[run_date]/cf/... . Lists the run date folders in front
+ * of [run_date], then checks each date actually contains the rest of the
+ * combination's output path. */
 export const discoverRunDates = async (
   baseUrl: string,
 ): Promise<RunDatesByCombo> => {
   const { containerUrl, prefix } = splitBaseUrl(baseUrl);
   const root = prefix ? `${prefix}/` : '';
 
-  const modelNames = Array.from(
-    new Set(entries.map((m) => m.subseasonal_model_name)),
-  );
-  const datesByModel: Record<string, string[]> = {};
+  const parentOf = (m: ModelEntry) =>
+    m.output_relative_path.split('[run_date]')[0];
+
+  const datesByParent: Record<string, string[]> = {};
   await Promise.all(
-    modelNames.map(async (name) => {
-      const { prefixes } = await listBlobs(containerUrl, `${root}${name}/`, {
+    Array.from(new Set(entries.map(parentOf))).map(async (parent) => {
+      const { prefixes } = await listBlobs(containerUrl, `${root}${parent}`, {
         delimiter: '/',
       });
-      datesByModel[name] = prefixes
+      datesByParent[parent] = prefixes
         .map((p) => p.split('/').filter(Boolean).pop() ?? '')
         .filter((d) => DATE_FOLDER.test(d));
     }),
@@ -111,7 +113,7 @@ export const discoverRunDates = async (
   const result: RunDatesByCombo = {};
   await Promise.all(
     entries.map(async (m) => {
-      const candidates = datesByModel[m.subseasonal_model_name] ?? [];
+      const candidates = datesByParent[parentOf(m)] ?? [];
       const checks = await Promise.all(
         candidates.map(async (date) => {
           const path = m.output_relative_path
@@ -133,3 +135,7 @@ export const discoverRunDates = async (
   );
   return result;
 };
+
+// Models with no downscaling are on the coarse grid
+export const isCoarseDownscalingModel = (downscalingModel: string | null) =>
+  downscalingModel === 'none' || downscalingModel === 'coarse';

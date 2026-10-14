@@ -15,6 +15,7 @@ import {
   selectSelectedSubseasonalModel,
   selectSelectedDownscalingModel,
 } from './cumulusSlice';
+import { isCoarseDownscalingModel } from './modelPaths';
 import CumulusSourceLayer from './CumulusSourceLayer';
 import { transformExtent } from 'ol/proj';
 import type { Extent } from 'ol/extent';
@@ -48,11 +49,20 @@ type RunMetadata = {
   files: RunFileEntry[];
 };
 
-const exampleBounds: SpatialBounds = {
-  lat_max: 26,
-  lat_min: -11,
-  lon_max: 57,
-  lon_min: -20,
+// Downscaled files:
+const downscaledBounds: SpatialBounds = {
+  lat_max: 26.05,
+  lat_min: -11.05,
+  lon_max: 57.05,
+  lon_min: -20.05,
+};
+
+// Coarse files:
+const coarseBounds: SpatialBounds = {
+  lat_max: 26.5,
+  lat_min: -11.5,
+  lon_max: 57.5,
+  lon_min: -20.5,
 };
 
 function buildExtent(
@@ -89,7 +99,6 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   //const hashTables: HashTable[] = useSelector(selectHashTables);
   const cumulusBaseUrl = useSelector(selectBaseUrl);
   const [runMeta, setRunMeta] = useState<RunMetadata | null>(null);
-  const [extent, setExtent] = useState<Extent | null>(null);
   const [isLoadingMeta, setIsLoadingMeta] = useState(true);
 
   // Put initial entry into cache
@@ -101,9 +110,6 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
     };
 
     dispatch(request(newRequest));
-
-    const extent = buildExtent(exampleBounds, 'EPSG:4326', 'EPSG:3857');
-    setExtent(extent);
   }, []);
 
   useEffect(() => {
@@ -124,6 +130,7 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
     downscalingModel,
   ]);
 
+  /*
   useEffect(() => {
     if (!runMeta) return;
     const extent = buildExtent(
@@ -157,11 +164,13 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
         setIsLoadingMeta(false);
       }
     }
+    
     // Load metadata when the dayOfYear changes
     console.log('Changed dayOfYear: ' + dayOfYear);
     const metadataUrl = getMetadataUrl(cumulusBaseUrl, dayOfYear);
     //void loadRunMetadata(metadataUrl);
   }, [dayOfYear]);
+  */
 
   /*
   useEffect(() => {
@@ -181,7 +190,20 @@ const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   }, [liRequestId]);
   */
 
+  const downscaledExtent = buildExtent(
+    downscaledBounds,
+    'EPSG:4326',
+    'EPSG:3857',
+  );
+  const coarseExtent = buildExtent(coarseBounds, 'EPSG:4326', 'EPSG:3857');
+
   const sourcesToLoad = Object.keys(cache).map((id) => {
+    // Each layer keeps the extent of its own model combination, taken from
+    // the request id (date?entry?accumDays?subseasonal?downscaling)
+    const layerDownscalingModel = id.split('?')[4] ?? null;
+    const extent = isCoarseDownscalingModel(layerDownscalingModel)
+      ? coarseExtent
+      : downscaledExtent;
     console.log(
       'Loading source with id: ' +
         id +
