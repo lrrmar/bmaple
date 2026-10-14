@@ -5,7 +5,6 @@ interface ModelEntry {
   subseasonal_model_name: string;
   subseasonal_model_head?: string;
   downscaled_model_name: string;
-  input_relative_path: string;
   output_relative_path: string;
 }
 

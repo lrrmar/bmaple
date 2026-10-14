@@ -138,6 +138,7 @@ const CumulusSourceLayer = ({ id, sourceIdentifier, extent }: Props) => {
         url: url,
         imageExtent: extent,
         //projection: display_crs,
+        interpolate: false,
       }),
       opacity: 0.75,
       // Visibility is managed by CumulusGraphic

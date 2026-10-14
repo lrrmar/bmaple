@@ -88,7 +88,7 @@ const Slider = () => {
 
     // Format the selected entry as a lead time string in hours,
     // padded with a leading zero if necessary
-    const strSelected = selectedEntry.toString().padStart(3, '0') + 'h';
+    const strSelected = selectedEntry.toString().padStart(4, '0') + 'h';
 
     setSelectedEntryString('Lead time: +' + strSelected);
 

@@ -26,7 +26,7 @@ interface InitialState {
 const initialState: InitialState = {
   baseUrl:
     process.env.AZURE_CUMULUS_WEB_APP_ML_STORAGE_URL ??
-    'https://cumulusappstorage.blob.core.windows.net/data/live_downscaled_png',
+    'https://cumulusappstorage.blob.core.windows.net/data',
   token: '1VX7KPWpX91kyecHWLafkIYJ-9yL4lsbKfV43t7HrX0',
   selectedOnsetVariable: 'precip_24h',
   selectedDayOfYear: '2026-10-07',
