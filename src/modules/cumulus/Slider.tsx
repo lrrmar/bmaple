@@ -5,6 +5,7 @@ import './Slider.css';
 import {
   //selectHashTables,
   selectSelectedAccumDays,
+  selectSelectedDayOfYear,
   updateSelectedEntry,
 } from './cumulusSlice';
 //import type { HashTable } from './CumulusHashTables';
@@ -28,6 +29,7 @@ const Slider = () => {
 
   const dispatch = useDispatch();
   const accumDays = useSelector(selectSelectedAccumDays) ?? 1;
+  const runDate = useSelector(selectSelectedDayOfYear);
 
   // An N-day accumulation only exists from lead time N*24h, i.e. slot index N-1
   const minSliderValue = Math.min(accumDays, nTimeslots) - 1;
@@ -39,7 +41,18 @@ const Slider = () => {
 
   const [selectedEntry, setSelectedEntry] = useState<number>();
 
-  const [selectedEntryString, setSelectedEntryString] = useState('Lead time:');
+  const forecastDate =
+    runDate && selectedEntry != null
+      ? new Intl.DateTimeFormat('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        }).format(
+          new Date(`${runDate}T00:00:00Z`).getTime() +
+            selectedEntry * 60 * 60 * 1000,
+        )
+      : null;
 
   const [currentSliderValue, setCurrentSliderValue] =
     useState<number>(defaultSliderValue);
@@ -90,8 +103,6 @@ const Slider = () => {
     // padded with a leading zero if necessary
     const strSelected = selectedEntry.toString().padStart(4, '0') + 'h';
 
-    setSelectedEntryString('Lead time: +' + strSelected);
-
     console.log('strSelected:' + strSelected);
     dispatch(updateSelectedEntry(strSelected));
   }, [selectedEntry]);
@@ -105,7 +116,10 @@ const Slider = () => {
       </div>
       <div className="slider">
         <div className="slider-time-label">
-          {selectedEntryString}
+          Forecast date: {forecastDate ?? 'Select a model run date'}
+          {forecastDate &&
+            selectedEntry != null &&
+            ` (+${selectedEntry.toString().padStart(4, '0')}h)`}
           {accumDays > 1 && (
             <span className="slider-hint">
               {accumDays}-day accumulation available from +{accumDays * 24}h
