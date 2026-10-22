@@ -58,3 +58,12 @@ test('updates the forecast date when accumulation clamps the lead time', () => {
     screen.getByText('Forecast date: 01 March 2028 (+0072h)', { exact: false }),
   ).toBeTruthy();
 });
+
+test('keeps the forecast date when the run date moves earlier', () => {
+  const store = setup('2026-10-07');
+  act(() => {
+    store.dispatch(updateSelectedDayOfYear('2026-10-05'));
+  });
+  expect(store.getState().cumulus.selectedEntry).toBe('0072h');
+  expect(store.getState().cumulus.selectedForecastDate).toBe('2026-10-08');
+});

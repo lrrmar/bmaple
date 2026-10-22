@@ -4,13 +4,16 @@ import './Dropdown.css';
 import {
   selectBaseUrl,
   selectRunDatesByCombo,
+  selectSelectedAccumDays,
   selectSelectedDayOfYear,
+  selectSelectedForecastDate,
   selectSelectedDownscalingModel,
   selectSelectedSubseasonalModel,
   updateRunDatesByCombo,
   updateSelectedDayOfYear,
 } from './cumulusSlice';
 import { dateDisplayString } from './dateFormatHelpers';
+import { isDateString, pickRunDate } from './forecastDates';
 import { discoverRunDates, findModelEntry } from './modelPaths';
 
 const DropdownStartDate = () => {
@@ -18,6 +21,8 @@ const DropdownStartDate = () => {
   const baseUrl = useSelector(selectBaseUrl);
   const runDatesByCombo = useSelector(selectRunDatesByCombo);
   const selectedDate = useSelector(selectSelectedDayOfYear);
+  const forecastDate = useSelector(selectSelectedForecastDate);
+  const accumDays = useSelector(selectSelectedAccumDays);
   const subseasonalModel = useSelector(selectSelectedSubseasonalModel);
   const downscalingModel = useSelector(selectSelectedDownscalingModel);
 
@@ -41,7 +46,11 @@ const DropdownStartDate = () => {
     if (dates.length === 0 || (selectedDate && dates.includes(selectedDate))) {
       return;
     }
-    dispatch(updateSelectedDayOfYear(dates[0]));
+    // Keep the forecast date if possible, otherwise get as near to it as we can
+    const best = isDateString(forecastDate)
+      ? pickRunDate(dates, forecastDate, accumDays)
+      : null;
+    dispatch(updateSelectedDayOfYear(best ?? dates[0]));
   }, [dates, selectedDate]);
 
   // dates are newest first: a higher index is an earlier run date
