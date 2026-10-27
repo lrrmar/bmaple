@@ -6,6 +6,7 @@
   background-color: #f5f5f5;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 0;
 }
 
 .dropdown-label {
@@ -68,4 +69,88 @@
 .dropdown-step-button:disabled {
   color: #bbb;
   cursor: default;
+}
+
+.wrapped-dropdown {
+  position: relative;
+}
+
+.wrapped-dropdown .dropdown-label {
+  font-weight: 400;
+  color: #666;
+}
+
+.wrapped-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+}
+
+.wrapped-dropdown-trigger span:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.wrapped-dropdown-trigger,
+.wrapped-dropdown-option,
+.dropdown-readonly {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  font-size: 12px;
+  color: #666;
+}
+
+.dropdown-readonly {
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.wrapped-dropdown-options {
+  position: absolute;
+  top: calc(100% - 8px);
+  left: 8px;
+  right: 8px;
+  z-index: 20;
+  max-height: min(320px, 45vh);
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #888;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.wrapped-dropdown-option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.wrapped-dropdown-option + .wrapped-dropdown-option {
+  border-top: 1px solid #eee;
+}
+
+.wrapped-dropdown-option[aria-selected='true'] {
+  background: #e8f5e9;
+}
+
+.wrapped-dropdown-option:hover,
+.wrapped-dropdown-option:focus {
+  background: #dceddd;
+  outline: 2px solid #4caf50;
+  outline-offset: -2px;
+}
+
+.catalogue-message {
+  color: #333;
+  font-size: 12px;
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
+}
+
+.catalogue-message button {
+  margin-left: 8px;
 }

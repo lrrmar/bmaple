@@ -18,8 +18,6 @@ import cumulusReducer from './modules/cumulus/cumulusSlice';
 import CumulusProfile from './modules/cumulus/CumulusGraphic';
 import CumulusSource from './modules/cumulus/CumulusSource';
 
-import PopUpListener from './modules/cumulus/PopUpListener';
-
 import DateNavigationMenu from './modules/cumulus/DateNavigationMenu';
 import Slider from './modules/cumulus/Slider';
 import DropdownStartDate from './modules/cumulus/DropdownStartDate';
@@ -27,9 +25,11 @@ import DropdownAccumDays from './modules/cumulus/DropdownAccumDays';
 import {
   DropdownSubseasonalModel,
   DropdownDownscalingModel,
+  DropdownDatasetConfiguration,
+  CatalogueStatus,
 } from './modules/cumulus/DropdownModels';
 import OpacitySlider from './modules/cumulus/OpacitySlider';
-import OnsetVariableSelector from './modules/cumulus/OnsetVariableSelector';
+import PrecipitationLegend from './modules/cumulus/PrecipitationLegend';
 
 export const store = configureStore({
   reducer: {
@@ -65,20 +65,20 @@ const App = () => {
           <OSMBaseMap id={'OSM'} />
         </BaseMaps>
 
-        <PopUpListener cache={{}} sourceIdentifier={'cumulus'} />
-
         <div className="cumulus-controls-stack">
           <DateNavigationMenu>
+            <CatalogueStatus />
             <DropdownSubseasonalModel></DropdownSubseasonalModel>
             <DropdownDownscalingModel></DropdownDownscalingModel>
             <DropdownStartDate></DropdownStartDate>
+            <DropdownDatasetConfiguration />
             <DropdownAccumDays></DropdownAccumDays>
             <Slider></Slider>
             <OpacitySlider></OpacitySlider>
           </DateNavigationMenu>
         </div>
 
-        <OnsetVariableSelector />
+        <PrecipitationLegend />
       </Map>
     </div>
   );

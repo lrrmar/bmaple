@@ -5,7 +5,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import Slider from './Slider';
 import cumulusReducer, {
   updateSelectedAccumDays,
-  updateSelectedDayOfYear,
+  updateSelectedModelRunDate,
 } from './cumulusSlice';
 
 jest.mock('react-slider', () => ({
@@ -17,7 +17,7 @@ jest.mock('react-slider', () => ({
 
 const setup = (runDate: string) => {
   const store = configureStore({ reducer: { cumulus: cumulusReducer } });
-  store.dispatch(updateSelectedDayOfYear(runDate));
+  store.dispatch(updateSelectedModelRunDate(runDate));
   render(
     <Provider store={store}>
       <Slider />
@@ -33,7 +33,7 @@ test('shows the forecast date and updates it when the run date changes', () => {
   ).toBeTruthy();
 
   act(() => {
-    store.dispatch(updateSelectedDayOfYear('2026-10-09'));
+    store.dispatch(updateSelectedModelRunDate('2026-10-09'));
   });
   expect(
     screen.getByText('Forecast date: 10 October 2026 (+0024h)'),
@@ -46,7 +46,7 @@ test('adds the selected lead time across a year boundary', () => {
   expect(
     screen.getByText('Forecast date: 02 January 2027 (+0072h)'),
   ).toBeTruthy();
-  expect(store.getState().cumulus.selectedEntry).toBe('0072h');
+  expect(store.getState().cumulus.selectedLeadTime).toBe('0072h');
 });
 
 test('updates the forecast date when accumulation clamps the lead time', () => {
@@ -62,8 +62,8 @@ test('updates the forecast date when accumulation clamps the lead time', () => {
 test('keeps the forecast date when the run date moves earlier', () => {
   const store = setup('2026-10-07');
   act(() => {
-    store.dispatch(updateSelectedDayOfYear('2026-10-05'));
+    store.dispatch(updateSelectedModelRunDate('2026-10-05'));
   });
-  expect(store.getState().cumulus.selectedEntry).toBe('0072h');
+  expect(store.getState().cumulus.selectedLeadTime).toBe('0072h');
   expect(store.getState().cumulus.selectedForecastDate).toBe('2026-10-08');
 });

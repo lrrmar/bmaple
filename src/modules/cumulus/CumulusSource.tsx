@@ -1,84 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import mapReducer, { mapSlice } from '../../mapping/mapSlice';
+import React, { useEffect } from 'react';
+
 import {
   useAppDispatch as useDispatch,
   useAppSelector as useSelector,
 } from '../../hooks';
-import { request, Request, selectCache, Cache } from '../../mapping/cacheSlice';
+import { request, Cache } from '../../mapping/cacheSlice';
+
 import {
-  selectSelectedOnsetVariable,
-  selectSelectedDayOfYear,
   selectSelectedAccumDays,
-  selectSelectedEntry,
+  selectSelectedLeadTime,
   updateProfileLayerId,
   selectBaseUrl,
-  selectSelectedSubseasonalModel,
-  selectSelectedDownscalingModel,
+  selectCatalogueStatus,
+  selectDatasetMatch,
+  selectProfileLayerId,
 } from './cumulusSlice';
-import { isCoarseDownscalingModel } from './modelPaths';
+import { buildPngUrl } from './catalogue';
 import CumulusSourceLayer from './CumulusSourceLayer';
-import { transformExtent } from 'ol/proj';
-import type { Extent } from 'ol/extent';
-
-type RunFileEntry = {
-  input_nc: string;
-  output_png: string;
-  init_time: string | null;
-  valid_time: string | null;
-  lead_time_hours: number | null;
-};
-
-type SpatialBounds = {
-  lat_min: number;
-  lat_max: number;
-  lon_min: number;
-  lon_max: number;
-};
-
-type RunMetadata = {
-  input_model_root: string;
-  output_model_root: string;
-  data_crs: 'EPSG:4326';
-  display_crs: 'EPSG:3857';
-  spatial_bounds: SpatialBounds;
-  rendering: {
-    variable: string;
-    bins_mm: string[];
-    colors: string[];
-  };
-  files: RunFileEntry[];
-};
-
-// Downscaled files:
-const downscaledBounds: SpatialBounds = {
-  lat_max: 26.05,
-  lat_min: -11.05,
-  lon_max: 57.05,
-  lon_min: -20.05,
-};
-
-// Coarse files:
-const coarseBounds: SpatialBounds = {
-  lat_max: 26.5,
-  lat_min: -11.5,
-  lon_max: 57.5,
-  lon_min: -20.5,
-};
-
-function buildExtent(
-  bounds: SpatialBounds,
-  data_crs: string,
-  display_crs: string,
-) {
-  const extent4326: [number, number, number, number] = [
-    bounds.lon_min,
-    bounds.lat_min,
-    bounds.lon_max,
-    bounds.lat_max,
-  ];
-
-  return transformExtent(extent4326, data_crs, display_crs);
-}
 
 interface Props {
   sourceIdentifier: string;
@@ -87,142 +25,64 @@ interface Props {
 
 const CumulusSource = ({ sourceIdentifier, cache }: Props) => {
   const dispatch = useDispatch();
-  const onsetVariable = useSelector(selectSelectedOnsetVariable);
-  const dayOfYear: string | null = useSelector(selectSelectedDayOfYear);
-  const accumDays: number | null = useSelector(selectSelectedAccumDays);
-  const entry: string | null = useSelector(selectSelectedEntry);
-  const subseasonalModel = useSelector(selectSelectedSubseasonalModel);
-  const downscalingModel = useSelector(selectSelectedDownscalingModel);
-  const buildRequestId = () =>
-    [dayOfYear, entry, accumDays, subseasonalModel, downscalingModel].join('?');
-  //const liRequestId: string | null = useSelector(selectSelectedLightningId);
-  //const hashTables: HashTable[] = useSelector(selectHashTables);
-  const cumulusBaseUrl = useSelector(selectBaseUrl);
-  const [runMeta, setRunMeta] = useState<RunMetadata | null>(null);
-  const [isLoadingMeta, setIsLoadingMeta] = useState(true);
-
-  // Put initial entry into cache
-  useEffect(() => {
-    const requestId = buildRequestId();
-    const newRequest = {
-      id: requestId,
-      source: 'cumulus',
-    };
-
-    dispatch(request(newRequest));
-  }, []);
+  const accumDays = useSelector(selectSelectedAccumDays);
+  const entry = useSelector(selectSelectedLeadTime);
+  const baseUrl = useSelector(selectBaseUrl);
+  const status = useSelector(selectCatalogueStatus);
+  const { product } = useSelector(selectDatasetMatch);
+  const profileLayerId = useSelector(selectProfileLayerId);
+  // The full URL identifies a layer, including its variant and checkpoint.
+  const url =
+    status === 'ready' && product && accumDays && entry
+      ? buildPngUrl(baseUrl, product, accumDays, entry)
+      : null;
 
   useEffect(() => {
-    const requestId = buildRequestId();
-    if (requestId && !cache[requestId]) {
-      console.log('CACHE MISS');
-      dispatch(request({ id: requestId, source: 'cumulus' }));
-    } else {
-      console.log('CACHE HIT');
-      dispatch(updateProfileLayerId(requestId));
-    }
-  }, [
-    onsetVariable,
-    dayOfYear,
-    entry,
-    accumDays,
-    subseasonalModel,
-    downscalingModel,
-  ]);
+    if (profileLayerId !== url) dispatch(updateProfileLayerId(url));
+  }, [dispatch, url, profileLayerId]);
 
-  /*
   useEffect(() => {
-    if (!runMeta) return;
-    const extent = buildExtent(
-      runMeta.spatial_bounds,
-      runMeta.data_crs,
-      runMeta.display_crs,
+    if (!url || !product || cache[url]) return;
+    const extent = product.image_extent;
+    dispatch(
+      request({
+        id: url,
+        source: sourceIdentifier,
+        imageExtent: [
+          extent.longitude_min,
+          extent.latitude_min,
+          extent.longitude_max,
+          extent.latitude_max,
+        ],
+        dataCrs: product.data_crs,
+      }),
     );
-    console.log('Built extent from run metadata: ', extent);
-    setExtent(extent);
-  }, [runMeta]);
+  }, [dispatch, url, product, cache, sourceIdentifier]);
 
-  const getMetadataUrl = (storageHost: string, runDate: string | null) => {
-    if (!runDate) {
-      return '';
-    }
-    const host = storageHost.replace(/\/+$/g, '');
-    const path = `${runDate}/model_unet_precip/run_metadata.json`;
-    return `https://${host}/${path}`;
-  };
-
-  useEffect(() => {
-    async function loadRunMetadata(url: string) {
-      console.log('Fetching metadata from URL: ' + url);
-      try {
-        const meta = (await fetch(url).then((r) => r.json())) as RunMetadata;
-        setRunMeta(meta);
-        console.log('Loaded run metadata: ', meta);
-      } catch (error) {
-        console.error('Failed to fetch run metadata:', error);
-      } finally {
-        setIsLoadingMeta(false);
-      }
-    }
-    
-    // Load metadata when the dayOfYear changes
-    console.log('Changed dayOfYear: ' + dayOfYear);
-    const metadataUrl = getMetadataUrl(cumulusBaseUrl, dayOfYear);
-    //void loadRunMetadata(metadataUrl);
-  }, [dayOfYear]);
-  */
-
-  /*
-  useEffect(() => {
-    if (rdtRequestId && !cache[rdtRequestId]) {
-      dispatch(request({ id: rdtRequestId, source: 'fasta' }));
-    } else {
-      dispatch(updateProfileRdtId(rdtRequestId));
-    }
-  }, [rdtRequestId]);
-
-  useEffect(() => {
-    if (liRequestId && !cache[liRequestId]) {
-      dispatch(request({ id: liRequestId, source: 'fasta' }));
-    } else {
-      dispatch(updateProfileLightningId(liRequestId));
-    }
-  }, [liRequestId]);
-  */
-
-  const downscaledExtent = buildExtent(
-    downscaledBounds,
-    'EPSG:4326',
-    'EPSG:3857',
+  return (
+    <div className="CumulusSource">
+      {Object.entries(cache).map(([id, cached]) => {
+        const extent: unknown = cached.imageExtent;
+        if (
+          cached.source !== sourceIdentifier ||
+          !Array.isArray(extent) ||
+          extent.length !== 4 ||
+          !extent.every((value) => typeof value === 'number') ||
+          typeof cached.dataCrs !== 'string'
+        )
+          return null;
+        return (
+          <CumulusSourceLayer
+            key={id}
+            id={id}
+            sourceIdentifier={sourceIdentifier}
+            extent={extent.map(Number)}
+            dataCrs={cached.dataCrs}
+          />
+        );
+      })}
+    </div>
   );
-  const coarseExtent = buildExtent(coarseBounds, 'EPSG:4326', 'EPSG:3857');
-
-  const sourcesToLoad = Object.keys(cache).map((id) => {
-    // Each layer keeps the extent of its own model combination, taken from
-    // the request id (date?entry?accumDays?subseasonal?downscaling)
-    const layerDownscalingModel = id.split('?')[4] ?? null;
-    const extent = isCoarseDownscalingModel(layerDownscalingModel)
-      ? coarseExtent
-      : downscaledExtent;
-    console.log(
-      'Loading source with id: ' +
-        id +
-        ' and extent: ' +
-        JSON.stringify(extent),
-    );
-    return (
-      <CumulusSourceLayer
-        sourceIdentifier={sourceIdentifier}
-        key={id}
-        id={id}
-        extent={extent}
-      />
-    );
-  });
-
-  //const fastaHashTable = FastaHashTablesServer();
-
-  return <div className="CumulusSource">{sourcesToLoad}</div>;
 };
 
 export default CumulusSource;

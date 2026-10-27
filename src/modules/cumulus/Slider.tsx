@@ -4,9 +4,9 @@ import ReactSlider from 'react-slider';
 import './Slider.css';
 import {
   selectSelectedAccumDays,
-  selectSelectedEntry,
+  selectSelectedLeadTime,
   selectSelectedForecastDate,
-  updateSelectedEntry,
+  updateSelectedLeadTime,
 } from './cumulusSlice';
 import {
   formatLeadEntry,
@@ -21,7 +21,7 @@ const Slider = () => {
   const dispatch = useDispatch();
   const accumDays = useSelector(selectSelectedAccumDays) ?? 1;
   const forecastDateValue = useSelector(selectSelectedForecastDate);
-  const leadHours = parseLeadHours(useSelector(selectSelectedEntry));
+  const leadHours = parseLeadHours(useSelector(selectSelectedLeadTime));
 
   // Slider positions are daily lead time slots: index i is lead (i+1)*24h.
   // An N-day accumulation only exists from lead time N*24h.
@@ -64,7 +64,7 @@ const Slider = () => {
               withTracks
               onChange={(value) =>
                 dispatch(
-                  updateSelectedEntry(
+                  updateSelectedLeadTime(
                     formatLeadEntry((value + 1) * HOURS_PER_DAY),
                   ),
                 )

@@ -26,6 +26,8 @@
   /*background-color: rgba(0,0,0,0.8);*/
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 3px;
+  max-height: calc(100dvh - 20px);
+  overflow-y: auto;
 }
 
 /*

@@ -60,11 +60,11 @@ const DropdownAccumDays = () => {
 
   return (
     <div className="dropdown-container">
-      <label htmlFor="start-date-dropdown" className="dropdown-label">
+      <label htmlFor="accumulation-dropdown" className="dropdown-label">
         Accumulation period
       </label>
       <select
-        id="start-date-dropdown"
+        id="accumulation-dropdown"
         className="dropdown-select"
         onChange={handleAccumDayChange}
       >
