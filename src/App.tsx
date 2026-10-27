@@ -27,6 +27,7 @@ import {
   DropdownDownscalingModel,
   DropdownDatasetConfiguration,
   CatalogueStatus,
+  DownscaledToggle,
 } from './modules/cumulus/DropdownModels';
 import OpacitySlider from './modules/cumulus/OpacitySlider';
 import PrecipitationLegend from './modules/cumulus/PrecipitationLegend';
@@ -69,6 +70,7 @@ const App = () => {
           <DateNavigationMenu>
             <CatalogueStatus />
             <DropdownSubseasonalModel></DropdownSubseasonalModel>
+            <DownscaledToggle />
             <DropdownDownscalingModel></DropdownDownscalingModel>
             <DropdownStartDate></DropdownStartDate>
             <DropdownDatasetConfiguration />

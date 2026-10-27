@@ -16,6 +16,11 @@
   margin-bottom: 2px;
 }
 
+.dropdown-label-muted {
+  color: #777;
+  font-weight: 400;
+}
+
 .dropdown-select {
   padding: 8px 12px;
   font-size: 14px;
@@ -39,6 +44,67 @@
 
 .dropdown-select option {
   padding: 8px;
+}
+
+.dropdown-select:disabled {
+  color: #777;
+  background-color: #eee;
+  cursor: default;
+}
+
+.dataset-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+}
+
+.dataset-toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.dataset-toggle-track {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: #777;
+  position: relative;
+}
+
+.dataset-toggle-track::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.15s ease;
+}
+
+.dataset-toggle input:checked + .dataset-toggle-track {
+  background: #276ab3;
+}
+
+.dataset-toggle input:checked + .dataset-toggle-track::after {
+  transform: translateX(16px);
+}
+
+.dataset-toggle input:focus-visible + .dataset-toggle-track {
+  outline: 2px solid #276ab3;
+  outline-offset: 3px;
+}
+
+.dataset-toggle input:disabled + .dataset-toggle-track {
+  opacity: 0.5;
 }
 
 .dropdown-row {

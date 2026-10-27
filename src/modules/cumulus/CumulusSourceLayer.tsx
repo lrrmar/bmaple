@@ -5,9 +5,14 @@ import { getUid } from 'ol/util';
 import { transformExtent } from 'ol/proj';
 import type { Extent } from 'ol/extent';
 
-import { useAppDispatch as useDispatch } from '../../hooks';
+import {
+  useAppDispatch as useDispatch,
+  useAppSelector as useSelector,
+} from '../../hooks';
 import { ingest } from '../../mapping/cacheSlice';
 import openLayersMap from '../../mapping/OpenLayersMap';
+
+import { selectInterpolationEnabled } from './cumulusSlice';
 
 interface Props {
   id: string;
@@ -23,6 +28,7 @@ const CumulusSourceLayer = ({
   dataCrs,
 }: Props) => {
   const dispatch = useDispatch();
+  const interpolationEnabled = useSelector(selectInterpolationEnabled);
   const [lonMin, latMin, lonMax, latMax] = extent;
 
   useEffect(() => {
@@ -33,7 +39,7 @@ const CumulusSourceLayer = ({
         dataCrs,
         'EPSG:3857',
       ),
-      interpolate: false,
+      interpolate: interpolationEnabled,
     });
     source.on('imageloaderror', () => {
       console.error(`Failed to load forecast overlay: ${id}`);
@@ -61,7 +67,17 @@ const CumulusSourceLayer = ({
       layer.dispose();
       source.dispose();
     };
-  }, [dispatch, id, sourceIdentifier, lonMin, latMin, lonMax, latMax, dataCrs]);
+  }, [
+    dispatch,
+    id,
+    sourceIdentifier,
+    lonMin,
+    latMin,
+    lonMax,
+    latMax,
+    dataCrs,
+    interpolationEnabled,
+  ]);
 
   return null;
 };

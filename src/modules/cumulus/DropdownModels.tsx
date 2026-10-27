@@ -11,6 +11,7 @@ import {
   selectCatalogue,
   selectCatalogueError,
   selectCatalogueStatus,
+  selectDownscaledEnabled,
   selectDatasetMatch,
   selectSelectedCheckpoint,
   selectSelectedModelRunDate,
@@ -21,8 +22,9 @@ import {
   updateSelectedDownscalingModel,
   updateSelectedSubseasonalModel,
   updateSelectedVariant,
+  updateDownscaledEnabled,
 } from './cumulusSlice';
-import { downscalingKey, subseasonalKey, unique } from './catalogue';
+import { matchesModelSelection, subseasonalKey, unique } from './catalogue';
 import WrappedDropdown from './WrappedDropdown';
 
 export const CatalogueStatus = () => {
@@ -71,6 +73,7 @@ interface ModelDropdownProps {
   options: string[];
   value: string | null;
   onSelect: (value: string) => void;
+  disabled?: boolean;
 }
 
 const ModelDropdown = ({
@@ -79,22 +82,26 @@ const ModelDropdown = ({
   options,
   value,
   onSelect,
+  disabled = false,
 }: ModelDropdownProps) => (
   <div className="dropdown-container">
-    <label htmlFor={id} className="dropdown-label">
+    <label
+      htmlFor={id}
+      className={`dropdown-label${disabled ? ' dropdown-label-muted' : ''}`}
+    >
       {label}
     </label>
     <select
       id={id}
       className="dropdown-select"
       value={value ?? ''}
-      disabled={options.length === 0}
+      disabled={disabled || options.length === 0}
       onChange={(event) => onSelect(event.target.value)}
     >
       {options.length === 0 && <option value="">No datasets available</option>}
       {options.map((option) => (
         <option key={option} value={option}>
-          {option === 'none' ? 'None (coarse)' : option}
+          {option}
         </option>
       ))}
     </select>
@@ -121,23 +128,58 @@ export const DropdownDownscalingModel = () => {
   const selected = useSelector(selectSelectedDownscalingModel);
   const model = useSelector(selectSelectedSubseasonalModel);
   const catalogue = useSelector(selectCatalogue);
+  const enabled = useSelector(selectDownscaledEnabled);
   const options = unique(
     (catalogue?.products ?? [])
-      .filter((product) => subseasonalKey(product) === model)
-      .map(downscalingKey),
+      .filter(
+        (product) =>
+          subseasonalKey(product) === model &&
+          product.run_type === 'downscaled',
+      )
+      .map((product) => product.downscaled_model),
   )
     .filter((value): value is string => value !== null)
-    .sort((a, b) =>
-      a === b ? 0 : a === 'none' ? 1 : b === 'none' ? -1 : a.localeCompare(b),
-    );
+    .sort();
   return (
     <ModelDropdown
       id="downscaling-model-dropdown"
       label="Downscaling Model"
       options={options}
       value={selected}
+      disabled={!enabled}
       onSelect={(value) => dispatch(updateSelectedDownscalingModel(value))}
     />
+  );
+};
+
+export const DownscaledToggle = () => {
+  const dispatch = useDispatch();
+  const enabled = useSelector(selectDownscaledEnabled);
+  const model = useSelector(selectSelectedSubseasonalModel);
+  const catalogue = useSelector(selectCatalogue);
+  const canSwitch = (catalogue?.products ?? []).some(
+    (product) =>
+      subseasonalKey(product) === model &&
+      product.run_type === (enabled ? 'coarse' : 'downscaled'),
+  );
+  return (
+    <div className="dropdown-container">
+      <label className="dataset-toggle">
+        <span>Coarse</span>
+        <input
+          type="checkbox"
+          role="switch"
+          aria-label="Downscaled"
+          checked={enabled}
+          disabled={!canSwitch}
+          onChange={(event) =>
+            dispatch(updateDownscaledEnabled(event.target.checked))
+          }
+        />
+        <span className="dataset-toggle-track" aria-hidden="true" />
+        <span>Downscaled</span>
+      </label>
+    </div>
   );
 };
 
@@ -149,11 +191,14 @@ export const DropdownDatasetConfiguration = () => {
   const variant = useSelector(selectSelectedVariant);
   const checkpoint = useSelector(selectSelectedCheckpoint);
   const runDate = useSelector(selectSelectedModelRunDate);
+  const downscaledEnabled = useSelector(selectDownscaledEnabled);
   const candidates = (catalogue?.products ?? []).filter(
     (product) =>
-      subseasonalKey(product) === model &&
-      downscalingKey(product) === downscaling &&
-      product.run_date === runDate,
+      matchesModelSelection(product, {
+        selectedSubseasonalModel: model,
+        selectedDownscalingModel: downscaling,
+        downscaledEnabled,
+      }) && product.run_date === runDate,
   );
   const variants = unique(candidates.map((product) => product.variant)).sort();
   const checkpoints = unique(
@@ -166,7 +211,7 @@ export const DropdownDatasetConfiguration = () => {
 
   return (
     <>
-      {downscaling !== 'none' && variants.some((value) => value !== null) && (
+      {downscaledEnabled && variants.some((value) => value !== null) && (
         <WrappedDropdown
           key={`variant-${model}-${downscaling}-${runDate}`}
           id="downscaling-variant"
@@ -181,7 +226,7 @@ export const DropdownDatasetConfiguration = () => {
           key={`checkpoint-${model}-${downscaling}-${runDate}-${variant}`}
           id="model-checkpoint"
           label={
-            downscaling !== 'none'
+            downscaledEnabled
               ? 'Downscaling checkpoint'
               : candidates[0]?.forecast_model === 'aurora'
                 ? 'Aurora checkpoint'

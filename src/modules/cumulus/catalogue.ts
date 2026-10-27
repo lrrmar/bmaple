@@ -25,6 +25,7 @@ export interface Catalogue {
 }
 
 export interface DatasetSelection {
+  downscaledEnabled: boolean;
   selectedSubseasonalModel: string | null;
   selectedDownscalingModel: string | null;
   selectedVariant: string | null;
@@ -109,10 +110,22 @@ export const subseasonalKey = (product: CatalogueProduct) =>
     ? `${product.forecast_model}-${product.subseasonal_model_head}`
     : product.forecast_model;
 
-export const downscalingKey = (product: CatalogueProduct) =>
-  product.run_type === 'coarse' ? 'none' : product.downscaled_model;
-
 export const unique = <T>(values: T[]): T[] => Array.from(new Set(values));
+
+type ModelSelection = Pick<
+  DatasetSelection,
+  'selectedSubseasonalModel' | 'selectedDownscalingModel' | 'downscaledEnabled'
+>;
+
+export const matchesModelSelection = (
+  product: CatalogueProduct,
+  selection: ModelSelection,
+) =>
+  subseasonalKey(product) === selection.selectedSubseasonalModel &&
+  (selection.downscaledEnabled
+    ? product.run_type === 'downscaled' &&
+      product.downscaled_model === selection.selectedDownscalingModel
+    : product.run_type === 'coarse');
 
 export const matchingProducts = (
   products: CatalogueProduct[],
@@ -120,26 +133,18 @@ export const matchingProducts = (
 ) =>
   products.filter(
     (product) =>
-      subseasonalKey(product) === selection.selectedSubseasonalModel &&
-      downscalingKey(product) === selection.selectedDownscalingModel &&
+      matchesModelSelection(product, selection) &&
       product.variant === selection.selectedVariant &&
       product.checkpoint === selection.selectedCheckpoint,
   );
 
 export const availableRunDates = (
   products: CatalogueProduct[],
-  selection: Pick<
-    DatasetSelection,
-    'selectedSubseasonalModel' | 'selectedDownscalingModel'
-  >,
+  selection: ModelSelection,
 ) =>
   unique(
     products
-      .filter(
-        (product) =>
-          subseasonalKey(product) === selection.selectedSubseasonalModel &&
-          downscalingKey(product) === selection.selectedDownscalingModel,
-      )
+      .filter((product) => matchesModelSelection(product, selection))
       .map((product) => product.run_date),
   )
     .sort()

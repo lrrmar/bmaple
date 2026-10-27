@@ -11,7 +11,7 @@ import type { RootState } from '../../App';
 import {
   Catalogue,
   availableRunDates,
-  downscalingKey,
+  matchesModelSelection,
   fetchCatalogue,
   matchingProducts,
   subseasonalKey,
@@ -29,6 +29,7 @@ import {
 } from './forecastDates';
 
 interface InitialState {
+  downscaledEnabled: boolean;
   baseUrl: string;
   token: string;
   selectedModelRunDate: string | null; // start date
@@ -48,9 +49,11 @@ interface InitialState {
   //opacityCRR: number;
   chosenStyle: string;
   overlayOpacity: number; // 0 to 1
+  interpolationEnabled: boolean;
 }
 
 const initialState: InitialState = {
+  downscaledEnabled: true,
   baseUrl:
     process.env.AZURE_CUMULUS_WEB_APP_ML_STORAGE_URL ??
     'https://cumulusappstorage.blob.core.windows.net/data',
@@ -73,6 +76,7 @@ const initialState: InitialState = {
   //opacityCRR: 1,
   chosenStyle: 'rainbow',
   overlayOpacity: 0.75,
+  interpolationEnabled: false,
 };
 
 /* Derives lead time from run date and forecast date, clamping it to the valid
@@ -110,12 +114,25 @@ function reconcileDataset(state: InitialState) {
   candidates = candidates.filter(
     (product) => subseasonalKey(product) === state.selectedSubseasonalModel,
   );
-  const downscaling = unique(candidates.map(downscalingKey)).sort();
-  if (!downscaling.includes(state.selectedDownscalingModel)) {
+  const hasDownscaled = candidates.some(
+    (product) => product.run_type === 'downscaled',
+  );
+  const hasCoarse = candidates.some((product) => product.run_type === 'coarse');
+  if (!hasDownscaled) state.downscaledEnabled = false;
+  else if (!hasCoarse) state.downscaledEnabled = true;
+  const downscaling = unique(
+    candidates
+      .filter((product) => product.run_type === 'downscaled')
+      .map((product) => product.downscaled_model),
+  ).sort();
+  if (
+    downscaling.length > 0 &&
+    !downscaling.includes(state.selectedDownscalingModel)
+  ) {
     state.selectedDownscalingModel = downscaling[0];
   }
-  candidates = candidates.filter(
-    (product) => downscalingKey(product) === state.selectedDownscalingModel,
+  candidates = candidates.filter((product) =>
+    matchesModelSelection(product, state),
   );
   const dates = availableRunDates(candidates, state);
   if (
@@ -163,6 +180,13 @@ export const cumulusSlice = createSlice({
   name: 'cumulus',
   initialState,
   reducers: {
+    updateInterpolationEnabled: (state, enabled: PayloadAction<boolean>) => {
+      state.interpolationEnabled = enabled.payload;
+    },
+    updateDownscaledEnabled: (state, enabled: PayloadAction<boolean>) => {
+      state.downscaledEnabled = enabled.payload;
+      reconcileDataset(state);
+    },
     // Changing the run date keeps the forecast date; the lead time follows
     updateSelectedModelRunDate: (state, id: PayloadAction<string | null>) => {
       state.selectedModelRunDate = id.payload;
@@ -245,6 +269,8 @@ export const cumulusSlice = createSlice({
 });
 
 export const {
+  updateInterpolationEnabled,
+  updateDownscaledEnabled,
   updateSelectedModelRunDate,
   updateSelectedAccumDays,
   updateSelectedLeadTime,
@@ -260,6 +286,10 @@ export const {
 
 export const selectOverlayOpacity = (state: RootState) =>
   state.cumulus.overlayOpacity;
+export const selectInterpolationEnabled = (state: RootState) =>
+  state.cumulus.interpolationEnabled;
+export const selectDownscaledEnabled = (state: RootState) =>
+  state.cumulus.downscaledEnabled;
 export const selectCatalogue = (state: RootState) => state.cumulus.catalogue;
 export const selectCatalogueStatus = (state: RootState) =>
   state.cumulus.catalogueStatus;
@@ -293,11 +323,18 @@ export const selectAvailableRunDates = createSelector(
     selectCatalogue,
     selectSelectedSubseasonalModel,
     selectSelectedDownscalingModel,
+    selectDownscaledEnabled,
   ],
-  (catalogue, selectedSubseasonalModel, selectedDownscalingModel) =>
+  (
+    catalogue,
+    selectedSubseasonalModel,
+    selectedDownscalingModel,
+    downscaledEnabled,
+  ) =>
     availableRunDates(catalogue?.products ?? [], {
       selectedSubseasonalModel,
       selectedDownscalingModel,
+      downscaledEnabled,
     }),
 );
 export const selectDatasetMatch = createSelector(
@@ -308,6 +345,7 @@ export const selectDatasetMatch = createSelector(
     selectSelectedVariant,
     selectSelectedCheckpoint,
     selectSelectedModelRunDate,
+    selectDownscaledEnabled,
   ],
   (
     catalogue,
@@ -316,12 +354,14 @@ export const selectDatasetMatch = createSelector(
     selectedVariant,
     selectedCheckpoint,
     runDate,
+    downscaledEnabled,
   ) => {
     const matches = matchingProducts(catalogue?.products ?? [], {
       selectedSubseasonalModel,
       selectedDownscalingModel,
       selectedVariant,
       selectedCheckpoint,
+      downscaledEnabled,
     }).filter((product) => product.run_date === runDate);
     return {
       product: matches.length === 1 ? matches[0] : null,
