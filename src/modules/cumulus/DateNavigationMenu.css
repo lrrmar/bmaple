@@ -1,13 +1,51 @@
+.ol-map {
+  --cumulus-menu-width: 410px;
+  --cumulus-menu-left: 5px;
+}
+
 .cumulus-controls-stack {
   position: absolute;
   top: 5px;
-  left: 5px;
-  width: 410px;
+  left: var(--cumulus-menu-left);
+  width: var(--cumulus-menu-width);
   max-width: calc(100vw - 20px);
   z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.forecast-controls-anchor {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  padding-left: min(
+    calc(var(--cumulus-menu-width) + var(--cumulus-menu-left)),
+    max(0px, calc(100% - 750px))
+  );
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.forecast-controls-stack {
+  width: 710px;
+  max-width: calc(100vw - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.forecast-slider-panel {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 2px 6px 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .DateNavigationMenu {

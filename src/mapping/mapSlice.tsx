@@ -24,9 +24,9 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  center: [15, 12],
+  center: [0, 0],
   //center: [-3, 54],
-  zoom: 4,
+  zoom: 3.5,
   units: null,
   displayTime: '',
   verticalLevel: '',

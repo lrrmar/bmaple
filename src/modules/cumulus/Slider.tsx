@@ -9,6 +9,7 @@ import {
   updateSelectedLeadTime,
 } from './cumulusSlice';
 import {
+  addHours,
   formatLeadEntry,
   HOURS_PER_DAY,
   isDateString,
@@ -31,14 +32,32 @@ const Slider = () => {
       ? minSliderValue
       : Math.max(minSliderValue, leadHours / HOURS_PER_DAY - 1);
 
-  const forecastDate = isDateString(forecastDateValue)
-    ? new Intl.DateTimeFormat('en-GB', {
+  let forecastDate: string | null = null;
+  if (isDateString(forecastDateValue)) {
+    const end = new Date(`${forecastDateValue}T00:00:00Z`);
+    if (accumDays > 1) {
+      const start = new Date(
+        `${addHours(forecastDateValue, -(accumDays - 1) * HOURS_PER_DAY)}T00:00:00Z`,
+      );
+      const formatter = new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year:
+          start.getUTCFullYear() !== end.getUTCFullYear()
+            ? 'numeric'
+            : undefined,
+        timeZone: 'UTC',
+      });
+      forecastDate = `${formatter.format(start)} - ${formatter.format(end)}`;
+    } else {
+      forecastDate = new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
         timeZone: 'UTC',
-      }).format(new Date(`${forecastDateValue}T00:00:00Z`))
-    : null;
+      }).format(end);
+    }
+  }
 
   return (
     <div className="slider-wrapper">

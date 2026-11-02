@@ -8,6 +8,7 @@ import Profiles from './mapping/Profiles';
 import Sources from './mapping/Sources';
 import BaseMaps from './mapping/BaseMaps';
 import OSMBaseMap from './mapping/OSMBaseMap';
+import ZoomControls from './mapping/ZoomControls';
 import './App.css';
 
 import waypointReducer from './modules/waypoints/waypointSlice';
@@ -75,12 +76,19 @@ const App = () => {
             <DropdownStartDate></DropdownStartDate>
             <DropdownDatasetConfiguration />
             <DropdownAccumDays></DropdownAccumDays>
-            <Slider></Slider>
             <OpacitySlider></OpacitySlider>
           </DateNavigationMenu>
         </div>
 
-        <PrecipitationLegend />
+        <div className="forecast-controls-anchor">
+          <ZoomControls />
+          <div className="forecast-controls-stack">
+            <div className="forecast-slider-panel">
+              <Slider />
+            </div>
+            <PrecipitationLegend />
+          </div>
+        </div>
       </Map>
     </div>
   );
