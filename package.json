@@ -15,6 +15,7 @@
     "@types/openlayers": "^4.6.23",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "fast-png": "^6.4.0",
     "ol": "^9.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
