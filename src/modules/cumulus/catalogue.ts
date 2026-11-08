@@ -9,6 +9,16 @@ export interface CatalogueProduct {
   region: string;
   product: string;
   png_path_template: string;
+  png_mode: 'data';
+  png_encoding: {
+    version: 1;
+    channels: 'RGB';
+    blue: 0;
+    scale_mm: 0.1;
+    offset_mm: 0;
+    nodata_code: 65535;
+    units: 'mm';
+  };
   data_crs: string;
   image_extent: {
     longitude_min: number;
@@ -39,9 +49,22 @@ const isNullableString = (value: unknown) =>
   value === null || typeof value === 'string';
 
 const isProduct = (value: unknown): value is CatalogueProduct => {
-  if (!isRecord(value) || !isRecord(value.image_extent)) return false;
+  if (
+    !isRecord(value) ||
+    !isRecord(value.image_extent) ||
+    !isRecord(value.png_encoding)
+  )
+    return false;
   const extent = value.image_extent;
   return (
+    value.png_mode === 'data' &&
+    value.png_encoding.version === 1 &&
+    value.png_encoding.channels === 'RGB' &&
+    value.png_encoding.blue === 0 &&
+    value.png_encoding.scale_mm === 0.1 &&
+    value.png_encoding.offset_mm === 0 &&
+    value.png_encoding.nodata_code === 65535 &&
+    value.png_encoding.units === 'mm' &&
     ['forecast_model', 'region', 'product', 'data_crs'].every(
       (key) => typeof value[key] === 'string' && value[key] !== '',
     ) &&
@@ -74,7 +97,7 @@ const isProduct = (value: unknown): value is CatalogueProduct => {
 
 export const catalogueRoot = (baseUrl: string) => {
   const root = baseUrl.replace(/\/+$/, '');
-  return root.endsWith('/png') ? root : `${root}/png`;
+  return `${root.replace(/\/pngd?$/, '')}/pngd`;
 };
 
 export const fetchCatalogue = async (
